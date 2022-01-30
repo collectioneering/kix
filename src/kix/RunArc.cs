@@ -183,7 +183,18 @@ internal class RunArc : BRunTool, IRunnable
         }
         else
             foreach (ArtifactToolProfile profile in profiles)
+            {
+                try
+                {
+                    Common.LoadAssemblyForToolString(profile.Tool);
+                }
+                catch (InvalidOperationException e)
+                {
+                    Console.WriteLine(e.Message);
+                    return 69;
+                }
                 await ArtifactDumping.DumpAsync(profile, arm, adm, options, l).ConfigureAwait(false);
+            }
         return 0;
     }
 
