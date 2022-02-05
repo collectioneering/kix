@@ -15,7 +15,7 @@ internal class RunArc : BRunTool, IRunnable
     [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
     public string? Output { get; set; }
 
-    [Option('h', "hash", HelpText = "Checksum algorithm (e.g. SHA1|SHA256|SHA384|SHA512|MD5).", Default = "SHA256")]
+    [Option('h', "hash", HelpText = "Checksum algorithm (e.g. None|SHA1|SHA256|SHA384|SHA512|MD5).", Default = "SHA256")]
     public string Hash { get; set; } = null!;
 
     [Value(0, HelpText = "Profile file.", MetaValue = "file", MetaName = "profileFile", Required = true)]
@@ -49,9 +49,10 @@ internal class RunArc : BRunTool, IRunnable
 
     public async Task<int> RunAsync()
     {
-        if (!ChecksumSource.DefaultSources.ContainsKey(Hash))
+        string? hash = string.Equals(Hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : Hash;
+        if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
         {
-            Console.WriteLine($"Failed to find hash algorithm {Hash}\nKnown algorithms:");
+            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
             foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
                 Console.WriteLine(id);
             return 2;
@@ -61,7 +62,7 @@ internal class RunArc : BRunTool, IRunnable
             Console.WriteLine("Null output mode cannot be used in conjunction with validation mode.");
             return 1234;
         }
-        ArtifactToolDumpOptions options = new(Update, !Full, Skip, Hash);
+        ArtifactToolDumpOptions options = new(Update, !Full, Skip, hash);
         ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
         IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
