@@ -6,11 +6,14 @@ namespace Kix;
 
 public class BRunTool
 {
-    [Option('c', "cookieFile", HelpText = "Cookie file.", MetaValue = "file")] public string? CookieFile { get; set; }
+    [Option('c', "cookieFile", HelpText = "Cookie file.", MetaValue = "file")]
+    public string? CookieFile { get; set; }
 
-    [Option('p', "property", HelpText = "Properties.", MetaValue = "property")] public IReadOnlyCollection<string> Properties { get; set; } = null!;
+    [Option('p', "property", HelpText = "Properties.", MetaValue = "property")]
+    public IReadOnlyCollection<string> Properties { get; set; } = null!;
 
-    [Option("debug", HelpText = "Debug mode.")] public bool Debug { get; set; }
+    [Option("debug", HelpText = "Debug mode.")]
+    public bool Debug { get; set; }
 
     protected async Task<ArtifactTool> GetSearchingToolAsync(ArtifactToolProfile artifactToolProfile, CancellationToken cancellationToken = default)
     {

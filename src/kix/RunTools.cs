@@ -10,9 +10,11 @@ namespace Kix;
 [Verb("tools", HelpText = "List artifact tools.")]
 internal class RunTools : IRunnable
 {
-    [Option('s', "search", HelpText = "Search pattern.", MetaValue = "pattern")] public string? Search { get; set; }
+    [Option('s', "search", HelpText = "Search pattern.", MetaValue = "pattern")]
+    public string? Search { get; set; }
 
-    [Option('v', "verbose", HelpText = "Enable verbose output.")] public bool Verbose { get; set; }
+    [Option('v', "verbose", HelpText = "Enable verbose output.")]
+    public bool Verbose { get; set; }
 
     [Option('d', "detailed", HelpText = "Show detailed information on entries.")]
     public bool Detailed { get; set; }

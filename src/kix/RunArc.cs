@@ -34,12 +34,14 @@ internal class RunArc : BRunTool, IRunnable
         MetaValue = "mode", Default = ResourceUpdateMode.ArtifactHard)]
     public ResourceUpdateMode Update { get; set; }
 
-    [Option('f', "full", HelpText = "Ignore nonfull artifacts.")] public bool Full { get; set; }
+    [Option('f', "full", HelpText = "Ignore nonfull artifacts.")]
+    public bool Full { get; set; }
 
     [Option('s', "skip", HelpText = $"Skip artifacts ([{nameof(ArtifactSkipMode.None)}]|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}).", Default = ArtifactSkipMode.None)]
     public ArtifactSkipMode Skip { get; set; }
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")] public bool Detailed { get; set; }
+    [Option("detailed", HelpText = "Show detailed information on entries.")]
+    public bool Detailed { get; set; }
 
     public async Task<int> RunAsync()
     {

@@ -14,7 +14,8 @@ internal class RunDump : BRunTool, IRunnable
     [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
     public string? Output { get; set; }
 
-    [Option("no-database", HelpText = "Don't use database to track resources.")] public bool NoDatabase { get; set; }
+    [Option("no-database", HelpText = "Don't use database to track resources.")]
+    public bool NoDatabase { get; set; }
 
     [Option('i', "input", HelpText = "Profile file.", MetaValue = "file", Group = "source")]
     public string? ProfileFile { get; set; } = null!;

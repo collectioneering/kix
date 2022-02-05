@@ -9,7 +9,8 @@ internal class RunList : BRunTool, IRunnable
     [Option('i', "input", HelpText = "Profile file.", MetaValue = "file", Group = "source")]
     public string? ProfileFile { get; set; } = null!;
 
-    [Option('l', "list-resource", HelpText = "List associated resources.")] public bool ListResource { get; set; }
+    [Option('l', "list-resource", HelpText = "List associated resources.")]
+    public bool ListResource { get; set; }
 
     [Option('t', "tool", HelpText = "Tool to use or filter profiles by.", MetaValue = "name", Group = "source")]
     public string? Tool { get; set; }
@@ -17,7 +18,8 @@ internal class RunList : BRunTool, IRunnable
     [Option('g', "group", HelpText = "Group to use or filter profiles by.", MetaValue = "name")]
     public string? Group { get; set; } = null!;
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")] public bool Detailed { get; set; }
+    [Option("detailed", HelpText = "Show detailed information on entries.")]
+    public bool Detailed { get; set; }
 
     public async Task<int> RunAsync()
     {
