@@ -2,6 +2,7 @@
 using Art;
 using Art.EF.Sqlite;
 using CommandLine;
+using kix;
 
 namespace Kix;
 
@@ -43,6 +44,9 @@ internal class RunArc : BRunTool, IRunnable
     [Option("detailed", HelpText = "Show detailed information on entries.")]
     public bool Detailed { get; set; }
 
+    [Option("null-output", HelpText = "Send resources to the void.")]
+    public bool NullOutput { get; set; }
+
     public async Task<int> RunAsync()
     {
         if (!ChecksumSource.DefaultSources.ContainsKey(Hash))
@@ -52,9 +56,14 @@ internal class RunArc : BRunTool, IRunnable
                 Console.WriteLine(id);
             return 2;
         }
+        if ((Validate || ValidateOnly) && NullOutput)
+        {
+            Console.WriteLine("Null output mode cannot be used in conjunction with validation mode.");
+            return 1234;
+        }
         ArtifactToolDumpOptions options = new(Update, !Full, Skip, Hash);
         string output = Output ?? Directory.GetCurrentDirectory();
-        ArtifactDataManager adm = new DiskArtifactDataManager(output);
+        ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(output);
         using SqliteArtifactRegistrationManager arm = new(Database);
         IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
         List<ArtifactToolProfile> profiles = new();
