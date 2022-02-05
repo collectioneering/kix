@@ -62,8 +62,7 @@ internal class RunArc : BRunTool, IRunnable
             return 1234;
         }
         ArtifactToolDumpOptions options = new(Update, !Full, Skip, Hash);
-        string output = Output ?? Directory.GetCurrentDirectory();
-        ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(output);
+        ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
         IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
         List<ArtifactToolProfile> profiles = new();
