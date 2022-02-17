@@ -7,7 +7,7 @@ namespace Kix;
 [Verb("db-delete", HelpText = "Delete archives in database.")]
 internal class RunDbDelete : RunDbBase, IRunnable
 {
-    [Option("list", HelpText = "List items.", Group = "action")]
+    [Option("list", HelpText = "List items.")]
     public bool List { get; set; }
 
     [Option("do-delete", HelpText = "Perform actual delete.")]
