@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art" Version="0.38.0-preview.1" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.38.0-preview.1" />
+    <PackageReference Include="Art" Version="0.38.0-preview.2" />
+    <PackageReference Include="Art.EF.Sqlite" Version="0.38.0-preview.2" />
     <PackageReference Include="EA" Version="1.0.0" />
     <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
   </ItemGroup>
