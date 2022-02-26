@@ -1,6 +1,6 @@
 using Art;
+using Art.Management;
 using CommandLine;
-using kix;
 
 namespace Kix;
 

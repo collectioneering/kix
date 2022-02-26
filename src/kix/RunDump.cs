@@ -1,7 +1,9 @@
 ﻿using Art;
 using Art.EF.Sqlite;
+using Art.Logging;
+using Art.Management;
+using Art.Proxies;
 using CommandLine;
-using kix;
 
 namespace Kix;
 

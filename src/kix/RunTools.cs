@@ -3,7 +3,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Art;
 using CommandLine;
-using kix;
 
 namespace Kix;
 

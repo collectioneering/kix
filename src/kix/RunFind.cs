@@ -1,4 +1,5 @@
 ﻿using Art;
+using Art.Proxies;
 using CommandLine;
 
 namespace Kix;

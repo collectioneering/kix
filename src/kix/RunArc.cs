@@ -1,8 +1,12 @@
 ﻿using System.Security.Cryptography;
 using Art;
+using Art.Crypto;
 using Art.EF.Sqlite;
+using Art.Logging;
+using Art.Management;
+using Art.Proxies;
+using Art.Resources;
 using CommandLine;
-using kix;
 
 namespace Kix;
 
@@ -158,7 +162,7 @@ internal class RunArc : BRunTool, IRunnable
                 }
                 if (!ArtifactToolLoader.TryLoad(artifactToolProfile, out ArtifactTool? t))
                     throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
-                ArtifactToolConfig config = new(arm, adm, FailureBypassFlags.None);
+                ArtifactToolConfig config = new(arm, adm, FailureFlags.None);
                 using ArtifactTool tool = t;
                 tool.DebugMode = Debug;
                 artifactToolProfile = artifactToolProfile.WithCoreTool(t);

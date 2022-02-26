@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace kix;
+namespace Kix;
 
 internal record KixManifest(string BasePath, KixManifestContent Content)
 {
