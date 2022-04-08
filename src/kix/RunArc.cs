@@ -45,6 +45,9 @@ internal class RunArc : BRunTool, IRunnable
     [Option('s', "skip", HelpText = $"Skip artifacts ([{nameof(ArtifactSkipMode.None)}]|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}).", Default = ArtifactSkipMode.None)]
     public ArtifactSkipMode Skip { get; set; }
 
+    [Option('z', "fast-exit", HelpText = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.")]
+    public bool FastExit { get; set; }
+
     [Option("detailed", HelpText = "Show detailed information on entries.")]
     public bool Detailed { get; set; }
 
@@ -66,7 +69,7 @@ internal class RunArc : BRunTool, IRunnable
             Console.WriteLine("Null output mode cannot be used in conjunction with validation mode.");
             return 1234;
         }
-        ArtifactToolDumpOptions options = new(Update, !Full, Skip, hash);
+        ArtifactToolDumpOptions options = new(Update, !Full, FastExit ? ArtifactSkipMode.FastExit : Skip, hash);
         ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
         IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
