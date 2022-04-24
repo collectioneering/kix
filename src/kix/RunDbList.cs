@@ -32,7 +32,7 @@ internal class RunDbList : RunDbBase, IRunnable
             if (Augment != null)
             {
                 await using FileStream afs = File.OpenRead(Augment);
-                var augmentProfiles = ArtifactToolProfile.DeserializeProfiles(afs);
+                var augmentProfiles = ArtifactToolProfile.DeserializeProfiles(afs, JsonOpt.Options);
                 Dictionary<(string Tool, string Group), ArtifactToolProfile> adict = augmentProfiles.ToDictionary(x => (x.Tool, x.Group), x => x);
                 foreach (((string? tool, string? group), List<string> value) in dict)
                     adict[(tool, group)] = adict.TryGetValue((tool, group), out ArtifactToolProfile? aprofile)

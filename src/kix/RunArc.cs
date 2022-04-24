@@ -75,7 +75,7 @@ internal class RunArc : BRunTool, IRunnable
         IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in ProfileFiles)
-            profiles.AddRange(ArtifactToolProfile.DeserializeProfilesFromFile(profileFile));
+            profiles.AddRange(ArtifactToolProfile.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
         if (Validate || ValidateOnly)
         {

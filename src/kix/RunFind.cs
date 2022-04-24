@@ -34,7 +34,7 @@ internal class RunFind : BRunTool, IRunnable
             return await ExecAsync(profile);
         }
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfile.DeserializeProfilesFromFile(ProfileFile))
+        foreach (ArtifactToolProfile profile in ArtifactToolProfile.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
         {
             if (Group != null && Group != profile.Group || Tool != null && Tool != profile.Tool) continue;
             ec = Math.Max(await ExecAsync(profile), ec);
