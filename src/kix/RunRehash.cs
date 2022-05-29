@@ -11,7 +11,7 @@ namespace Kix;
 [Verb("rehash", HelpText = "Recompute hashes for archive contents.")]
 internal class RunRehash : IRunnable
 {
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = "kix_data.db")]
+    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
     public string Database { get; set; } = null!;
 
     [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]

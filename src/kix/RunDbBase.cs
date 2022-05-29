@@ -4,7 +4,7 @@ namespace Kix;
 
 internal class RunDbBase
 {
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = "kix_data.db")]
+    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
     public string Database { get; set; } = null!;
 
     [Option('t', "tool", HelpText = "Tool to filter by.", MetaValue = "pattern")]

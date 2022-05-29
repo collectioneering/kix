@@ -49,7 +49,7 @@ internal class RunList : BRunTool, IRunnable
         }
         using var tool = t;
         ArtifactToolListOptions options = new();
-        ArtifactToolListProxy proxy = new(tool, options, OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default);
+        ArtifactToolListProxy proxy = new(tool, options, Common.GetDefaultToolLogHandler());
         await foreach (ArtifactData data in proxy.ListAsync())
             if (ListResource)
                 await Common.DisplayAsync(data.Info, data.Values, Detailed);

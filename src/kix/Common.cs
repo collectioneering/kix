@@ -2,6 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Art;
+using Art.Logging;
 using Art.Management;
 using Art.Resources;
 using EA;
@@ -10,6 +11,10 @@ namespace Kix;
 
 internal static class Common
 {
+    internal const string DefaultDbFile = "kix_data.db";
+
+    internal static IToolLogHandler GetDefaultToolLogHandler() => OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
+
     internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, ArtifactRegistrationManager arm, bool detailed)
     {
         Display(i, detailed);

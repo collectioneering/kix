@@ -11,7 +11,7 @@ namespace Kix;
 [Verb("arc", HelpText = "Execute archival artifact tools.")]
 internal class RunArc : BRunTool, IRunnable
 {
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = "kix_data.db")]
+    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
     public string Database { get; set; } = null!;
 
     [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
@@ -22,15 +22,6 @@ internal class RunArc : BRunTool, IRunnable
 
     [Value(0, HelpText = "Profile file.", MetaValue = "file", MetaName = "profileFile", Required = true)]
     public IReadOnlyCollection<string> ProfileFiles { get; set; } = null!;
-
-    [Option("validate", HelpText = "Validate resources with known checksums and re-obtain with provided profiles.")]
-    public bool Validate { get; set; }
-
-    [Option("validate-only", HelpText = "Validate resources with known checksums but do not re-obtain.")]
-    public bool ValidateOnly { get; set; }
-
-    [Option("add-checksum", HelpText = "Add checksum to resources without checksum during validation.")]
-    public bool AddChecksum { get; set; }
 
     [Option('u', "update",
         HelpText = $"Resource update mode ({nameof(ResourceUpdateMode.ArtifactSoft)}|[{nameof(ResourceUpdateMode.ArtifactHard)}]|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}).",
@@ -46,9 +37,6 @@ internal class RunArc : BRunTool, IRunnable
     [Option('z', "fast-exit", HelpText = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.")]
     public bool FastExit { get; set; }
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
-
     [Option("null-output", HelpText = "Send resources to the void.")]
     public bool NullOutput { get; set; }
 
@@ -62,52 +50,27 @@ internal class RunArc : BRunTool, IRunnable
                 Console.WriteLine(id);
             return 2;
         }
-        if ((Validate || ValidateOnly) && NullOutput)
-        {
-            Console.WriteLine("Null output mode cannot be used in conjunction with validation mode.");
-            return 1234;
-        }
         ArtifactToolDumpOptions options = new(Update, !Full, FastExit ? ArtifactSkipMode.FastExit : Skip, hash);
         ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
-        IToolLogHandler l = OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
+        IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in ProfileFiles)
             profiles.AddRange(ArtifactToolProfile.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
-        if (Validate || ValidateOnly)
+        foreach (ArtifactToolProfile profile in profiles)
         {
-            var validationContext = new ValidationContext(arm, adm, Debug, AddChecksum, l);
-            await validationContext.ProcessAsync(profiles);
-            if (!validationContext.AnyFailed)
+            try
             {
-                l.Log("All resources for specified profiles successfully validated.", null, LogLevel.Information);
-                return 0;
+                Common.LoadAssemblyForToolString(profile.Tool);
             }
-            int resourceFailCount = validationContext.CountResourceFailures();
-            if (ValidateOnly)
+            catch (InvalidOperationException e)
             {
-                l.Log($"{resourceFailCount} resources failed to validate.", null, LogLevel.Information);
-                return 1;
+                Console.WriteLine(e.Message);
+                return 69;
             }
-            l.Log($"{resourceFailCount} resources failed to validate and will be reacquired.", null, LogLevel.Information);
-            var repairContext = validationContext.CreateRepairContext();
-            await repairContext.RepairAsync(profiles, Detailed, Hash);
+            await ArtifactDumping.DumpAsync(profile, arm, adm, options, l).ConfigureAwait(false);
         }
-        else
-            foreach (ArtifactToolProfile profile in profiles)
-            {
-                try
-                {
-                    Common.LoadAssemblyForToolString(profile.Tool);
-                }
-                catch (InvalidOperationException e)
-                {
-                    Console.WriteLine(e.Message);
-                    return 69;
-                }
-                await ArtifactDumping.DumpAsync(profile, arm, adm, options, l).ConfigureAwait(false);
-            }
         return 0;
     }
 }

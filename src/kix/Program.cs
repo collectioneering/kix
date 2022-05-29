@@ -13,7 +13,7 @@ internal static class Program
             v.HelpWriter = Console.Error;
         });
         return await parser
-            .ParseArguments<RunArc, RunDbList, RunDbDelete, RunDump, RunFind, RunList, RunRehash, RunTools>(args)
+            .ParseArguments<RunArc, RunDbList, RunDbDelete, RunDump, RunFind, RunList, RunRehash, RunTools, RunValidate>(args)
             .MapResult<IRunnable, Task<int>>(x => x.RunAsync(), _ => Task.FromResult(1)).Caf();
     }
 }
