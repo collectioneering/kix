@@ -1,11 +1,9 @@
-﻿using System.Security.Cryptography;
-using Art;
+﻿using Art;
 using Art.Crypto;
 using Art.EF.Sqlite;
 using Art.Logging;
 using Art.Management;
 using Art.Proxies;
-using Art.Resources;
 using CommandLine;
 
 namespace Kix;
@@ -79,125 +77,22 @@ internal class RunArc : BRunTool, IRunnable
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
         if (Validate || ValidateOnly)
         {
-            Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed = new();
-
-            void AddFail(ArtifactResourceInfo r)
-            {
-                if (!failed.TryGetValue(r.Key.Artifact, out var list)) list = failed[r.Key.Artifact] = new List<ArtifactResourceInfo>();
-                list.Add(r);
-            }
-
-            foreach (ArtifactToolProfile profile in profiles)
-            {
-                try
-                {
-                    Common.LoadAssemblyForToolString(profile.Tool);
-                }
-                catch (InvalidOperationException e)
-                {
-                    Console.WriteLine(e.Message);
-                    return 69;
-                }
-                ArtifactTool tool;
-                if (ArtifactToolLoader.TryLoad(profile, out var toolTmp)) tool = toolTmp;
-                else
-                {
-                    Console.WriteLine($"Unknown tool {profile.Tool}");
-                    return 88;
-                }
-                tool.DebugMode = Debug;
-                var pp = profile.WithCoreTool(tool);
-                l.Log($"Processing entries for profile {pp.Tool}/{pp.Group}", null, LogLevel.Title);
-                int i = 0, j = 0;
-                foreach (ArtifactInfo inf in await arm.ListArtifactsAsync(pp.Tool, pp.Group))
-                {
-                    i++;
-                    foreach (ArtifactResourceInfo rInf in await arm.ListResourcesAsync(inf.Key))
-                    {
-                        j++;
-                        if (!await adm.ExistsAsync(rInf.Key))
-                        {
-                            AddFail(rInf);
-                            continue;
-                        }
-                        if (rInf.Checksum == null)
-                        {
-                            if (AddChecksum) AddFail(rInf);
-                            continue;
-                        }
-                        if (!ChecksumSource.TryGetHashAlgorithm(rInf.Checksum.Id, out HashAlgorithm? hashAlgorithm))
-                        {
-                            AddFail(rInf);
-                            continue;
-                        }
-                        await using Stream sourceStream = await adm.OpenInputStreamAsync(rInf.Key);
-                        await using HashProxyStream hps = new(sourceStream, hashAlgorithm, true);
-                        await using MemoryStream ms = new();
-                        await hps.CopyToAsync(ms);
-                        if (!rInf.Checksum.Value.AsSpan().SequenceEqual(hps.GetHash())) AddFail(rInf);
-                    }
-                }
-                l.Log($"Processed {i} artifacts and {j} resources for profile {pp.Tool}/{pp.Group}", null, LogLevel.Information);
-            }
-            if (failed.Count == 0)
+            var validationContext = new ValidationContext(arm, adm, Debug, AddChecksum, l);
+            await validationContext.ProcessAsync(profiles);
+            if (!validationContext.AnyFailed)
             {
                 l.Log("All resources for specified profiles successfully validated.", null, LogLevel.Information);
                 return 0;
             }
+            int resourceFailCount = validationContext.CountResourceFailures();
             if (ValidateOnly)
             {
-                l.Log($"{failed.Sum(v => v.Value.Count)} resources failed to validate.", null, LogLevel.Information);
+                l.Log($"{resourceFailCount} resources failed to validate.", null, LogLevel.Information);
                 return 1;
             }
-            l.Log($"{failed.Sum(v => v.Value.Count)} resources failed to validate and will be reacquired.", null, LogLevel.Information);
-            foreach (ArtifactToolProfile profile in profiles)
-            {
-                ArtifactToolProfile artifactToolProfile = profile;
-                if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-                try
-                {
-                    Common.LoadAssemblyForToolString(profile.Tool);
-                }
-                catch (InvalidOperationException e)
-                {
-                    Console.WriteLine(e.Message);
-                    return 69;
-                }
-                if (!ArtifactToolLoader.TryLoad(artifactToolProfile, out ArtifactTool? t))
-                    throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
-                ArtifactToolConfig config = new(arm, adm, FailureFlags.None);
-                using ArtifactTool tool = t;
-                tool.DebugMode = Debug;
-                artifactToolProfile = artifactToolProfile.WithCoreTool(t);
-                if (!failed.Keys.Any(v => v.Tool == artifactToolProfile.Tool && v.Group == artifactToolProfile.Group))
-                    continue;
-                await tool.InitializeAsync(config, artifactToolProfile).ConfigureAwait(false);
-                switch (tool)
-                {
-                    case IArtifactToolFind:
-                        {
-                            var proxy = new ArtifactToolFindProxy(tool);
-                            foreach ((ArtifactKey key, List<ArtifactResourceInfo> list) in failed.Where(v => v.Key.Tool == artifactToolProfile.Tool && v.Key.Group == artifactToolProfile.Group).ToList())
-                                if (await proxy.FindAsync(key.Id) is { } data) await Fixup(tool, l, failed, key, list, data);
-                                else l.Log($"Failed to obtain artifact {key.Tool}/{key.Group}:{key.Id}", null, LogLevel.Error);
-                            break;
-                        }
-                    case IArtifactToolList:
-                        {
-                            await foreach (ArtifactData data in (new ArtifactToolListProxy(tool, ArtifactToolListOptions.Default, l).ListAsync()))
-                                if (failed.TryGetValue(data.Info.Key, out List<ArtifactResourceInfo>? list))
-                                    await Fixup(tool, l, failed, data.Info.Key, list, data);
-                            break;
-                        }
-                }
-            }
-            if (failed.Count != 0)
-            {
-                l.Log($"Failed to reacquire {failed.Sum(v => v.Value.Count)} resources.", null, LogLevel.Error);
-                foreach (ArtifactResourceInfo value in failed.Values.SelectMany(v => v)) Common.Display(value, Detailed);
-            }
-            else
-                l.Log("Successfully reacquired all resources.", null, LogLevel.Information);
+            l.Log($"{resourceFailCount} resources failed to validate and will be reacquired.", null, LogLevel.Information);
+            var repairContext = validationContext.CreateRepairContext();
+            await repairContext.RepairAsync(profiles, Detailed, Hash);
         }
         else
             foreach (ArtifactToolProfile profile in profiles)
@@ -214,20 +109,5 @@ internal class RunArc : BRunTool, IRunnable
                 await ArtifactDumping.DumpAsync(profile, arm, adm, options, l).ConfigureAwait(false);
             }
         return 0;
-    }
-
-    private async Task Fixup(ArtifactTool tool, IToolLogHandler l, Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, ArtifactKey key, List<ArtifactResourceInfo> list, ArtifactData data)
-    {
-        foreach (ArtifactResourceInfo resource in list.ToList())
-        {
-            if (!data.TryGetValue(resource.Key, out ArtifactResourceInfo? resourceActual))
-            {
-                l.Log($"Failed to obtain resource {resource.GetInfoPathString()} for artifact {key.Tool}/{key.Group}:{key.Id}", null, LogLevel.Error);
-                continue;
-            }
-            await tool.DumpResourceAsync(resourceActual, ResourceUpdateMode.Hard, l, Hash);
-            list.Remove(resource);
-        }
-        if (list.Count == 0) failed.Remove(key);
     }
 }
