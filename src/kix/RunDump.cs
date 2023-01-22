@@ -1,8 +1,8 @@
 ﻿using Art;
+using Art.Common;
+using Art.Common.Management;
+using Art.Common.Proxies;
 using Art.EF.Sqlite;
-using Art.Logging;
-using Art.Management;
-using Art.Proxies;
 using CommandLine;
 
 namespace Kix;
@@ -44,11 +44,11 @@ internal class RunDump : BRunTool, IRunnable
         }
     }
 
-    private async Task<int> RunAsync(ArtifactDataManager adm, ArtifactRegistrationManager arm)
+    private async Task<int> RunAsync(ArtifactDataManager adm, ArtifactRegistrationManagerBase arm)
     {
         if (ProfileFile == null) return await ExecAsync(new ArtifactToolProfile(Tool!, Group ?? "default", null), arm, adm);
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfile.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
+        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
         {
             if (Group != null && Group != profile.Group || Tool != null && Tool != profile.Tool) continue;
             ec = Math.Max(await ExecAsync(profile, arm, adm), ec);
@@ -56,10 +56,10 @@ internal class RunDump : BRunTool, IRunnable
         return ec;
     }
 
-    private async Task<int> ExecAsync(ArtifactToolProfile profile, ArtifactRegistrationManager arm, ArtifactDataManager adm)
+    private async Task<int> ExecAsync(ArtifactToolProfile profile, ArtifactRegistrationManagerBase arm, ArtifactDataManager adm)
     {
         ArtifactToolDumpOptions options = new();
-        ArtifactTool t;
+        ArtifactToolBase t;
         try
         {
             t = await GetToolAsync(profile, arm, adm);

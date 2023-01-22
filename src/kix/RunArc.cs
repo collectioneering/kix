@@ -1,9 +1,8 @@
 ﻿using Art;
-using Art.Crypto;
+using Art.Common;
+using Art.Common.Management;
+using Art.Common.Proxies;
 using Art.EF.Sqlite;
-using Art.Logging;
-using Art.Management;
-using Art.Proxies;
 using CommandLine;
 
 namespace Kix;
@@ -56,7 +55,7 @@ internal class RunArc : BRunTool, IRunnable
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in ProfileFiles)
-            profiles.AddRange(ArtifactToolProfile.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
+            profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {

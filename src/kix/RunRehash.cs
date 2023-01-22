@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography;
 using Art;
-using Art.Crypto;
+using Art.Common;
+using Art.Common.Management;
 using Art.EF.Sqlite;
-using Art.Management;
-using Art.Resources;
 using CommandLine;
 
 namespace Kix;

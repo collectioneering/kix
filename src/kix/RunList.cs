@@ -1,6 +1,6 @@
 ﻿using Art;
-using Art.Logging;
-using Art.Proxies;
+using Art.Common;
+using Art.Common.Proxies;
 using CommandLine;
 
 namespace Kix;
@@ -27,7 +27,7 @@ internal class RunList : BRunTool, IRunnable
     {
         if (ProfileFile == null) return await ExecAsync(new ArtifactToolProfile(Tool!, Group ?? "", null));
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfile.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
+        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
         {
             if (Group != null && Group != profile.Group || Tool != null && Tool != profile.Tool) continue;
             ec = Math.Max(await ExecAsync(profile), ec);
@@ -37,7 +37,7 @@ internal class RunList : BRunTool, IRunnable
 
     private async Task<int> ExecAsync(ArtifactToolProfile profile)
     {
-        ArtifactTool t;
+        ArtifactToolBase t;
         try
         {
             t = await GetSearchingToolAsync(profile);
