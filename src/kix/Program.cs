@@ -1,4 +1,4 @@
-﻿using Art;
+﻿using Art.Common;
 using CommandLine;
 
 namespace Kix;

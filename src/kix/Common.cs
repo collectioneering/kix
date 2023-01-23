@@ -2,9 +2,8 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Art;
-using Art.Logging;
-using Art.Management;
-using Art.Resources;
+using Art.Common;
+using Art.Common.Logging;
 using EA;
 
 namespace Kix;
@@ -15,7 +14,7 @@ internal static class Common
 
     internal static IToolLogHandler GetDefaultToolLogHandler() => OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
 
-    internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, ArtifactRegistrationManager arm, bool detailed)
+    internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, ArtifactRegistrationManagerBase arm, bool detailed)
     {
         Display(i, detailed);
         if (listResource)
@@ -126,7 +125,7 @@ internal static class Common
 
     internal static Assembly LoadAssemblyForToolString(string toolString)
     {
-        (string assembly, _) = ArtifactToolProfile.GetId(toolString);
+        (string assembly, _) = ArtifactToolProfileUtil.GetID(toolString);
         KixManifest manifest;
         try
         {

@@ -1,18 +1,14 @@
 ﻿using System.Security.Cryptography;
 using Art;
-using Art.Crypto;
-using Art.Logging;
-using Art.Management;
-using Art.Resources;
+using Art.Common;
 
 namespace Kix;
 
 public class ValidationContext
 {
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
-    private readonly ArtifactRegistrationManager _arm;
+    private readonly ArtifactRegistrationManagerBase _arm;
     private readonly ArtifactDataManager _adm;
-    private readonly bool _debug;
     private readonly bool _addChecksum;
     private readonly IToolLogHandler _l;
 
@@ -20,11 +16,10 @@ public class ValidationContext
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(ArtifactRegistrationManager arm, ArtifactDataManager adm, bool debug, bool addChecksum, IToolLogHandler l)
+    public ValidationContext(ArtifactRegistrationManagerBase arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l)
     {
         _arm = arm;
         _adm = adm;
-        _debug = debug;
         _addChecksum = addChecksum;
         _l = l;
     }
@@ -84,10 +79,9 @@ public class ValidationContext
         foreach (ArtifactToolProfile profile in profiles)
         {
             Common.LoadAssemblyForToolString(profile.Tool); // InvalidOperationException
-            ArtifactTool tool;
+            ArtifactToolBase tool;
             if (ArtifactToolLoader.TryLoad(profile, out var toolTmp)) tool = toolTmp;
             else throw new InvalidOperationException($"Unknown tool {profile.Tool}");
-            tool.DebugMode = _debug;
             var pp = profile.WithCoreTool(tool);
             _l.Log($"Processing entries for profile {pp.Tool}/{pp.Group}", null, LogLevel.Title);
             var result = await ProcessAsync(await _arm.ListArtifactsAsync(pp.Tool, pp.Group));
@@ -98,7 +92,7 @@ public class ValidationContext
         return new ValidationProcessResult(artifactCount, resourceCount);
     }
 
-    public RepairContext CreateRepairContext() => new(_failed, _arm, _adm, _debug, _l);
+    public RepairContext CreateRepairContext() => new(_failed, _arm, _adm, _l);
 }
 
 public readonly record struct ValidationProcessResult(int Artifacts, int Resources);

@@ -1,25 +1,21 @@
 ﻿using Art;
-using Art.Logging;
-using Art.Management;
-using Art.Proxies;
-using Art.Resources;
+using Art.Common;
+using Art.Common.Proxies;
 
 namespace Kix;
 
 public class RepairContext
 {
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed;
-    private readonly ArtifactRegistrationManager _arm;
+    private readonly ArtifactRegistrationManagerBase _arm;
     private readonly ArtifactDataManager _adm;
-    private readonly bool _debug;
     private readonly IToolLogHandler _l;
 
-    public RepairContext(IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, ArtifactRegistrationManager arm, ArtifactDataManager adm, bool debug, IToolLogHandler l)
+    public RepairContext(IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, ArtifactRegistrationManagerBase arm, ArtifactDataManager adm, IToolLogHandler l)
     {
         _failed = new Dictionary<ArtifactKey, List<ArtifactResourceInfo>>(failed);
         _arm = arm;
         _adm = adm;
-        _debug = debug;
         _l = l;
     }
 
@@ -30,11 +26,10 @@ public class RepairContext
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
             Common.LoadAssemblyForToolString(profile.Tool); // InvalidOperationException
-            if (!ArtifactToolLoader.TryLoad(artifactToolProfile, out ArtifactTool? t))
+            if (!ArtifactToolLoader.TryLoad(artifactToolProfile, out ArtifactToolBase? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
-            ArtifactToolConfig config = new(_arm, _adm, FailureFlags.None);
-            using ArtifactTool tool = t;
-            tool.DebugMode = _debug;
+            ArtifactToolConfig config = new(_arm, _adm);
+            using ArtifactToolBase tool = t;
             artifactToolProfile = artifactToolProfile.WithCoreTool(t);
             if (!_failed.Keys.Any(v => v.Tool == artifactToolProfile.Tool && v.Group == artifactToolProfile.Group))
                 continue;
@@ -71,7 +66,7 @@ public class RepairContext
         return true;
     }
 
-    private async Task Fixup(ArtifactTool tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, ArtifactData data, string hashAlgorithm)
+    private async Task Fixup(ArtifactToolBase tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, ArtifactData data, string hashAlgorithm)
     {
         foreach (ArtifactResourceInfo resource in list.ToList())
         {

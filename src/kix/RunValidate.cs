@@ -1,8 +1,7 @@
 ﻿using Art;
-using Art.Crypto;
+using Art.Common;
+using Art.Common.Management;
 using Art.EF.Sqlite;
-using Art.Logging;
-using Art.Management;
 using CommandLine;
 
 namespace Kix;
@@ -44,7 +43,7 @@ internal class RunValidate : BRunTool, IRunnable
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in ProfileFiles)
-            profiles.AddRange(ArtifactToolProfile.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
+            profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
         if (profiles.Count == 0)
         {
@@ -57,7 +56,7 @@ internal class RunValidate : BRunTool, IRunnable
         }
         ArtifactDataManager adm = new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
-        var validationContext = new ValidationContext(arm, adm, Debug, AddChecksum, l);
+        var validationContext = new ValidationContext(arm, adm, AddChecksum, l);
         ValidationProcessResult result;
         if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
         else result = await validationContext.ProcessAsync(profiles);

@@ -35,8 +35,8 @@ internal class RunTools : IRunnable
             if (Verbose) Console.WriteLine(assembly.FullName);
             Regex? re = Search != null ? Common.GetFilterRegex(Search, false, false) : null;
             foreach ((Type toolType, string toolString) in assembly.GetExportedTypes()
-                         .Where(t => t.IsAssignableTo(typeof(ArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
-                         .Select(v => (ToolType: v, ToolString: ArtifactTool.CreateToolString(v)))
+                         .Where(t => t.IsAssignableTo(typeof(ArtifactToolBase)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
+                         .Select(v => (ToolType: v, ToolString: ArtifactToolBase.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))
                 Common.PrintFormat(toolString, Detailed, () =>
                 {
