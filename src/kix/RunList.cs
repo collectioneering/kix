@@ -37,7 +37,7 @@ internal class RunList : BRunTool, IRunnable
 
     private async Task<int> ExecAsync(ArtifactToolProfile profile)
     {
-        ArtifactToolBase t;
+        IArtifactTool t;
         try
         {
             t = await GetSearchingToolAsync(profile);

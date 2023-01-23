@@ -1,4 +1,5 @@
 ﻿using Art;
+using Art.Common;
 using Art.EF.Sqlite;
 using CommandLine;
 

@@ -44,7 +44,7 @@ internal class RunDump : BRunTool, IRunnable
         }
     }
 
-    private async Task<int> RunAsync(ArtifactDataManager adm, ArtifactRegistrationManagerBase arm)
+    private async Task<int> RunAsync(ArtifactDataManager adm, IArtifactRegistrationManager arm)
     {
         if (ProfileFile == null) return await ExecAsync(new ArtifactToolProfile(Tool!, Group ?? "default", null), arm, adm);
         int ec = 0;
@@ -56,10 +56,10 @@ internal class RunDump : BRunTool, IRunnable
         return ec;
     }
 
-    private async Task<int> ExecAsync(ArtifactToolProfile profile, ArtifactRegistrationManagerBase arm, ArtifactDataManager adm)
+    private async Task<int> ExecAsync(ArtifactToolProfile profile, IArtifactRegistrationManager arm, ArtifactDataManager adm)
     {
         ArtifactToolDumpOptions options = new();
-        ArtifactToolBase t;
+        IArtifactTool t;
         try
         {
             t = await GetToolAsync(profile, arm, adm);

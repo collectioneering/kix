@@ -50,7 +50,7 @@ internal class RunArc : BRunTool, IRunnable
             return 2;
         }
         ArtifactToolDumpOptions options = new(Update, !Full, FastExit ? ArtifactSkipMode.FastExit : Skip, hash);
-        ArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
+        IArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();

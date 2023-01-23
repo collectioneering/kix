@@ -7,7 +7,7 @@ namespace Kix;
 public class ValidationContext
 {
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
-    private readonly ArtifactRegistrationManagerBase _arm;
+    private readonly IArtifactRegistrationManager _arm;
     private readonly ArtifactDataManager _adm;
     private readonly bool _addChecksum;
     private readonly IToolLogHandler _l;
@@ -16,7 +16,7 @@ public class ValidationContext
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(ArtifactRegistrationManagerBase arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l)
+    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l)
     {
         _arm = arm;
         _adm = adm;
@@ -79,7 +79,7 @@ public class ValidationContext
         foreach (ArtifactToolProfile profile in profiles)
         {
             Common.LoadAssemblyForToolString(profile.Tool); // InvalidOperationException
-            ArtifactToolBase tool;
+            IArtifactTool tool;
             if (ArtifactToolLoader.TryLoad(profile, out var toolTmp)) tool = toolTmp;
             else throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             var pp = profile.WithCoreTool(tool);

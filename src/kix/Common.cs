@@ -14,7 +14,7 @@ internal static class Common
 
     internal static IToolLogHandler GetDefaultToolLogHandler() => OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
 
-    internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, ArtifactRegistrationManagerBase arm, bool detailed)
+    internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, IArtifactRegistrationManager arm, bool detailed)
     {
         Display(i, detailed);
         if (listResource)

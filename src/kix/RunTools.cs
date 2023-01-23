@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Art;
+using Art.Common;
 using CommandLine;
 
 namespace Kix;
@@ -35,8 +36,8 @@ internal class RunTools : IRunnable
             if (Verbose) Console.WriteLine(assembly.FullName);
             Regex? re = Search != null ? Common.GetFilterRegex(Search, false, false) : null;
             foreach ((Type toolType, string toolString) in assembly.GetExportedTypes()
-                         .Where(t => t.IsAssignableTo(typeof(ArtifactToolBase)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
-                         .Select(v => (ToolType: v, ToolString: ArtifactToolBase.CreateToolString(v)))
+                         .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
+                         .Select(v => (ToolType: v, ToolString: ArtifactToolStringUtil.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))
                 Common.PrintFormat(toolString, Detailed, () =>
                 {
