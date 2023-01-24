@@ -56,7 +56,7 @@ internal class RunValidate : BRunTool, IRunnable
         }
         ArtifactDataManager adm = new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
         using SqliteArtifactRegistrationManager arm = new(Database);
-        var validationContext = new ValidationContext(arm, adm, AddChecksum, l);
+        var validationContext = new ValidationContext(arm, adm, AddChecksum, l, !IgnoreSharedAssemblyVersion);
         ValidationProcessResult result;
         if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
         else result = await validationContext.ProcessAsync(profiles);

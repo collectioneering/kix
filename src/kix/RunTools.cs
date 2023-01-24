@@ -7,13 +7,10 @@ using CommandLine;
 namespace Kix;
 
 [Verb("tools", HelpText = "List artifact tools.")]
-internal class RunTools : IRunnable
+internal class RunTools : BRun, IRunnable
 {
     [Option('s', "search", HelpText = "Search pattern.", MetaValue = "pattern")]
     public string? Search { get; set; }
-
-    [Option('v', "verbose", HelpText = "Enable verbose output.")]
-    public bool Verbose { get; set; }
 
     [Option('d', "detailed", HelpText = "Show detailed information on entries.")]
     public bool Detailed { get; set; }
@@ -25,7 +22,7 @@ internal class RunTools : IRunnable
             Plugin context;
             try
             {
-                context = Plugin.LoadForManifest(manifest);
+                context = Plugin.LoadForManifest(manifest, !IgnoreSharedAssemblyVersion);
             }
             catch (Exception ex)
             {

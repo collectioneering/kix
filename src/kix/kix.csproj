@@ -11,6 +11,7 @@
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <Copyright>Copyright (C) 2021 Lucina</Copyright>
+    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

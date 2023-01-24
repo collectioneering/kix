@@ -2,8 +2,11 @@
 
 namespace Kix;
 
-internal class RunDbBase
+internal class RunDbBase : IRunOutput
 {
+    [Option('v', "verbose", HelpText = "Enable verbose output.")]
+    public bool Verbose { get; set; }
+
     [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
     public string Database { get; set; } = null!;
 

@@ -10,6 +10,9 @@ namespace Kix;
 [Verb("rehash", HelpText = "Recompute hashes for archive contents.")]
 internal class RunRehash : IRunnable
 {
+    [Option('v', "verbose", HelpText = "Enable verbose output.")]
+    public bool Verbose { get; set; }
+
     [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
     public string Database { get; set; } = null!;
 

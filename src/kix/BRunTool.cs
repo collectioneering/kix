@@ -5,9 +5,9 @@ using CommandLine;
 
 namespace Kix;
 
-public class BRunTool
+public class BRunTool : BRun
 {
-    [Option('c', "cookieFile", HelpText = "Cookie file.", MetaValue = "file")]
+    [Option('c', "cookie-file", HelpText = "Cookie file.", MetaValue = "file")]
     public string? CookieFile { get; set; }
 
     [Option('p', "property", HelpText = "Properties.", MetaValue = "property")]
@@ -21,7 +21,7 @@ public class BRunTool
 
     protected async Task<IArtifactTool> GetToolAsync(ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
-        var context = Plugin.LoadForToolString(artifactToolProfile.Tool);
+        var context = Plugin.LoadForToolString(artifactToolProfile.Tool, !IgnoreSharedAssemblyVersion);
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         artifactToolProfile = artifactToolProfile.GetWithConsoleOptions(CookieFile, Properties);
         IArtifactTool t = await ArtifactTool.PrepareToolAsync(context.Context, artifactToolProfile, arm, adm, cancellationToken);

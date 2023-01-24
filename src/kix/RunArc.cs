@@ -62,7 +62,7 @@ internal class RunArc : BRunTool, IRunnable
             Plugin context;
             try
             {
-                context = Plugin.LoadForToolString(profile.Tool);
+                context = Plugin.LoadForToolString(profile.Tool, !IgnoreSharedAssemblyVersion);
             }
             catch (InvalidOperationException e)
             {

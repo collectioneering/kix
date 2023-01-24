@@ -29,7 +29,7 @@ internal record KixManifest(string BasePath, KixManifestContent Content)
             KixManifestContent content;
             try
             {
-                content = JsonSerializer.Deserialize<KixManifestContent>(File.ReadAllText(file)) ?? throw new IOException();
+                content = JsonSerializer.Deserialize<KixManifestContent>(File.ReadAllText(file)) ?? throw new IOException($"Failed to deserialize manifest file {file}");
             }
             catch
             {

@@ -10,13 +10,15 @@ public class RepairContext
     private readonly IArtifactRegistrationManager _arm;
     private readonly ArtifactDataManager _adm;
     private readonly IToolLogHandler _l;
+    private readonly bool _ignoreSharedAssemblyVersion;
 
-    public RepairContext(IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
+    public RepairContext(IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l, bool ignoreSharedAssemblyVersion)
     {
         _failed = new Dictionary<ArtifactKey, List<ArtifactResourceInfo>>(failed);
         _arm = arm;
         _adm = adm;
         _l = l;
+        _ignoreSharedAssemblyVersion = ignoreSharedAssemblyVersion;
     }
 
     public async Task<bool> RepairAsync(List<ArtifactToolProfile> profiles, bool detailed, string hashAlgorithm)
@@ -25,7 +27,7 @@ public class RepairContext
         {
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = Plugin.LoadForToolString(profile.Tool, !_ignoreSharedAssemblyVersion); // InvalidOperationException
             if (!context.TryLoadTool(artifactToolProfile, out IArtifactTool? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
             ArtifactToolConfig config = new(_arm, _adm);

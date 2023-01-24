@@ -11,17 +11,19 @@ public class ValidationContext
     private readonly ArtifactDataManager _adm;
     private readonly bool _addChecksum;
     private readonly IToolLogHandler _l;
+    private readonly bool _ignoreSharedAssemblyVersion;
 
     public bool AnyFailed => _failed.Count != 0;
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l)
+    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l, bool ignoreSharedAssemblyVersion)
     {
         _arm = arm;
         _adm = adm;
         _addChecksum = addChecksum;
         _l = l;
+        _ignoreSharedAssemblyVersion = ignoreSharedAssemblyVersion;
     }
 
     private void AddFail(ArtifactResourceInfo r)
@@ -78,7 +80,7 @@ public class ValidationContext
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = Plugin.LoadForToolString(profile.Tool, !_ignoreSharedAssemblyVersion); // InvalidOperationException
             if (!context.TryLoadTool(profile, out var t))
                 throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             using IArtifactTool tool = t;
@@ -92,7 +94,7 @@ public class ValidationContext
         return new ValidationProcessResult(artifactCount, resourceCount);
     }
 
-    public RepairContext CreateRepairContext() => new(_failed, _arm, _adm, _l);
+    public RepairContext CreateRepairContext() => new(_failed, _arm, _adm, _l, _ignoreSharedAssemblyVersion);
 }
 
 public readonly record struct ValidationProcessResult(int Artifacts, int Resources);

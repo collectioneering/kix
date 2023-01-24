@@ -1,6 +1,6 @@
 ﻿namespace Kix;
 
-internal interface IRunnable
+internal interface IRunnable : IRunOutput
 {
     Task<int> RunAsync();
 }

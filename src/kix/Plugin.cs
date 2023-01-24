@@ -14,7 +14,7 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         return ArtifactToolLoader.TryLoad(BaseAssembly, artifactToolProfile.Tool, out t);
     }
 
-    public static Plugin LoadForToolString(string toolString)
+    public static Plugin LoadForToolString(string toolString, bool enforceSharedAssemblyVersion)
     {
         (string assembly, _) = ArtifactToolProfileUtil.GetID(toolString);
         KixManifest manifest;
@@ -26,13 +26,16 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         {
             throw new InvalidOperationException($"No applicable manifest for the assembly {assembly} could be found");
         }
-        return LoadForManifest(manifest);
+        return LoadForManifest(manifest, enforceSharedAssemblyVersion);
     }
 
-    public static Plugin LoadForManifest(KixManifest manifest)
+    public static Plugin LoadForManifest(KixManifest manifest, bool enforceSharedAssemblyVersion)
     {
         string baseDir = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path) ? Path.Combine(manifest.BasePath, manifest.Content.Path) : manifest.BasePath;
-        ValidateArtVersion(baseDir, manifest.Content.Assembly);
+        if (enforceSharedAssemblyVersion)
+        {
+            ValidateArtVersion(baseDir, manifest.Content.Assembly);
+        }
         var ctx = new KixAssemblyLoadContext(baseDir);
         return new Plugin(manifest, ctx, ctx.LoadFromAssemblyName(new AssemblyName(manifest.Content.Assembly)));
     }
@@ -42,7 +45,10 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         var loadedAssemblyName = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName("Art")).GetName();
         if (loadedAssemblyName.GetPublicKeyToken() is not { } loadedPublicKeyToken)
         {
-            throw new InvalidOperationException($"Active Art assembly [{loadedAssemblyName}] does not have a public key token");
+            throw new InvalidOperationException($"""
+                Loaded assembly [{loadedAssemblyName}] does not have a public key token.
+                Assembly version validation cannot be performed.
+                """);
         }
         // Art not referenced, don't treat as error for now
         if (!TryGetArtAssemblyName(basePath, assemblyShortName, out var assemblyName))
@@ -51,11 +57,18 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         }
         if (assemblyName.GetPublicKeyToken() is not { } publicKeyToken)
         {
-            throw new InvalidOperationException($"Plugin {assemblyShortName} at path {basePath} refers to Art assembly [{assemblyName}] that does not have a public key token");
+            throw new InvalidOperationException($"""
+                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not have a public key token.
+                Assembly version validation cannot be performed.
+                """);
         }
         if (!loadedPublicKeyToken.AsSpan().SequenceEqual(publicKeyToken))
         {
-            throw new InvalidOperationException($"Plugin {assemblyShortName} at path {basePath} refers to Art assembly [{assemblyName}] that does not match public key token of active Art assembly [{loadedAssemblyName}]");
+            throw new InvalidOperationException($"""
+                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not match public key token of loaded assembly [{loadedAssemblyName}].
+                This indicates that the plugin was compiled with a reference to a different version of the library than the one this program references.
+                This can lead to runtime errors if the API surface has changed.
+                """);
         }
     }
 
