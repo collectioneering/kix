@@ -2,7 +2,7 @@
 
 namespace Kix;
 
-internal abstract class RunDbBase : BVerb
+internal abstract class RunDbBase : Command
 {
     protected Option<string> DatabaseOption;
 

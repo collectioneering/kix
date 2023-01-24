@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.CommandLine.Parsing;
 using System.Security.Cryptography;
 using Art;
 using Art.Common;
@@ -9,7 +8,7 @@ using Art.EF.Sqlite;
 
 namespace Kix;
 
-internal class RunRehash : BVerb
+internal class RunRehash : Command
 {
     protected Option<string> DatabaseOption;
 

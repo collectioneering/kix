@@ -8,7 +8,7 @@ using Art.EF.Sqlite;
 
 namespace Kix;
 
-internal class RunValidate : BRunTool
+internal class RunValidate : ToolCommand
 {
     protected Option<string> DatabaseOption;
 
@@ -84,7 +84,7 @@ internal class RunValidate : BRunTool
         }
         ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
-        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l, !ShouldIgnoreSharedAssemblyVersionOption(context));
+        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l);
         ValidationProcessResult result;
         if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
         else result = await validationContext.ProcessAsync(profiles);

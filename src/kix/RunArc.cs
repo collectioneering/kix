@@ -9,7 +9,7 @@ using Art.EF.Sqlite;
 
 namespace Kix;
 
-internal class RunArc : BRunTool
+internal class RunArc : ToolCommand
 {
     protected Option<string> DatabaseOption;
 
@@ -99,7 +99,7 @@ internal class RunArc : BRunTool
             Plugin plugin;
             try
             {
-                plugin = Plugin.LoadForToolString(profile.Tool, !ShouldIgnoreSharedAssemblyVersionOption(context));
+                plugin = Plugin.LoadForToolString(profile.Tool);
             }
             catch (InvalidOperationException e)
             {

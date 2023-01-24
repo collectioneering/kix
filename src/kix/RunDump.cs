@@ -9,7 +9,7 @@ using Art.EF.Sqlite;
 
 namespace Kix;
 
-internal class RunDump : BRunTool
+internal class RunDump : ToolCommand
 {
     protected Option<string> DatabaseOption;
 

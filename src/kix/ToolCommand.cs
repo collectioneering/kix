@@ -7,13 +7,13 @@ using Art.Common.Management;
 
 namespace Kix;
 
-public abstract class BRunTool : BRun
+public abstract class ToolCommand : Command
 {
     protected Option<string> CookieFileOption;
 
     protected Option<List<string>> PropertiesOption;
 
-    protected BRunTool(string name, string? description = null) : base(name, description)
+    protected ToolCommand(string name, string? description = null) : base(name, description)
     {
         CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file.");
         CookieFileOption.ArgumentHelpName = "file";
@@ -32,7 +32,7 @@ public abstract class BRunTool : BRun
 
     protected async Task<IArtifactTool> GetToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
-        var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool, !ShouldIgnoreSharedAssemblyVersionOption(context));
+        var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool);
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();

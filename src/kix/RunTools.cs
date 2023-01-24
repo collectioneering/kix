@@ -7,7 +7,7 @@ using Art.Common;
 
 namespace Kix;
 
-internal class RunTools : BRun
+internal class RunTools : Command
 {
     protected Option<string> SearchOption;
 
@@ -34,7 +34,7 @@ internal class RunTools : BRun
             Plugin plugin;
             try
             {
-                plugin = Plugin.LoadForManifest(manifest, !ShouldIgnoreSharedAssemblyVersionOption(context));
+                plugin = Plugin.LoadForManifest(manifest);
             }
             catch (Exception ex)
             {

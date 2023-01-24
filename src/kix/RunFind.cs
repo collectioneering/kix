@@ -7,7 +7,7 @@ using Art.Common.Proxies;
 
 namespace Kix;
 
-internal class RunFind : BRunTool
+internal class RunFind : ToolCommand
 {
     protected Argument<List<string>> IdsArg;
 

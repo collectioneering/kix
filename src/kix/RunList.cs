@@ -7,7 +7,7 @@ using Art.Common.Proxies;
 
 namespace Kix;
 
-internal class RunList : BRunTool
+internal class RunList : ToolCommand
 {
     protected Option<string> ProfileFileOption;
 
