@@ -43,10 +43,10 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
     private static void ValidateArtVersion(string basePath, string assemblyShortName)
     {
         var loadedAssemblyName = AssemblyLoadContext.Default.LoadFromAssemblyName(new AssemblyName("Art")).GetName();
-        if (loadedAssemblyName.GetPublicKeyToken() is not { } loadedPublicKeyToken)
+        if (loadedAssemblyName.Version is not { } loadedVersion)
         {
             throw new InvalidOperationException($"""
-                Loaded assembly [{loadedAssemblyName}] does not have a public key token.
+                Loaded assembly [{loadedAssemblyName}] does not have a version.
                 Assembly version validation cannot be performed.
                 """);
         }
@@ -55,17 +55,17 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         {
             return;
         }
-        if (assemblyName.GetPublicKeyToken() is not { } publicKeyToken)
+        if (assemblyName.Version is not { } version)
         {
             throw new InvalidOperationException($"""
-                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not have a public key token.
+                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not have a version.
                 Assembly version validation cannot be performed.
                 """);
         }
-        if (!loadedPublicKeyToken.AsSpan().SequenceEqual(publicKeyToken))
+        if (!loadedVersion.Equals(version))
         {
             throw new InvalidOperationException($"""
-                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not match public key token of loaded assembly [{loadedAssemblyName}].
+                Plugin {assemblyShortName} at path {basePath} refers to assembly [{assemblyName}] that does not match version of loaded assembly [{loadedAssemblyName}].
                 This indicates that the plugin was compiled with a reference to a different version of the library than the one this program references.
                 This can lead to runtime errors if the API surface has changed.
                 """);
