@@ -25,7 +25,7 @@ public class RepairContext
         {
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-            var context = PluginContext.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoadTool(artifactToolProfile, out IArtifactTool? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
             ArtifactToolConfig config = new(_arm, _adm);

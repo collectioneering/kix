@@ -59,17 +59,17 @@ internal class RunArc : BRunTool, IRunnable
         profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
-            PluginContext context;
+            Plugin context;
             try
             {
-                context = PluginContext.LoadForToolString(profile.Tool);
+                context = Plugin.LoadForToolString(profile.Tool);
             }
             catch (InvalidOperationException e)
             {
                 Console.WriteLine(e.Message);
                 return 69;
             }
-            await ArtifactDumping.DumpAsync(context.AssemblyLoadContext, profile, arm, adm, options, l).ConfigureAwait(false);
+            await ArtifactDumping.DumpAsync(context.Context, profile, arm, adm, options, l).ConfigureAwait(false);
         }
         return 0;
     }

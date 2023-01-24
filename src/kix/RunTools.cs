@@ -22,10 +22,10 @@ internal class RunTools : IRunnable
     {
         foreach (KixManifest manifest in KixManifest.GetManifests())
         {
-            PluginContext context;
+            Plugin context;
             try
             {
-                context = PluginContext.LoadForManifest(manifest);
+                context = Plugin.LoadForManifest(manifest);
             }
             catch (Exception ex)
             {

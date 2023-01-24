@@ -21,10 +21,10 @@ public class BRunTool
 
     protected async Task<IArtifactTool> GetToolAsync(ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
-        var context = PluginContext.LoadForToolString(artifactToolProfile.Tool);
+        var context = Plugin.LoadForToolString(artifactToolProfile.Tool);
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         artifactToolProfile = artifactToolProfile.GetWithConsoleOptions(CookieFile, Properties);
-        IArtifactTool t = await ArtifactTool.PrepareToolAsync(context.AssemblyLoadContext, artifactToolProfile, arm, adm, cancellationToken);
+        IArtifactTool t = await ArtifactTool.PrepareToolAsync(context.Context, artifactToolProfile, arm, adm, cancellationToken);
         return t;
     }
 }

@@ -78,7 +78,7 @@ public class ValidationContext
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var context = PluginContext.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoadTool(profile, out var t))
                 throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             using IArtifactTool tool = t;
