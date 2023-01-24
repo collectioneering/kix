@@ -1,38 +1,62 @@
-﻿using Art;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("validate", HelpText = "Verify resource integrity.")]
-internal class RunValidate : BRunTool, IRunnable
+internal class RunValidate : BRunTool
 {
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
-    public string Database { get; set; } = null!;
+    protected Option<string> DatabaseOption;
 
-    [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
-    public string? Output { get; set; }
+    protected Option<string> OutputOption;
 
-    [Option('h', "hash", HelpText = "Checksum algorithm (e.g. None|SHA1|SHA256|SHA384|SHA512|MD5).", Default = "SHA256")]
-    public string Hash { get; set; } = null!;
+    protected Option<string> HashOption;
 
-    [Value(0, HelpText = "Profile file(s) to filter and repair with.", MetaValue = "file", MetaName = "profileFile")]
-    public IReadOnlyCollection<string> ProfileFiles { get; set; } = null!;
+    protected Argument<List<string>> ProfileFilesArg;
 
-    [Option("repair", HelpText = "Re-obtain resources that failed validation (requires appropriate profiles).")]
-    public bool Repair { get; set; }
+    protected Option<bool> RepairOption;
 
-    [Option("add-checksum", HelpText = "Add checksum to resources without checksum during validation.")]
-    public bool AddChecksum { get; set; }
+    protected Option<bool> AddChecksumOption;
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
+    protected Option<bool> DetailedOption;
 
-    public async Task<int> RunAsync()
+    public RunValidate() : this("validate", "Verify resource integrity.")
     {
-        string? hash = string.Equals(Hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : Hash;
+    }
+
+    public RunValidate(string name, string? description = null) : base(name, description)
+    {
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
+        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
+        AddOption(DatabaseOption);
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
+        OutputOption.ArgumentHelpName = "directory";
+        AddOption(OutputOption);
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
+        HashOption.SetDefaultValue("SHA256");
+        AddOption(HashOption);
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with.");
+        ProfileFilesArg.HelpName = "file";
+        ProfileFilesArg.Arity = ArgumentArity.ZeroOrMore;
+        AddArgument(ProfileFilesArg);
+        RepairOption = new Option<bool>(new[] { "--repair" }, "Re-obtain resources that failed validation (requires appropriate profiles)");
+        AddOption(RepairOption);
+        AddChecksumOption = new Option<bool>(new[] { "--add-checksum" }, "Add checksum to resources without checksum during validation.");
+        AddOption(AddChecksumOption);
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        AddOption(DetailedOption);
+        this.SetHandler(RunAsync);
+    }
+
+    public async Task<int> RunAsync(InvocationContext context)
+    {
+        string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
+        hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
         if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
         {
             Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
@@ -42,21 +66,25 @@ internal class RunValidate : BRunTool, IRunnable
         }
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
-        foreach (string profileFile in ProfileFiles)
+        foreach (string profileFile in context.ParseResult.GetValueForArgument(ProfileFilesArg))
             profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
-        profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
+        string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
+        IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
+        profiles = profiles.Select(p => p.GetWithConsoleOptions(cookieFile, properties)).ToList();
+        bool repair = context.ParseResult.GetValueForOption(RepairOption);
         if (profiles.Count == 0)
         {
-            if (Repair)
+            if (repair)
             {
                 l.Log("Repair was requested, but no profiles were provided", null, LogLevel.Error);
                 return 3;
             }
             l.Log("No profiles provided, validating all artifacts and resources", null, LogLevel.Information);
         }
-        ArtifactDataManager adm = new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
-        using SqliteArtifactRegistrationManager arm = new(Database);
-        var validationContext = new ValidationContext(arm, adm, AddChecksum, l, !IgnoreSharedAssemblyVersion);
+        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
+        ArtifactDataManager adm = new DiskArtifactDataManager(output);
+        using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
+        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
         ValidationProcessResult result;
         if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
         else result = await validationContext.ProcessAsync(profiles);
@@ -67,14 +95,14 @@ internal class RunValidate : BRunTool, IRunnable
             return 0;
         }
         int resourceFailCount = validationContext.CountResourceFailures();
-        if (!Repair)
+        if (!repair)
         {
             l.Log($"{resourceFailCount} resources failed to validate.", null, LogLevel.Information);
             return 1;
         }
         l.Log($"{resourceFailCount} resources failed to validate and will be reacquired.", null, LogLevel.Information);
         var repairContext = validationContext.CreateRepairContext();
-        await repairContext.RepairAsync(profiles, Detailed, Hash);
+        await repairContext.RepairAsync(profiles, context.ParseResult.GetValueForOption(DetailedOption), hash);
         return 0;
     }
 }

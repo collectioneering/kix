@@ -21,7 +21,7 @@ public class RepairContext
         _ignoreSharedAssemblyVersion = ignoreSharedAssemblyVersion;
     }
 
-    public async Task<bool> RepairAsync(List<ArtifactToolProfile> profiles, bool detailed, string hashAlgorithm)
+    public async Task<bool> RepairAsync(List<ArtifactToolProfile> profiles, bool detailed, string? hashAlgorithm)
     {
         foreach (ArtifactToolProfile profile in profiles)
         {
@@ -68,7 +68,7 @@ public class RepairContext
         return true;
     }
 
-    private async Task Fixup(IArtifactTool tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, ArtifactData data, string hashAlgorithm)
+    private async Task Fixup(IArtifactTool tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, ArtifactData data, string? hashAlgorithm)
     {
         foreach (ArtifactResourceInfo resource in list.ToList())
         {

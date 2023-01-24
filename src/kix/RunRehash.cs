@@ -1,42 +1,59 @@
-﻿using System.Security.Cryptography;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using System.Security.Cryptography;
 using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("rehash", HelpText = "Recompute hashes for archive contents.")]
-internal class RunRehash : IRunnable
+internal class RunRehash : BVerb
 {
-    [Option('v', "verbose", HelpText = "Enable verbose output.")]
-    public bool Verbose { get; set; }
+    protected Option<string> DatabaseOption;
 
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
-    public string Database { get; set; } = null!;
+    protected Option<string> OutputOption;
 
-    [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
-    public string? Output { get; set; }
+    protected Option<string> HashOption;
 
-    [Option('h', "hash", HelpText = "Checksum algorithm (e.g. SHA1|SHA256|SHA384|SHA512|MD5).", Required = true)]
-    public string Hash { get; set; } = null!;
+    protected Option<bool> DetailedOption;
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
 
-    public async Task<int> RunAsync()
+    public RunRehash() : this("rehash", "Recompute hashes for archive contents.")
     {
-        if (!ChecksumSource.DefaultSources.ContainsKey(Hash))
+    }
+
+    public RunRehash(string name, string? description = null) : base(name, description)
+    {
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
+        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
+        AddOption(DatabaseOption);
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
+        OutputOption.ArgumentHelpName = "directory";
+        AddOption(OutputOption);
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (SHA1|SHA256|SHA384|SHA512|MD5).");
+        HashOption.IsRequired = true;
+        AddOption(HashOption);
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        AddOption(DetailedOption);
+        this.SetHandler(RunAsync);
+    }
+
+    private async Task<int> RunAsync(InvocationContext context)
+    {
+        string hash = context.ParseResult.GetValueForOption(HashOption)!;
+        if (!ChecksumSource.DefaultSources.ContainsKey(hash))
         {
-            Console.WriteLine($"Failed to find hash algorithm {Hash}\nKnown algorithms:");
+            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
             foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
                 Console.WriteLine(id);
             return 2;
         }
-        string output = Output ?? Directory.GetCurrentDirectory();
+        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
         ArtifactDataManager adm = new DiskArtifactDataManager(output);
-        using SqliteArtifactRegistrationManager arm = new(Database);
+        using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed = new();
         int rehashed = 0;
 
@@ -46,6 +63,7 @@ internal class RunRehash : IRunnable
             list.Add(r);
         }
 
+        bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
         foreach (ArtifactInfo inf in await arm.ListArtifactsAsync())
         foreach (ArtifactResourceInfo rInf in await arm.ListResourcesAsync(inf.Key))
         {
@@ -57,12 +75,12 @@ internal class RunRehash : IRunnable
                 AddFail(rInf);
                 continue;
             }
-            if (!ChecksumSource.DefaultSources.TryGetValue(Hash, out ChecksumSource? haNewV))
+            if (!ChecksumSource.DefaultSources.TryGetValue(hash, out ChecksumSource? haNewV))
             {
                 Console.WriteLine("Failed to instantiate new hash algorithm");
                 return 2;
             }
-            Common.PrintFormat(rInf.GetInfoPathString(), Detailed, () => rInf.GetInfoString());
+            Common.PrintFormat(rInf.GetInfoPathString(), detailed, () => rInf.GetInfoString());
             using HashAlgorithm haNew = haNewV.HashAlgorithmFunc!();
             await using Stream sourceStream = await adm.OpenInputStreamAsync(rInf.Key);
             await using HashProxyStream hpsOriginal = new(sourceStream, haOriginal, true, true);
@@ -76,14 +94,14 @@ internal class RunRehash : IRunnable
             }
             ArtifactResourceInfo nInf = rInf with { Checksum = new Checksum(haNewV.Id, hpsNew.GetHash()) };
             await arm.AddResourceAsync(nInf);
-            Common.PrintFormat(nInf.GetInfoPathString(), Detailed, () => nInf.GetInfoString());
+            Common.PrintFormat(nInf.GetInfoPathString(), detailed, () => nInf.GetInfoString());
             rehashed++;
         }
         Console.WriteLine();
         if (failed.Count != 0)
         {
             Console.WriteLine($"{failed.Sum(v => v.Value.Count)} resources with checksums failed validation before rehash.");
-            foreach (ArtifactResourceInfo value in failed.Values.SelectMany(v => v)) Common.Display(value, Detailed);
+            foreach (ArtifactResourceInfo value in failed.Values.SelectMany(v => v)) Common.Display(value, detailed);
         }
         Console.WriteLine($"{rehashed} resources successfully rehashed.");
         return 0;

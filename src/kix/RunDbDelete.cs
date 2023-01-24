@@ -1,31 +1,54 @@
-﻿using Art;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using Art;
 using Art.Common;
 using Art.EF.Sqlite;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("db-delete", HelpText = "Delete archives in database.")]
-internal class RunDbDelete : RunDbBase, IRunnable
+internal class RunDbDelete : RunDbBase
 {
-    [Option("list", HelpText = "List items.")]
-    public bool List { get; set; }
+    protected Option<bool> ListOption;
 
-    [Option("do-delete", HelpText = "Perform actual delete.")]
-    public bool DoDelete { get; set; }
+    protected Option<bool> DoDeleteOption;
 
-    public async Task<int> RunAsync()
+    public RunDbDelete() : this("db-delete", "Delete archives in database.")
     {
-        using SqliteArtifactRegistrationManager arm = new(Database);
-        IEnumerable<ArtifactInfo> en = (await arm.ListArtifactsOptionalsAsync(Tool, Group)).WithFilters(Tool, ToolLike, Group, GroupLike, Id, IdLike, NameLike);
+    }
+
+    public RunDbDelete(string name, string? description = null) : base(name, description)
+    {
+        ListOption = new Option<bool>(new[] { "--list" }, "List items.");
+        AddOption(ListOption);
+        DoDeleteOption = new Option<bool>(new[] { "--do-delete" }, "Perform actual delete.");
+        AddOption(DoDeleteOption);
+        this.SetHandler(RunAsync);
+    }
+
+    public async Task<int> RunAsync(InvocationContext context)
+    {
+        using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
+        string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;
+        string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
+        string? toolLike = context.ParseResult.HasOption(ToolLikeOption) ? context.ParseResult.GetValueForOption(ToolLikeOption) : null;
+        string? groupLike = context.ParseResult.HasOption(GroupLikeOption) ? context.ParseResult.GetValueForOption(GroupLikeOption) : null;
+        string? id = context.ParseResult.HasOption(IdOption) ? context.ParseResult.GetValueForOption(IdOption) : null;
+        string? idLike = context.ParseResult.HasOption(IdLikeOption) ? context.ParseResult.GetValueForOption(IdLikeOption) : null;
+        string? nameLike = context.ParseResult.HasOption(NameLikeOption) ? context.ParseResult.GetValueForOption(NameLikeOption) : null;
+        IEnumerable<ArtifactInfo> en = (await arm.ListArtifactsOptionalsAsync(tool, group)).WithFilters(tool, toolLike, group, groupLike, id, idLike, nameLike);
         int v = 0;
+        bool list = context.ParseResult.GetValueForOption(ListOption);
+        bool doDelete = context.ParseResult.GetValueForOption(DoDeleteOption);
+        bool listResource = context.ParseResult.GetValueForOption(ListResourceOption);
+        bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
         foreach (ArtifactInfo i in en.ToList())
         {
-            if (List) await Common.DisplayAsync(i, ListResource, arm, Detailed);
-            if (DoDelete) await arm.RemoveArtifactAsync(i.Key);
+            if (list) await Common.DisplayAsync(i, listResource, arm, detailed);
+            if (doDelete) await arm.RemoveArtifactAsync(i.Key);
             v++;
         }
-        Console.WriteLine(DoDelete ? $"Deleted {v} records." : $"{v} records would be affected.");
+        Console.WriteLine(doDelete ? $"Deleted {v} records." : $"{v} records would be affected.");
         return 0;
     }
 }

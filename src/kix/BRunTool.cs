@@ -1,30 +1,43 @@
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
 using Art;
 using Art.Common;
 using Art.Common.Management;
-using CommandLine;
 
 namespace Kix;
 
-public class BRunTool : BRun
+public abstract class BRunTool : BRun
 {
-    [Option('c', "cookie-file", HelpText = "Cookie file.", MetaValue = "file")]
-    public string? CookieFile { get; set; }
+    protected Option<string> CookieFileOption;
 
-    [Option('p', "property", HelpText = "Properties.", MetaValue = "property")]
-    public IReadOnlyCollection<string> Properties { get; set; } = null!;
+    protected Option<List<string>> PropertiesOption;
 
-    protected async Task<IArtifactTool> GetSearchingToolAsync(ArtifactToolProfile artifactToolProfile, CancellationToken cancellationToken = default)
+    protected BRunTool(string name, string? description = null) : base(name, description)
     {
-        if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-        return await GetToolAsync(artifactToolProfile, new InMemoryArtifactRegistrationManager(), new NullArtifactDataManager(), cancellationToken);
+        CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file.");
+        CookieFileOption.ArgumentHelpName = "file";
+        AddOption(CookieFileOption);
+        PropertiesOption = new Option<List<string>>(new[] { "-p", "--property" }, "Add a property.");
+        PropertiesOption.ArgumentHelpName = "key:value";
+        PropertiesOption.Arity = ArgumentArity.ZeroOrMore;
+        AddOption(PropertiesOption);
     }
 
-    protected async Task<IArtifactTool> GetToolAsync(ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
+    protected async Task<IArtifactTool> GetSearchingToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, CancellationToken cancellationToken = default)
     {
-        var context = Plugin.LoadForToolString(artifactToolProfile.Tool, !IgnoreSharedAssemblyVersion);
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-        artifactToolProfile = artifactToolProfile.GetWithConsoleOptions(CookieFile, Properties);
-        IArtifactTool t = await ArtifactTool.PrepareToolAsync(context.Context, artifactToolProfile, arm, adm, cancellationToken);
+        return await GetToolAsync(context, artifactToolProfile, new InMemoryArtifactRegistrationManager(), new NullArtifactDataManager(), cancellationToken);
+    }
+
+    protected async Task<IArtifactTool> GetToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
+    {
+        var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
+        if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
+        string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
+        IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
+        artifactToolProfile = artifactToolProfile.GetWithConsoleOptions(cookieFile, properties);
+        IArtifactTool t = await ArtifactTool.PrepareToolAsync(plugin.Context, artifactToolProfile, arm, adm, cancellationToken);
         return t;
     }
 }

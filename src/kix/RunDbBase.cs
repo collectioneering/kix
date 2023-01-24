@@ -1,39 +1,60 @@
-﻿using CommandLine;
+﻿using System.CommandLine;
 
 namespace Kix;
 
-internal class RunDbBase : IRunOutput
+internal abstract class RunDbBase : BVerb
 {
-    [Option('v', "verbose", HelpText = "Enable verbose output.")]
-    public bool Verbose { get; set; }
+    protected Option<string> DatabaseOption;
 
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
-    public string Database { get; set; } = null!;
+    protected Option<string> ToolOption;
 
-    [Option('t', "tool", HelpText = "Tool to filter by.", MetaValue = "pattern")]
-    public string? Tool { get; set; }
+    protected Option<string> GroupOption;
 
-    [Option('g', "group", HelpText = "Group to filter by.", MetaValue = "pattern")]
-    public string? Group { get; set; }
+    protected Option<string> IdOption;
 
-    [Option('i', "id", HelpText = "Id to filter by.", MetaValue = "pattern")]
-    public string? Id { get; set; }
+    protected Option<string> ToolLikeOption;
 
-    [Option("tool-like", HelpText = "Tool pattern to filter by.", MetaValue = "pattern")]
-    public string? ToolLike { get; set; }
+    protected Option<string> GroupLikeOption;
 
-    [Option("group-like", HelpText = "Group pattern to filter by.", MetaValue = "pattern")]
-    public string? GroupLike { get; set; }
+    protected Option<string> IdLikeOption;
 
-    [Option("id-like", HelpText = "Id pattern to filter by.", MetaValue = "pattern")]
-    public string? IdLike { get; set; }
+    protected Option<string> NameLikeOption;
 
-    [Option("name-like", HelpText = "Name pattern to filter by.", MetaValue = "pattern")]
-    public string? NameLike { get; set; }
+    protected Option<bool> ListResourceOption;
 
-    [Option('l', "list-resource", HelpText = "List resource items.")]
-    public bool ListResource { get; set; }
+    protected Option<bool> DetailedOption;
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
+
+    protected RunDbBase(string name, string? description = null) : base(name, description)
+    {
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
+        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
+        AddOption(DatabaseOption);
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to filter by.");
+        ToolOption.ArgumentHelpName = "value";
+        AddOption(ToolOption);
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to filter by.");
+        GroupOption.ArgumentHelpName = "value";
+        AddOption(GroupOption);
+        IdOption = new Option<string>(new[] { "-i", "--id" }, "Id to filter by.");
+        IdOption.ArgumentHelpName = "value";
+        AddOption(IdOption);
+        ToolLikeOption = new Option<string>(new[] { "--tool-like" }, "Tool pattern to filter by.");
+        ToolLikeOption.ArgumentHelpName = "pattern";
+        AddOption(ToolLikeOption);
+        GroupLikeOption = new Option<string>(new[] { "--group-like" }, "Group pattern to filter by.");
+        GroupLikeOption.ArgumentHelpName = "pattern";
+        AddOption(GroupLikeOption);
+        IdLikeOption = new Option<string>(new[] { "--id-like" }, "Id pattern to filter by.");
+        IdLikeOption.ArgumentHelpName = "pattern";
+        AddOption(IdLikeOption);
+        NameLikeOption = new Option<string>(new[] { "--name-like" }, "Name pattern to filter by.");
+        NameLikeOption.ArgumentHelpName = "pattern";
+        AddOption(NameLikeOption);
+        ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List resource items.");
+        AddOption(ListResourceOption);
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        AddOption(DetailedOption);
+    }
 }

@@ -1,41 +1,55 @@
-﻿using System.Text;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.Text;
 using System.Text.RegularExpressions;
 using Art;
 using Art.Common;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("tools", HelpText = "List artifact tools.")]
-internal class RunTools : BRun, IRunnable
+internal class RunTools : BRun
 {
-    [Option('s', "search", HelpText = "Search pattern.", MetaValue = "pattern")]
-    public string? Search { get; set; }
+    protected Option<string> SearchOption;
 
-    [Option('d', "detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
+    protected Option<bool> DetailedOption;
 
-    public Task<int> RunAsync()
+    public RunTools() : this("tools", "List available tools.")
+    {
+    }
+
+    public RunTools(string name, string? description = null) : base(name, description)
+    {
+        SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern.");
+        SearchOption.ArgumentHelpName = "pattern";
+        AddOption(SearchOption);
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        AddOption(DetailedOption);
+        this.SetHandler(RunAsync);
+    }
+
+    private Task<int> RunAsync(InvocationContext invocationContext)
     {
         foreach (KixManifest manifest in KixManifest.GetManifests())
         {
-            Plugin context;
+            bool verbose = invocationContext.ParseResult.GetValueForOption(VerboseOption);
+            Plugin plugin;
             try
             {
-                context = Plugin.LoadForManifest(manifest, !IgnoreSharedAssemblyVersion);
+                plugin = Plugin.LoadForManifest(manifest, !invocationContext.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
             }
             catch (Exception ex)
             {
-                if (Verbose) Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
+                if (verbose) Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
                 continue;
             }
-            if (Verbose) Console.WriteLine(context.BaseAssembly.FullName);
-            Regex? re = Search != null ? Common.GetFilterRegex(Search, false, false) : null;
-            foreach ((Type toolType, string toolString) in context.BaseAssembly.GetExportedTypes()
+            if (verbose) Console.WriteLine(plugin.BaseAssembly.FullName);
+            string? search = invocationContext.ParseResult.GetValueForOption(SearchOption);
+            Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
+            foreach ((Type toolType, string toolString) in plugin.BaseAssembly.GetExportedTypes()
                          .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
                          .Select(v => (ToolType: v, ToolString: ArtifactToolStringUtil.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))
-                Common.PrintFormat(toolString, Detailed, () =>
+                Common.PrintFormat(toolString, invocationContext.ParseResult.GetValueForOption(DetailedOption), () =>
                 {
                     bool canFind = toolType.IsAssignableTo(typeof(IArtifactToolFind));
                     bool canList = toolType.IsAssignableTo(typeof(IArtifactToolList));

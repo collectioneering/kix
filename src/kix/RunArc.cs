@@ -1,47 +1,76 @@
-﻿using Art;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("arc", HelpText = "Execute archival artifact tools.")]
-internal class RunArc : BRunTool, IRunnable
+internal class RunArc : BRunTool
 {
-    [Option('d', "database", HelpText = "Sqlite database file.", MetaValue = "file", Default = Common.DefaultDbFile)]
-    public string Database { get; set; } = null!;
+    protected Option<string> DatabaseOption;
 
-    [Option('o', "output", HelpText = "Output directory.", MetaValue = "directory")]
-    public string? Output { get; set; }
+    protected Option<string> OutputOption;
 
-    [Option('h', "hash", HelpText = "Checksum algorithm (e.g. None|SHA1|SHA256|SHA384|SHA512|MD5).", Default = "SHA256")]
-    public string Hash { get; set; } = null!;
+    protected Option<string> HashOption;
 
-    [Value(0, HelpText = "Profile file.", MetaValue = "file", MetaName = "profileFile", Required = true)]
-    public IReadOnlyCollection<string> ProfileFiles { get; set; } = null!;
+    protected Argument<List<string>> ProfileFilesArg;
 
-    [Option('u', "update",
-        HelpText = $"Resource update mode ({nameof(ResourceUpdateMode.ArtifactSoft)}|[{nameof(ResourceUpdateMode.ArtifactHard)}]|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}).",
-        MetaValue = "mode", Default = ResourceUpdateMode.ArtifactHard)]
-    public ResourceUpdateMode Update { get; set; }
+    protected Option<ResourceUpdateMode> UpdateOption;
 
-    [Option('f', "full", HelpText = "Ignore nonfull artifacts.")]
-    public bool Full { get; set; }
+    protected Option<bool> FullOption;
 
-    [Option('s', "skip", HelpText = $"Skip artifacts ([{nameof(ArtifactSkipMode.None)}]|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}).", Default = ArtifactSkipMode.None)]
-    public ArtifactSkipMode Skip { get; set; }
+    protected Option<ArtifactSkipMode> SkipOption;
 
-    [Option('z', "fast-exit", HelpText = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.")]
-    public bool FastExit { get; set; }
+    protected Option<bool> FastExitOption;
 
-    [Option("null-output", HelpText = "Send resources to the void.")]
-    public bool NullOutput { get; set; }
+    protected Option<bool> NullOutputOption;
 
-    public async Task<int> RunAsync()
+    public RunArc() : this("arc", "Execute archival artifact tools.")
     {
-        string? hash = string.Equals(Hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : Hash;
+    }
+
+    public RunArc(string name, string? description = null) : base(name, description)
+    {
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
+        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
+        AddOption(DatabaseOption);
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
+        OutputOption.ArgumentHelpName = "directory";
+        AddOption(OutputOption);
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
+        HashOption.SetDefaultValue("SHA256");
+        AddOption(HashOption);
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s).");
+        ProfileFilesArg.HelpName = "file";
+        ProfileFilesArg.Arity = ArgumentArity.OneOrMore;
+        AddArgument(ProfileFilesArg);
+        UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({nameof(ResourceUpdateMode.ArtifactSoft)}|{nameof(ResourceUpdateMode.ArtifactHard)}|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}).");
+        UpdateOption.ArgumentHelpName = "mode";
+        UpdateOption.SetDefaultValue(ResourceUpdateMode.ArtifactHard);
+        AddOption(UpdateOption);
+        FullOption = new Option<bool>(new[] { "-f", "--full" }, "Only process full artifacts.");
+        AddOption(FullOption);
+        SkipOption = new Option<ArtifactSkipMode>(new[] { "-s", "--skip" }, $"Skip artifacts ({nameof(ArtifactSkipMode.None)}|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}).");
+        FastExitOption = new Option<bool>(new[] { "-z", "--fast-exit" }, $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.");
+        SkipOption.ArgumentHelpName = "mode";
+        SkipOption.SetDefaultValue(ArtifactSkipMode.None);
+        AddOption(SkipOption);
+        FastExitOption = new Option<bool>(new[] { "-z", "--fast-exit" }, $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.");
+        AddOption(FastExitOption);
+        NullOutputOption = new Option<bool>(new[] { "--null-output" }, "Send resources to the void.");
+        AddOption(NullOutputOption);
+        this.SetHandler(RunAsync);
+    }
+
+    public async Task<int> RunAsync(InvocationContext context)
+    {
+        string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
+        hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
         if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
         {
             Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
@@ -49,27 +78,35 @@ internal class RunArc : BRunTool, IRunnable
                 Console.WriteLine(id);
             return 2;
         }
-        ArtifactToolDumpOptions options = new(Update, !Full, FastExit ? ArtifactSkipMode.FastExit : Skip, hash);
-        IArtifactDataManager adm = NullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(Output ?? Directory.GetCurrentDirectory());
-        using SqliteArtifactRegistrationManager arm = new(Database);
+        ResourceUpdateMode update = context.ParseResult.GetValueForOption(UpdateOption);
+        bool full = context.ParseResult.GetValueForOption(FullOption);
+        ArtifactSkipMode skip = context.ParseResult.GetValueForOption(SkipOption);
+        bool fastExit = context.ParseResult.GetValueForOption(FastExitOption);
+        bool nullOutput = context.ParseResult.GetValueForOption(NullOutputOption);
+        ArtifactToolDumpOptions options = new(update, !full, fastExit ? ArtifactSkipMode.FastExit : skip, hash);
+        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
+        IArtifactDataManager adm = nullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(output);
+        using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
-        foreach (string profileFile in ProfileFiles)
+        foreach (string profileFile in context.ParseResult.GetValueForArgument(ProfileFilesArg))
             profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
-        profiles = profiles.Select(p => p.GetWithConsoleOptions(CookieFile, Properties)).ToList();
+        string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
+        IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
+        profiles = profiles.Select(p => p.GetWithConsoleOptions(cookieFile, properties)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
-            Plugin context;
+            Plugin plugin;
             try
             {
-                context = Plugin.LoadForToolString(profile.Tool, !IgnoreSharedAssemblyVersion);
+                plugin = Plugin.LoadForToolString(profile.Tool, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
             }
             catch (InvalidOperationException e)
             {
                 Console.WriteLine(e.Message);
                 return 69;
             }
-            await ArtifactDumping.DumpAsync(context.Context, profile, arm, adm, options, l).ConfigureAwait(false);
+            await ArtifactDumping.DumpAsync(plugin.Context, profile, arm, adm, options, l).ConfigureAwait(false);
         }
         return 0;
     }

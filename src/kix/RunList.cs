@@ -1,46 +1,76 @@
-﻿using Art;
+﻿using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.CommandLine.Parsing;
+using Art;
 using Art.Common;
 using Art.Common.Proxies;
-using CommandLine;
 
 namespace Kix;
 
-[Verb("list", HelpText = "Execute artifact list tools.")]
-internal class RunList : BRunTool, IRunnable
+internal class RunList : BRunTool
 {
-    [Option('i', "input", HelpText = "Profile file.", MetaValue = "file", Group = "source")]
-    public string? ProfileFile { get; set; } = null!;
+    protected Option<string> ProfileFileOption;
 
-    [Option('l', "list-resource", HelpText = "List associated resources.")]
-    public bool ListResource { get; set; }
+    protected Option<bool> ListResourceOption;
 
-    [Option('t', "tool", HelpText = "Tool to use or filter profiles by.", MetaValue = "name", Group = "source")]
-    public string? Tool { get; set; }
+    protected Option<string> ToolOption;
 
-    [Option('g', "group", HelpText = "Group to use or filter profiles by.", MetaValue = "name")]
-    public string? Group { get; set; } = null!;
+    protected Option<string> GroupOption;
 
-    [Option("detailed", HelpText = "Show detailed information on entries.")]
-    public bool Detailed { get; set; }
+    protected Option<bool> DetailedOption;
 
-    public async Task<int> RunAsync()
+    public RunList() : this("list", "Execute artifact list tools.")
     {
-        if (ProfileFile == null) return await ExecAsync(new ArtifactToolProfile(Tool!, Group ?? "", null));
-        int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(ProfileFile, JsonOpt.Options))
+    }
+
+    public RunList(string name, string? description = null) : base(name, description)
+    {
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
+        ProfileFileOption.ArgumentHelpName = "file";
+        AddOption(ProfileFileOption);
+        ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources.");
+        AddOption(ListResourceOption);
+        ProfileFileOption.ArgumentHelpName = "file";
+        AddOption(ProfileFileOption);
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.");
+        ToolOption.ArgumentHelpName = "name";
+        AddOption(ToolOption);
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.");
+        GroupOption.ArgumentHelpName = "name";
+        AddOption(GroupOption);
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        AddOption(DetailedOption);
+        AddValidator(v =>
         {
-            if (Group != null && Group != profile.Group || Tool != null && Tool != profile.Tool) continue;
-            ec = Math.Max(await ExecAsync(profile), ec);
+            if (v.GetValueForOption(ProfileFileOption) == null && v.GetValueForOption(ToolOption) == null)
+            {
+                v.ErrorMessage = $"At least one of {ProfileFileOption.Aliases.First()} or {ToolOption.Aliases.First()} must be passed";
+            }
+        });
+        this.SetHandler(RunAsync);
+    }
+
+    public async Task<int> RunAsync(InvocationContext context)
+    {
+        string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
+        string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;
+        string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
+        if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "", null));
+        int ec = 0;
+        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
+        {
+            if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
+            ec = Math.Max(await ExecAsync(context, profile), ec);
         }
         return ec;
     }
 
-    private async Task<int> ExecAsync(ArtifactToolProfile profile)
+    private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile)
     {
         IArtifactTool t;
         try
         {
-            t = await GetSearchingToolAsync(profile);
+            t = await GetSearchingToolAsync(context, profile);
         }
         catch (InvalidOperationException e)
         {
@@ -50,11 +80,13 @@ internal class RunList : BRunTool, IRunnable
         using var tool = t;
         ArtifactToolListOptions options = new();
         ArtifactToolListProxy proxy = new(tool, options, Common.GetDefaultToolLogHandler());
+        bool listResource = context.ParseResult.GetValueForOption(ListResourceOption);
+        bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
         await foreach (ArtifactData data in proxy.ListAsync())
-            if (ListResource)
-                await Common.DisplayAsync(data.Info, data.Values, Detailed);
+            if (listResource)
+                await Common.DisplayAsync(data.Info, data.Values, detailed);
             else
-                Common.Display(data.Info, Detailed);
+                Common.Display(data.Info, detailed);
         return 0;
     }
 }

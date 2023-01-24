@@ -1,12 +1,18 @@
-using CommandLine;
+using System.CommandLine;
 
 namespace Kix;
 
-public class BRun : IRunOutput
+public abstract class BRun : BVerb
 {
-    [Option('v', "verbose", HelpText = "Enable verbose output.")]
-    public bool Verbose { get; set; }
+    protected Option<bool> VerboseOption;
 
-    //[Option("ignore-shared-api-version", HelpText = "Ignore Art library version validation.")]
-    public bool IgnoreSharedAssemblyVersion { get; set; }
+    protected Option<bool> IgnoreSharedAssemblyVersionOption;
+
+    protected BRun(string name, string? description = null) : base(name, description)
+    {
+        VerboseOption = new Option<bool>(new[] { "-v", "--verbose" }, "Enable verbose output.");
+        AddOption(VerboseOption);
+        IgnoreSharedAssemblyVersionOption = new Option<bool>(new[] { "--ignore-shared-api-version" }, "Ignore Art library version validation.");
+        AddOption(IgnoreSharedAssemblyVersionOption);
+    }
 }

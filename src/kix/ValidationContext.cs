@@ -74,7 +74,6 @@ public class ValidationContext
         return new ValidationProcessResult(1, resourceCount);
     }
 
-
     public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactToolProfile> profiles)
     {
         int artifactCount = 0, resourceCount = 0;
