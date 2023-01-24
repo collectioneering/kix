@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using Art;
 using Art.Common;
@@ -23,19 +22,19 @@ internal class RunTools : IRunnable
     {
         foreach (KixManifest manifest in KixManifest.GetManifests())
         {
-            Assembly assembly;
+            PluginContext context;
             try
             {
-                assembly = Common.LoadAssemblyForManifest(manifest);
+                context = PluginContext.LoadForManifest(manifest);
             }
             catch (Exception ex)
             {
                 if (Verbose) Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
                 continue;
             }
-            if (Verbose) Console.WriteLine(assembly.FullName);
+            if (Verbose) Console.WriteLine(context.BaseAssembly.FullName);
             Regex? re = Search != null ? Common.GetFilterRegex(Search, false, false) : null;
-            foreach ((Type toolType, string toolString) in assembly.GetExportedTypes()
+            foreach ((Type toolType, string toolString) in context.BaseAssembly.GetExportedTypes()
                          .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
                          .Select(v => (ToolType: v, ToolString: ArtifactToolStringUtil.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))

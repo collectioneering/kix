@@ -78,10 +78,10 @@ public class ValidationContext
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            Common.LoadAssemblyForToolString(profile.Tool); // InvalidOperationException
-            IArtifactTool tool;
-            if (ArtifactToolLoader.TryLoad(profile, out var toolTmp)) tool = toolTmp;
-            else throw new InvalidOperationException($"Unknown tool {profile.Tool}");
+            var context = PluginContext.LoadForToolString(profile.Tool); // InvalidOperationException
+            if (!context.TryLoadTool(profile, out var t))
+                throw new InvalidOperationException($"Unknown tool {profile.Tool}");
+            using IArtifactTool tool = t;
             var pp = profile.WithCoreTool(tool);
             _l.Log($"Processing entries for profile {pp.Tool}/{pp.Group}", null, LogLevel.Title);
             var result = await ProcessAsync(await _arm.ListArtifactsAsync(pp.Tool, pp.Group));

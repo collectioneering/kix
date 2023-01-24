@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Art;
@@ -121,28 +120,5 @@ internal static class Common
         if (cookieFile != null) opts.AddPropWithWarning("cookieFile", cookieFile.J());
         opts.AddProps(properties);
         return artifactToolProfile with { Options = opts };
-    }
-
-    internal static Assembly LoadAssemblyForToolString(string toolString)
-    {
-        (string assembly, _) = ArtifactToolProfileUtil.GetID(toolString);
-        KixManifest manifest;
-        try
-        {
-            manifest = KixManifest.GetManifests().Single(v => string.Equals(v.Content.Assembly, assembly, StringComparison.InvariantCultureIgnoreCase));
-        }
-        catch
-        {
-            throw new InvalidOperationException($"No applicable manifest for the assembly {assembly} could be found");
-        }
-        return LoadAssemblyForManifest(manifest);
-    }
-
-    internal static Assembly LoadAssemblyForManifest(KixManifest manifest)
-    {
-        string assemblyPath = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path)
-            ? Path.Combine(manifest.BasePath, manifest.Content.Path, Path.ChangeExtension(manifest.Content.Assembly, ".dll"))
-            : Path.Combine(manifest.BasePath, Path.ChangeExtension(manifest.Content.Assembly, ".dll"));
-        return Assembly.LoadFrom(assemblyPath);
     }
 }
