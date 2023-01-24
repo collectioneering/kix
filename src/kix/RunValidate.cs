@@ -84,7 +84,7 @@ internal class RunValidate : BRunTool
         string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
         ArtifactDataManager adm = new DiskArtifactDataManager(output);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
-        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
+        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l, !ShouldIgnoreSharedAssemblyVersionOption(context));
         ValidationProcessResult result;
         if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
         else result = await validationContext.ProcessAsync(profiles);

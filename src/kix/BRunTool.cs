@@ -32,7 +32,7 @@ public abstract class BRunTool : BRun
 
     protected async Task<IArtifactTool> GetToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
-        var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
+        var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool, !ShouldIgnoreSharedAssemblyVersionOption(context));
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();

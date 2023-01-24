@@ -27,29 +27,27 @@ internal class RunTools : BRun
         this.SetHandler(RunAsync);
     }
 
-    private Task<int> RunAsync(InvocationContext invocationContext)
+    private Task<int> RunAsync(InvocationContext context)
     {
         foreach (KixManifest manifest in KixManifest.GetManifests())
         {
-            bool verbose = invocationContext.ParseResult.GetValueForOption(VerboseOption);
             Plugin plugin;
             try
             {
-                plugin = Plugin.LoadForManifest(manifest, !invocationContext.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
+                plugin = Plugin.LoadForManifest(manifest, !ShouldIgnoreSharedAssemblyVersionOption(context));
             }
             catch (Exception ex)
             {
-                if (verbose) Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
+                Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
                 continue;
             }
-            if (verbose) Console.WriteLine(plugin.BaseAssembly.FullName);
-            string? search = invocationContext.ParseResult.GetValueForOption(SearchOption);
+            string? search = context.ParseResult.GetValueForOption(SearchOption);
             Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
             foreach ((Type toolType, string toolString) in plugin.BaseAssembly.GetExportedTypes()
                          .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
                          .Select(v => (ToolType: v, ToolString: ArtifactToolStringUtil.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))
-                Common.PrintFormat(toolString, invocationContext.ParseResult.GetValueForOption(DetailedOption), () =>
+                Common.PrintFormat(toolString, context.ParseResult.GetValueForOption(DetailedOption), () =>
                 {
                     bool canFind = toolType.IsAssignableTo(typeof(IArtifactToolFind));
                     bool canList = toolType.IsAssignableTo(typeof(IArtifactToolList));

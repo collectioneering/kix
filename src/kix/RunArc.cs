@@ -99,7 +99,7 @@ internal class RunArc : BRunTool
             Plugin plugin;
             try
             {
-                plugin = Plugin.LoadForToolString(profile.Tool, !context.ParseResult.GetValueForOption(IgnoreSharedAssemblyVersionOption));
+                plugin = Plugin.LoadForToolString(profile.Tool, !ShouldIgnoreSharedAssemblyVersionOption(context));
             }
             catch (InvalidOperationException e)
             {
