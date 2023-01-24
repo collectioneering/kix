@@ -35,9 +35,10 @@ internal class RunDump : BRunTool
         AddOption(DatabaseOption);
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
         OutputOption.ArgumentHelpName = "directory";
+        OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
+        AddOption(OutputOption);
         NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources.");
         AddOption(NoDatabaseOption);
-        AddOption(OutputOption);
         ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
         ProfileFileOption.ArgumentHelpName = "file";
         AddOption(ProfileFileOption);
@@ -59,8 +60,7 @@ internal class RunDump : BRunTool
 
     private async Task<int> RunAsync(InvocationContext context)
     {
-        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
-        ArtifactDataManager adm = new DiskArtifactDataManager(output);
+        ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         if (context.ParseResult.GetValueForOption(NoDatabaseOption))
         {
             InMemoryArtifactRegistrationManager arm = new();

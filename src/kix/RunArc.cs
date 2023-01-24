@@ -41,6 +41,7 @@ internal class RunArc : BRunTool
         AddOption(DatabaseOption);
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
         OutputOption.ArgumentHelpName = "directory";
+        OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
         HashOption.SetDefaultValue("SHA256");
@@ -84,8 +85,7 @@ internal class RunArc : BRunTool
         bool fastExit = context.ParseResult.GetValueForOption(FastExitOption);
         bool nullOutput = context.ParseResult.GetValueForOption(NullOutputOption);
         ArtifactToolDumpOptions options = new(update, !full, fastExit ? ArtifactSkipMode.FastExit : skip, hash);
-        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
-        IArtifactDataManager adm = nullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(output);
+        IArtifactDataManager adm = nullOutput ? new NullArtifactDataManager() : new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();

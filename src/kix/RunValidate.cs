@@ -36,6 +36,7 @@ internal class RunValidate : BRunTool
         AddOption(DatabaseOption);
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
         OutputOption.ArgumentHelpName = "directory";
+        OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
         HashOption.SetDefaultValue("SHA256");
@@ -81,8 +82,7 @@ internal class RunValidate : BRunTool
             }
             l.Log("No profiles provided, validating all artifacts and resources", null, LogLevel.Information);
         }
-        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
-        ArtifactDataManager adm = new DiskArtifactDataManager(output);
+        ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l, !ShouldIgnoreSharedAssemblyVersionOption(context));
         ValidationProcessResult result;

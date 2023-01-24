@@ -32,6 +32,7 @@ internal class RunRehash : BVerb
         AddOption(DatabaseOption);
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
         OutputOption.ArgumentHelpName = "directory";
+        OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (SHA1|SHA256|SHA384|SHA512|MD5).");
         HashOption.IsRequired = true;
@@ -51,8 +52,7 @@ internal class RunRehash : BVerb
                 Console.WriteLine(id);
             return 2;
         }
-        string output = (context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null) ?? Directory.GetCurrentDirectory();
-        ArtifactDataManager adm = new DiskArtifactDataManager(output);
+        ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed = new();
         int rehashed = 0;
