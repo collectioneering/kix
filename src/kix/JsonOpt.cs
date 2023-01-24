@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Kix;
+namespace kix;
 
 public static class JsonOpt
 {

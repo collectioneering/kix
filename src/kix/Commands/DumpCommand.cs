@@ -7,9 +7,9 @@ using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunDump : ToolCommand
+internal class DumpCommand : ToolCommand
 {
     protected Option<string> DatabaseOption;
 
@@ -23,11 +23,11 @@ internal class RunDump : ToolCommand
 
     protected Option<string> GroupOption;
 
-    public RunDump() : this("dump", "Execute artifact dump tools.")
+    public DumpCommand() : this("dump", "Execute artifact dump tools.")
     {
     }
 
-    public RunDump(string name, string? description = null) : base(name, description)
+    public DumpCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
         DatabaseOption.ArgumentHelpName = "file";

@@ -3,7 +3,7 @@ using System.Reflection;
 using Art;
 using Art.Common;
 
-namespace Kix;
+namespace kix;
 
 internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Assembly BaseAssembly)
 {

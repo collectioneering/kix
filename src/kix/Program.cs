@@ -1,6 +1,8 @@
 ﻿using System.CommandLine;
+using kix.Commands;
+using kix.Commands.Database;
 
-namespace Kix;
+namespace kix;
 
 internal static class Program
 {
@@ -8,15 +10,14 @@ internal static class Program
     {
         var rootCommand = new RootCommand
         {
-            new RunArc(),
-            new RunDump(),
-            new RunFind(),
-            new RunList(),
-            new RunRehash(),
-            new RunTools(),
-            new RunValidate(),
-            new RunDbList(),
-            new RunDbDelete()
+            new ArcCommand(),
+            new DumpCommand(),
+            new FindCommand(),
+            new ListCommand(),
+            new RehashCommand(),
+            new ToolsCommand(),
+            new ValidateCommand(),
+            new DatabaseCommand()
         };
         return await rootCommand.InvokeAsync(args);
     }

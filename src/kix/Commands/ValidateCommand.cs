@@ -6,9 +6,9 @@ using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunValidate : ToolCommand
+internal class ValidateCommand : ToolCommand
 {
     protected Option<string> DatabaseOption;
 
@@ -24,11 +24,11 @@ internal class RunValidate : ToolCommand
 
     protected Option<bool> DetailedOption;
 
-    public RunValidate() : this("validate", "Verify resource integrity.")
+    public ValidateCommand() : this("validate", "Verify resource integrity.")
     {
     }
 
-    public RunValidate(string name, string? description = null) : base(name, description)
+    public ValidateCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
         DatabaseOption.ArgumentHelpName = "file";

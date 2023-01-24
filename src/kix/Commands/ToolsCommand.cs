@@ -5,19 +5,19 @@ using System.Text.RegularExpressions;
 using Art;
 using Art.Common;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunTools : Command
+internal class ToolsCommand : Command
 {
     protected Option<string> SearchOption;
 
     protected Option<bool> DetailedOption;
 
-    public RunTools() : this("tools", "List available tools.")
+    public ToolsCommand() : this("tools", "List available tools.")
     {
     }
 
-    public RunTools(string name, string? description = null) : base(name, description)
+    public ToolsCommand(string name, string? description = null) : base(name, description)
     {
         SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern.");
         SearchOption.ArgumentHelpName = "pattern";

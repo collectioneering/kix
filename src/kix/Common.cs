@@ -5,7 +5,7 @@ using Art.Common;
 using Art.Common.Logging;
 using EA;
 
-namespace Kix;
+namespace kix;
 
 internal static class Common
 {

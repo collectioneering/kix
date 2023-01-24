@@ -7,9 +7,9 @@ using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunArc : ToolCommand
+internal class ArcCommand : ToolCommand
 {
     protected Option<string> DatabaseOption;
 
@@ -29,11 +29,11 @@ internal class RunArc : ToolCommand
 
     protected Option<bool> NullOutputOption;
 
-    public RunArc() : this("arc", "Execute archival artifact tools.")
+    public ArcCommand() : this("arc", "Execute archival artifact tools.")
     {
     }
 
-    public RunArc(string name, string? description = null) : base(name, description)
+    public ArcCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
         DatabaseOption.ArgumentHelpName = "file";

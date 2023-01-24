@@ -6,9 +6,9 @@ using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunRehash : Command
+internal class RehashCommand : Command
 {
     protected Option<string> DatabaseOption;
 
@@ -19,11 +19,11 @@ internal class RunRehash : Command
     protected Option<bool> DetailedOption;
 
 
-    public RunRehash() : this("rehash", "Recompute hashes for archive contents.")
+    public RehashCommand() : this("rehash", "Recompute hashes for archive contents.")
     {
     }
 
-    public RunRehash(string name, string? description = null) : base(name, description)
+    public RehashCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
         DatabaseOption.ArgumentHelpName = "file";

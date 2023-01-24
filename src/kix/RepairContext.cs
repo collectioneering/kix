@@ -2,7 +2,7 @@
 using Art.Common;
 using Art.Common.Proxies;
 
-namespace Kix;
+namespace kix;
 
 public class RepairContext
 {

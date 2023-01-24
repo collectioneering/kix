@@ -5,19 +5,15 @@ using Art;
 using Art.Common;
 using Art.EF.Sqlite;
 
-namespace Kix;
+namespace kix.Commands.Database;
 
-internal class RunDbDelete : RunDbBase
+internal class DatabaseCommandDelete : DatabaseCommandBase
 {
     protected Option<bool> ListOption;
 
     protected Option<bool> DoDeleteOption;
 
-    public RunDbDelete() : this("db-delete", "Delete archives in database.")
-    {
-    }
-
-    public RunDbDelete(string name, string? description = null) : base(name, description)
+    public DatabaseCommandDelete(string name, string? description = null) : base(name, description)
     {
         ListOption = new Option<bool>(new[] { "--list" }, "List items.");
         AddOption(ListOption);

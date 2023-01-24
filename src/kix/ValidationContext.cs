@@ -2,7 +2,7 @@
 using Art;
 using Art.Common;
 
-namespace Kix;
+namespace kix;
 
 public class ValidationContext
 {

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Kix;
+namespace kix;
 
 public class KixAssemblyLoadContext : AssemblyLoadContext
 {

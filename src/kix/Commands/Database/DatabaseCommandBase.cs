@@ -1,8 +1,8 @@
 ﻿using System.CommandLine;
 
-namespace Kix;
+namespace kix.Commands.Database;
 
-internal abstract class RunDbBase : Command
+internal abstract class DatabaseCommandBase : Command
 {
     protected Option<string> DatabaseOption;
 
@@ -25,7 +25,7 @@ internal abstract class RunDbBase : Command
     protected Option<bool> DetailedOption;
 
 
-    protected RunDbBase(string name, string? description = null) : base(name, description)
+    protected DatabaseCommandBase(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
         DatabaseOption.ArgumentHelpName = "file";

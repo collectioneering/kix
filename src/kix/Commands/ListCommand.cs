@@ -5,12 +5,10 @@ using Art;
 using Art.Common;
 using Art.Common.Proxies;
 
-namespace Kix;
+namespace kix.Commands;
 
-internal class RunFind : ToolCommand
+internal class ListCommand : ToolCommand
 {
-    protected Argument<List<string>> IdsArg;
-
     protected Option<string> ProfileFileOption;
 
     protected Option<bool> ListResourceOption;
@@ -21,19 +19,17 @@ internal class RunFind : ToolCommand
 
     protected Option<bool> DetailedOption;
 
-    public RunFind() : this("find", "Execute artifact finder tools.")
+    public ListCommand() : this("list", "Execute artifact list tools.")
     {
     }
 
-    public RunFind(string name, string? description = null) : base(name, description)
+    public ListCommand(string name, string? description = null) : base(name, description)
     {
-        IdsArg = new Argument<List<string>>("ids", "IDs.");
-        IdsArg.HelpName = "id";
-        IdsArg.Arity = ArgumentArity.OneOrMore;
-        AddArgument(IdsArg);
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
+        ProfileFileOption.ArgumentHelpName = "file";
+        AddOption(ProfileFileOption);
         ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources.");
         AddOption(ListResourceOption);
-        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
         ProfileFileOption.ArgumentHelpName = "file";
         AddOption(ProfileFileOption);
         ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.");
@@ -59,11 +55,7 @@ internal class RunFind : ToolCommand
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
         string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;
         string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
-        if (profileFile == null)
-        {
-            ArtifactToolProfile profile = new(tool!, group ?? "unknown", null);
-            return await ExecAsync(context, profile);
-        }
+        if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "", null));
         int ec = 0;
         foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
         {
@@ -86,33 +78,15 @@ internal class RunFind : ToolCommand
             return 69;
         }
         using var tool = t;
-        ArtifactToolFindProxy proxy = new(tool);
+        ArtifactToolListOptions options = new();
+        ArtifactToolListProxy proxy = new(tool, options, Common.GetDefaultToolLogHandler());
         bool listResource = context.ParseResult.GetValueForOption(ListResourceOption);
         bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
-        foreach (string id in context.ParseResult.GetValueForArgument(IdsArg))
-        {
-            ArtifactData? data = null;
-            try
-            {
-                data = await proxy.FindAsync(id);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                continue;
-            }
-            finally
-            {
-                if (data == null) Console.WriteLine($"!! [{id}] not found");
-            }
-            if (data != null)
-            {
-                if (listResource)
-                    await Common.DisplayAsync(data.Info, data.Values, detailed);
-                else
-                    Common.Display(data.Info, detailed);
-            }
-        }
+        await foreach (ArtifactData data in proxy.ListAsync())
+            if (listResource)
+                await Common.DisplayAsync(data.Info, data.Values, detailed);
+            else
+                Common.Display(data.Info, detailed);
         return 0;
     }
 }

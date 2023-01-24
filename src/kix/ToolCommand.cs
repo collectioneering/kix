@@ -5,7 +5,7 @@ using Art;
 using Art.Common;
 using Art.Common.Management;
 
-namespace Kix;
+namespace kix;
 
 public abstract class ToolCommand : Command
 {
