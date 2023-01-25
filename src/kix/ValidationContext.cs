@@ -30,41 +30,62 @@ public class ValidationContext
 
     public async Task<ValidationProcessResult> ProcessAsync(List<ArtifactInfo> artifacts, string? hashForAdd)
     {
-        if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
+        int artifactCount = 0, resourceCount = 0;
+        if (hashForAdd == null)
         {
-            throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
-        }
-        try
-        {
-            int artifactCount = 0, resourceCount = 0;
             foreach (ArtifactInfo inf in artifacts)
             {
-                var result = await ProcessAsync(inf, hashForAdd, hashAlgorithm);
+                var result = await ProcessAsync(inf, hashForAdd, null);
                 artifactCount += result.Artifacts;
                 resourceCount += result.Resources;
             }
-            return new ValidationProcessResult(artifactCount, resourceCount);
         }
-        finally
+        else
         {
-            hashAlgorithm.Dispose();
+            if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
+            {
+                throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
+            }
+            try
+            {
+                foreach (ArtifactInfo inf in artifacts)
+                {
+                    var result = await ProcessAsync(inf, hashForAdd, hashAlgorithm);
+                    artifactCount += result.Artifacts;
+                    resourceCount += result.Resources;
+                }
+            }
+            finally
+            {
+                hashAlgorithm.Dispose();
+            }
         }
+        return new ValidationProcessResult(artifactCount, resourceCount);
     }
 
     public async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, string? hashForAdd)
     {
-        if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
+        ValidationProcessResult result;
+        if (hashForAdd == null)
         {
-            throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
+            result = await ProcessAsync(artifact, hashForAdd, null);
         }
-        try
+        else
         {
-            return await ProcessAsync(artifact, hashForAdd, hashAlgorithm);
+            if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
+            {
+                throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
+            }
+            try
+            {
+                result = await ProcessAsync(artifact, hashForAdd, hashAlgorithm);
+            }
+            finally
+            {
+                hashAlgorithm.Dispose();
+            }
         }
-        finally
-        {
-            hashAlgorithm.Dispose();
-        }
+        return result;
     }
 
     private async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, string? hashForAdd, HashAlgorithm? hashAlgorithmForAdd)
