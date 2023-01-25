@@ -9,18 +9,16 @@ public class ValidationContext
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
     private readonly IArtifactRegistrationManager _arm;
     private readonly ArtifactDataManager _adm;
-    private readonly bool _addChecksum;
     private readonly IToolLogHandler _l;
 
     public bool AnyFailed => _failed.Count != 0;
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, bool addChecksum, IToolLogHandler l)
+    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
     {
         _arm = arm;
         _adm = adm;
-        _addChecksum = addChecksum;
         _l = l;
     }
 
@@ -30,19 +28,46 @@ public class ValidationContext
         list.Add(r);
     }
 
-    public async Task<ValidationProcessResult> ProcessAsync(List<ArtifactInfo> artifacts)
+    public async Task<ValidationProcessResult> ProcessAsync(List<ArtifactInfo> artifacts, string? hashForAdd)
     {
-        int artifactCount = 0, resourceCount = 0;
-        foreach (ArtifactInfo inf in artifacts)
+        if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
         {
-            var result = await ProcessAsync(inf);
-            artifactCount += result.Artifacts;
-            resourceCount += result.Resources;
+            throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
         }
-        return new ValidationProcessResult(artifactCount, resourceCount);
+        try
+        {
+            int artifactCount = 0, resourceCount = 0;
+            foreach (ArtifactInfo inf in artifacts)
+            {
+                var result = await ProcessAsync(inf, hashForAdd, hashAlgorithm);
+                artifactCount += result.Artifacts;
+                resourceCount += result.Resources;
+            }
+            return new ValidationProcessResult(artifactCount, resourceCount);
+        }
+        finally
+        {
+            hashAlgorithm.Dispose();
+        }
     }
 
-    public async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact)
+    public async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, string? hashForAdd)
+    {
+        if (!ChecksumSource.TryGetHashAlgorithm(hashForAdd, out HashAlgorithm? hashAlgorithm))
+        {
+            throw new ArgumentException($"Unsupported hash algorithm {hashForAdd}");
+        }
+        try
+        {
+            return await ProcessAsync(artifact, hashForAdd, hashAlgorithm);
+        }
+        finally
+        {
+            hashAlgorithm.Dispose();
+        }
+    }
+
+    private async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, string? hashForAdd, HashAlgorithm? hashAlgorithmForAdd)
     {
         int resourceCount = 0;
         foreach (ArtifactResourceInfo rInf in await _arm.ListResourcesAsync(artifact.Key))
@@ -55,7 +80,16 @@ public class ValidationContext
             }
             if (rInf.Checksum == null)
             {
-                if (_addChecksum) AddFail(rInf);
+                if (hashForAdd == null || hashAlgorithmForAdd == null)
+                {
+                    AddFail(rInf);
+                }
+                else
+                {
+                    await using Stream sourceStreamAdd = await _adm.OpenInputStreamAsync(rInf.Key);
+                    byte[] hash = await hashAlgorithmForAdd.ComputeHashAsync(sourceStreamAdd);
+                    await _arm.AddResourceAsync(rInf with { Checksum = new Checksum(hashForAdd, hash) });
+                }
                 continue;
             }
             if (!ChecksumSource.TryGetHashAlgorithm(rInf.Checksum.Id, out HashAlgorithm? hashAlgorithm))
@@ -63,16 +97,21 @@ public class ValidationContext
                 AddFail(rInf);
                 continue;
             }
-            await using Stream sourceStream = await _adm.OpenInputStreamAsync(rInf.Key);
-            await using HashProxyStream hps = new(sourceStream, hashAlgorithm, true);
-            await using MemoryStream ms = new();
-            await hps.CopyToAsync(ms);
-            if (!rInf.Checksum.Value.AsSpan().SequenceEqual(hps.GetHash())) AddFail(rInf);
+            try
+            {
+                await using Stream sourceStream = await _adm.OpenInputStreamAsync(rInf.Key);
+                byte[] hash = await hashAlgorithm.ComputeHashAsync(sourceStream);
+                if (!rInf.Checksum.Value.AsSpan().SequenceEqual(hash)) AddFail(rInf);
+            }
+            finally
+            {
+                hashAlgorithm.Dispose();
+            }
         }
         return new ValidationProcessResult(1, resourceCount);
     }
 
-    public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactToolProfile> profiles)
+    public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactToolProfile> profiles, string? hashForAdd)
     {
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
@@ -83,7 +122,7 @@ public class ValidationContext
             using IArtifactTool tool = t;
             var pp = profile.WithCoreTool(tool);
             _l.Log($"Processing entries for profile {pp.Tool}/{pp.Group}", null, LogLevel.Title);
-            var result = await ProcessAsync(await _arm.ListArtifactsAsync(pp.Tool, pp.Group));
+            var result = await ProcessAsync(await _arm.ListArtifactsAsync(pp.Tool, pp.Group), hashForAdd);
             _l.Log($"Processed {result.Artifacts} artifacts and {result.Resources} resources for profile {pp.Tool}/{pp.Group}", null, LogLevel.Information);
             artifactCount += result.Artifacts;
             resourceCount += result.Resources;

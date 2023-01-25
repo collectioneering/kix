@@ -79,10 +79,11 @@ internal class ValidateCommand : ToolCommandBase
         }
         ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
-        var validationContext = new ValidationContext(arm, adm, context.ParseResult.GetValueForOption(AddChecksumOption), l);
+        var validationContext = new ValidationContext(arm, adm, l);
         ValidationProcessResult result;
-        if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync());
-        else result = await validationContext.ProcessAsync(profiles);
+        string? hashForAdd = context.ParseResult.GetValueForOption(AddChecksumOption) ? hash : null;
+        if (profiles.Count == 0) result = await validationContext.ProcessAsync(await arm.ListArtifactsAsync(), hashForAdd);
+        else result = await validationContext.ProcessAsync(profiles, hashForAdd);
         l.Log($"Total: {result.Artifacts} artifacts and {result.Resources} processed.", null, LogLevel.Information);
         if (!validationContext.AnyFailed)
         {
