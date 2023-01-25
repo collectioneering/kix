@@ -7,7 +7,7 @@ using Art.Common;
 
 namespace kix.Commands;
 
-internal class ToolsCommand : Command
+internal class ToolsCommand : CommandBase
 {
     protected Option<string> SearchOption;
 
@@ -23,10 +23,9 @@ internal class ToolsCommand : Command
         AddOption(SearchOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
         AddOption(DetailedOption);
-        this.SetHandler(RunAsync);
     }
 
-    private Task<int> RunAsync(InvocationContext context)
+    protected override Task<int> RunAsync(InvocationContext context)
     {
         var manifests = new Dictionary<string, KixManifest>();
         KixManifest.LoadManifests(manifests);

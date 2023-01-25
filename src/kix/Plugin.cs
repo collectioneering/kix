@@ -17,7 +17,7 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
         string assembly = ArtifactToolProfileUtil.GetID(toolString).Assembly;
         if (!KixManifest.TryFind(assembly, out var manifest))
         {
-            throw new InvalidOperationException($"No applicable manifest for the assembly {assembly} could be found");
+            throw new ManifestNotFoundException(assembly);
         }
         return LoadForManifest(manifest);
     }

@@ -7,7 +7,7 @@ using Art.Common.Management;
 
 namespace kix.Commands;
 
-public abstract class ToolCommandBase : Command
+public abstract class ToolCommandBase : CommandBase
 {
     protected Option<string> CookieFileOption;
 

@@ -19,10 +19,9 @@ internal class DatabaseCommandDelete : DatabaseCommandBase
         AddOption(ListOption);
         DoDeleteOption = new Option<bool>(new[] { "--do-delete" }, "Perform actual delete.");
         AddOption(DoDeleteOption);
-        this.SetHandler(RunAsync);
     }
 
-    private async Task<int> RunAsync(InvocationContext context)
+    protected override async Task<int> RunAsync(InvocationContext context)
     {
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;

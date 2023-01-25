@@ -59,10 +59,9 @@ internal class ArcCommand : ToolCommandBase
         AddOption(FastExitOption);
         NullOutputOption = new Option<bool>(new[] { "--null-output" }, "Send resources to the void.");
         AddOption(NullOutputOption);
-        this.SetHandler(RunAsync);
     }
 
-    private async Task<int> RunAsync(InvocationContext context)
+    protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;

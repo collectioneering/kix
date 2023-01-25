@@ -8,7 +8,7 @@ using Art.EF.Sqlite;
 
 namespace kix.Commands;
 
-internal class RehashCommand : Command
+internal class RehashCommand : CommandBase
 {
     protected Option<string> DatabaseOption;
 
@@ -35,10 +35,9 @@ internal class RehashCommand : Command
         AddOption(HashOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
         AddOption(DetailedOption);
-        this.SetHandler(RunAsync);
     }
 
-    private async Task<int> RunAsync(InvocationContext context)
+    protected override async Task<int> RunAsync(InvocationContext context)
     {
         string hash = context.ParseResult.GetValueForOption(HashOption)!;
         if (!ChecksumSource.DefaultSources.ContainsKey(hash))

@@ -2,7 +2,7 @@
 
 namespace kix.Commands.Database;
 
-internal abstract class DatabaseCommandBase : Command
+internal abstract class DatabaseCommandBase : CommandBase
 {
     protected Option<string> DatabaseOption;
 

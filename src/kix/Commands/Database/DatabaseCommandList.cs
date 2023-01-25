@@ -21,10 +21,9 @@ internal class DatabaseCommandList : DatabaseCommandBase
         AddOption(AugmentOption);
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Generate profile file.") { ArgumentHelpName = "file" };
         AddOption(OutputOption);
-        this.SetHandler(RunAsync);
     }
 
-    private async Task<int> RunAsync(InvocationContext context)
+    protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? augment = context.ParseResult.HasOption(AugmentOption) ? context.ParseResult.GetValueForOption(AugmentOption) : null;
         string? output = context.ParseResult.HasOption(OutputOption) ? context.ParseResult.GetValueForOption(OutputOption) : null;

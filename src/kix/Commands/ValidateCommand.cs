@@ -47,10 +47,9 @@ internal class ValidateCommand : ToolCommandBase
         AddOption(AddChecksumOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
         AddOption(DetailedOption);
-        this.SetHandler(RunAsync);
     }
 
-    private async Task<int> RunAsync(InvocationContext context)
+    protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
