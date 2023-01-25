@@ -28,7 +28,9 @@ internal class ToolsCommand : Command
 
     private Task<int> RunAsync(InvocationContext context)
     {
-        foreach (KixManifest manifest in KixManifest.GetManifests())
+        var manifests = new Dictionary<string, KixManifest>();
+        KixManifest.LoadManifests(manifests);
+        foreach (KixManifest manifest in manifests.Values)
         {
             Plugin plugin;
             try
