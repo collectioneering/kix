@@ -1,6 +1,8 @@
-﻿namespace kix;
+﻿using Art;
 
-public class ManifestNotFoundException : Exception
+namespace kix;
+
+public class ManifestNotFoundException : ArtUserException
 {
     public string AssemblyName { get; }
 

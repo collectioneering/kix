@@ -17,12 +17,7 @@ public abstract class CommandBase : Command
         {
             return await RunAsync(context);
         }
-        catch (ManifestNotFoundException e)
-        {
-            PrintExceptionMessage(e);
-            return -1;
-        }
-        catch (ArtifactToolNotFoundException e)
+        catch (ArtUserException e)
         {
             PrintExceptionMessage(e);
             return -1;
