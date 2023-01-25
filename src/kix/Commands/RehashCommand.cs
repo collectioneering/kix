@@ -25,16 +25,13 @@ internal class RehashCommand : Command
 
     public RehashCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
-        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
-        OutputOption.ArgumentHelpName = "directory";
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (SHA1|SHA256|SHA384|SHA512|MD5).");
-        HashOption.IsRequired = true;
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (SHA1|SHA256|SHA384|SHA512|MD5).") { IsRequired = true };
         AddOption(HashOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
         AddOption(DetailedOption);

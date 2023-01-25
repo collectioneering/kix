@@ -9,7 +9,7 @@ using Art.EF.Sqlite;
 
 namespace kix.Commands;
 
-internal class ArcCommand : ToolCommand
+internal class ArcCommand : ToolCommandBase
 {
     protected Option<string> DatabaseOption;
 
@@ -35,29 +35,23 @@ internal class ArcCommand : ToolCommand
 
     public ArcCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
-        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
-        OutputOption.ArgumentHelpName = "directory";
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
         HashOption.SetDefaultValue("SHA256");
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s).");
-        ProfileFilesArg.HelpName = "file";
-        ProfileFilesArg.Arity = ArgumentArity.OneOrMore;
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s).") { HelpName = "file", Arity = ArgumentArity.OneOrMore };
         AddArgument(ProfileFilesArg);
-        UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({nameof(ResourceUpdateMode.ArtifactSoft)}|{nameof(ResourceUpdateMode.ArtifactHard)}|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}).");
-        UpdateOption.ArgumentHelpName = "mode";
+        UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({Common.ResourceUpdateModes}).") { ArgumentHelpName = "mode" };
         UpdateOption.SetDefaultValue(ResourceUpdateMode.ArtifactHard);
         AddOption(UpdateOption);
         FullOption = new Option<bool>(new[] { "-f", "--full" }, "Only process full artifacts.");
         AddOption(FullOption);
-        SkipOption = new Option<ArtifactSkipMode>(new[] { "-s", "--skip" }, $"Skip artifacts ({nameof(ArtifactSkipMode.None)}|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}).");
-        FastExitOption = new Option<bool>(new[] { "-z", "--fast-exit" }, $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.");
+        SkipOption = new Option<ArtifactSkipMode>(new[] { "-s", "--skip" }, $"Skip artifacts ({Common.ArtifactSkipModes}).");
         SkipOption.ArgumentHelpName = "mode";
         SkipOption.SetDefaultValue(ArtifactSkipMode.None);
         AddOption(SkipOption);
@@ -68,7 +62,7 @@ internal class ArcCommand : ToolCommand
         this.SetHandler(RunAsync);
     }
 
-    public async Task<int> RunAsync(InvocationContext context)
+    private async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;

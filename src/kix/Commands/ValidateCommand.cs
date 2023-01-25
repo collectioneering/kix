@@ -8,7 +8,7 @@ using Art.EF.Sqlite;
 
 namespace kix.Commands;
 
-internal class ValidateCommand : ToolCommand
+internal class ValidateCommand : ToolCommandBase
 {
     protected Option<string> DatabaseOption;
 
@@ -30,20 +30,16 @@ internal class ValidateCommand : ToolCommand
 
     public ValidateCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
-        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
-        OutputOption.ArgumentHelpName = "directory";
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, "Checksum algorithm (None|SHA1|SHA256|SHA384|SHA512|MD5).");
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
         HashOption.SetDefaultValue("SHA256");
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with.");
-        ProfileFilesArg.HelpName = "file";
-        ProfileFilesArg.Arity = ArgumentArity.ZeroOrMore;
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with.") { HelpName = "file", Arity = ArgumentArity.ZeroOrMore };
         AddArgument(ProfileFilesArg);
         RepairOption = new Option<bool>(new[] { "--repair" }, "Re-obtain resources that failed validation (requires appropriate profiles)");
         AddOption(RepairOption);
@@ -54,7 +50,7 @@ internal class ValidateCommand : ToolCommand
         this.SetHandler(RunAsync);
     }
 
-    public async Task<int> RunAsync(InvocationContext context)
+    private async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;

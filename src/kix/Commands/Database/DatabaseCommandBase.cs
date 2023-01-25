@@ -27,30 +27,22 @@ internal abstract class DatabaseCommandBase : Command
 
     protected DatabaseCommandBase(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
-        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to filter by.");
-        ToolOption.ArgumentHelpName = "value";
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to filter by.") { ArgumentHelpName = "value" };
         AddOption(ToolOption);
-        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to filter by.");
-        GroupOption.ArgumentHelpName = "value";
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to filter by.") { ArgumentHelpName = "value" };
         AddOption(GroupOption);
-        IdOption = new Option<string>(new[] { "-i", "--id" }, "Id to filter by.");
-        IdOption.ArgumentHelpName = "value";
+        IdOption = new Option<string>(new[] { "-i", "--id" }, "Id to filter by.") { ArgumentHelpName = "value" };
         AddOption(IdOption);
-        ToolLikeOption = new Option<string>(new[] { "--tool-like" }, "Tool pattern to filter by.");
-        ToolLikeOption.ArgumentHelpName = "pattern";
+        ToolLikeOption = new Option<string>(new[] { "--tool-like" }, "Tool pattern to filter by.") { ArgumentHelpName = "pattern" };
         AddOption(ToolLikeOption);
-        GroupLikeOption = new Option<string>(new[] { "--group-like" }, "Group pattern to filter by.");
-        GroupLikeOption.ArgumentHelpName = "pattern";
+        GroupLikeOption = new Option<string>(new[] { "--group-like" }, "Group pattern to filter by.") { ArgumentHelpName = "pattern" };
         AddOption(GroupLikeOption);
-        IdLikeOption = new Option<string>(new[] { "--id-like" }, "Id pattern to filter by.");
-        IdLikeOption.ArgumentHelpName = "pattern";
+        IdLikeOption = new Option<string>(new[] { "--id-like" }, "Id pattern to filter by.") { ArgumentHelpName = "pattern" };
         AddOption(IdLikeOption);
-        NameLikeOption = new Option<string>(new[] { "--name-like" }, "Name pattern to filter by.");
-        NameLikeOption.ArgumentHelpName = "pattern";
+        NameLikeOption = new Option<string>(new[] { "--name-like" }, "Name pattern to filter by.") { ArgumentHelpName = "pattern" };
         AddOption(NameLikeOption);
         ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List resource items.");
         AddOption(ListResourceOption);

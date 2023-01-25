@@ -7,7 +7,7 @@ using Art.Common.Proxies;
 
 namespace kix.Commands;
 
-internal class ListCommand : ToolCommand
+internal class ListCommand : ToolCommandBase
 {
     protected Option<string> ProfileFileOption;
 
@@ -25,18 +25,15 @@ internal class ListCommand : ToolCommand
 
     public ListCommand(string name, string? description = null) : base(name, description)
     {
-        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
-        ProfileFileOption.ArgumentHelpName = "file";
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.") { ArgumentHelpName = "file" };
         AddOption(ProfileFileOption);
         ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources.");
         AddOption(ListResourceOption);
         ProfileFileOption.ArgumentHelpName = "file";
         AddOption(ProfileFileOption);
-        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.");
-        ToolOption.ArgumentHelpName = "name";
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.") { ArgumentHelpName = "name" };
         AddOption(ToolOption);
-        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.");
-        GroupOption.ArgumentHelpName = "name";
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.") { ArgumentHelpName = "name" };
         AddOption(GroupOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
         AddOption(DetailedOption);
@@ -50,7 +47,7 @@ internal class ListCommand : ToolCommand
         this.SetHandler(RunAsync);
     }
 
-    public async Task<int> RunAsync(InvocationContext context)
+    private async Task<int> RunAsync(InvocationContext context)
     {
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
         string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;

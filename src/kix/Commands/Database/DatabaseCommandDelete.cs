@@ -22,7 +22,7 @@ internal class DatabaseCommandDelete : DatabaseCommandBase
         this.SetHandler(RunAsync);
     }
 
-    public async Task<int> RunAsync(InvocationContext context)
+    private async Task<int> RunAsync(InvocationContext context)
     {
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);
         string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;

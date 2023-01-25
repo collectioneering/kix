@@ -9,7 +9,7 @@ using Art.EF.Sqlite;
 
 namespace kix.Commands;
 
-internal class DumpCommand : ToolCommand
+internal class DumpCommand : ToolCommandBase
 {
     protected Option<string> DatabaseOption;
 
@@ -29,24 +29,19 @@ internal class DumpCommand : ToolCommand
 
     public DumpCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.");
-        DatabaseOption.ArgumentHelpName = "file";
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.");
-        OutputOption.ArgumentHelpName = "directory";
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources.");
         AddOption(NoDatabaseOption);
-        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.");
-        ProfileFileOption.ArgumentHelpName = "file";
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.") { ArgumentHelpName = "file" };
         AddOption(ProfileFileOption);
-        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.");
-        ToolOption.ArgumentHelpName = "name";
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.") { ArgumentHelpName = "name" };
         AddOption(ToolOption);
-        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.");
-        GroupOption.ArgumentHelpName = "name";
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.") { ArgumentHelpName = "name" };
         AddOption(GroupOption);
         AddValidator(v =>
         {

@@ -5,22 +5,19 @@ using Art;
 using Art.Common;
 using Art.Common.Management;
 
-namespace kix;
+namespace kix.Commands;
 
-public abstract class ToolCommand : Command
+public abstract class ToolCommandBase : Command
 {
     protected Option<string> CookieFileOption;
 
     protected Option<List<string>> PropertiesOption;
 
-    protected ToolCommand(string name, string? description = null) : base(name, description)
+    protected ToolCommandBase(string name, string? description = null) : base(name, description)
     {
-        CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file.");
-        CookieFileOption.ArgumentHelpName = "file";
+        CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file.") { ArgumentHelpName = "file" };
         AddOption(CookieFileOption);
-        PropertiesOption = new Option<List<string>>(new[] { "-p", "--property" }, "Add a property.");
-        PropertiesOption.ArgumentHelpName = "key:value";
-        PropertiesOption.Arity = ArgumentArity.ZeroOrMore;
+        PropertiesOption = new Option<List<string>>(new[] { "-p", "--property" }, "Add a property.") { ArgumentHelpName = "key:value", Arity = ArgumentArity.ZeroOrMore };
         AddOption(PropertiesOption);
     }
 
