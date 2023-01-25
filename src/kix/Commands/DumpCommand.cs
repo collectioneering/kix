@@ -15,6 +15,8 @@ internal class DumpCommand : ToolCommandBase
 
     protected Option<string> OutputOption;
 
+    protected Option<string> HashOption;
+
     protected Option<bool> NoDatabaseOption;
 
     protected Option<string> ProfileFileOption;
@@ -35,6 +37,9 @@ internal class DumpCommand : ToolCommandBase
         OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
+        HashOption.SetDefaultValue("SHA256");
+        AddOption(HashOption);
         NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources.");
         AddOption(NoDatabaseOption);
         ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.") { ArgumentHelpName = "file" };
@@ -69,22 +74,31 @@ internal class DumpCommand : ToolCommandBase
 
     private async Task<int> RunAsync(InvocationContext context, ArtifactDataManager adm, IArtifactRegistrationManager arm)
     {
+        string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
+        hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
+        if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
+        {
+            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
+            foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
+                Console.WriteLine(id);
+            return 2;
+        }
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
         string? tool = context.ParseResult.HasOption(ToolOption) ? context.ParseResult.GetValueForOption(ToolOption) : null;
         string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
-        if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "default", null), arm, adm);
+        if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "default", null), arm, adm, hash);
         int ec = 0;
         foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
-            ec = Math.Max(await ExecAsync(context, profile, arm, adm), ec);
+            ec = Common.AccumulateErrorCode(await ExecAsync(context, profile, arm, adm, hash), ec);
         }
         return ec;
     }
 
-    private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile, IArtifactRegistrationManager arm, ArtifactDataManager adm)
+    private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile, IArtifactRegistrationManager arm, ArtifactDataManager adm, string? hash)
     {
-        ArtifactToolDumpOptions options = new();
+        ArtifactToolDumpOptions options = new(ChecksumId: hash);
         using var tool = await GetToolAsync(context, profile, arm, adm);
         ArtifactToolDumpProxy dProxy = new(tool, options, Common.GetDefaultToolLogHandler());
         await dProxy.DumpAsync();

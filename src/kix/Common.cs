@@ -16,6 +16,11 @@ internal static class Common
 
     internal static IToolLogHandler GetDefaultToolLogHandler() => OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
 
+    internal static int AccumulateErrorCode(int errorCode, int existingErrorCode)
+    {
+        return errorCode != 0 ? errorCode : existingErrorCode;
+    }
+
     internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, IArtifactRegistrationManager arm, bool detailed)
     {
         Display(i, detailed);

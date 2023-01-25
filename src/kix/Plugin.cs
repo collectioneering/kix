@@ -14,7 +14,16 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
 
     public static Plugin LoadForToolString(string toolString)
     {
-        string assembly = ArtifactToolProfileUtil.GetID(toolString).Assembly;
+        ArtifactToolID id;
+        try
+        {
+            id = ArtifactToolProfileUtil.GetID(toolString);
+        }
+        catch (ArgumentException e)
+        {
+            throw new ArtUserException(e.Message);
+        }
+        string assembly = id.Assembly;
         if (!KixManifest.TryFind(assembly, out var manifest))
         {
             throw new ManifestNotFoundException(assembly);

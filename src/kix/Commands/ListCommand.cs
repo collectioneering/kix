@@ -54,7 +54,7 @@ internal class ListCommand : ToolCommandBase
         foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
-            ec = Math.Max(await ExecAsync(context, profile), ec);
+            ec = Common.AccumulateErrorCode(await ExecAsync(context, profile), ec);
         }
         return ec;
     }
