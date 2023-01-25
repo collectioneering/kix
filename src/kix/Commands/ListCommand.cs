@@ -29,8 +29,6 @@ internal class ListCommand : ToolCommandBase
         AddOption(ProfileFileOption);
         ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources.");
         AddOption(ListResourceOption);
-        ProfileFileOption.ArgumentHelpName = "file";
-        AddOption(ProfileFileOption);
         ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.") { ArgumentHelpName = "name" };
         AddOption(ToolOption);
         GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.") { ArgumentHelpName = "name" };
