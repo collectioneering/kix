@@ -64,17 +64,7 @@ internal class ListCommand : ToolCommandBase
 
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile)
     {
-        IArtifactTool t;
-        try
-        {
-            t = await GetSearchingToolAsync(context, profile);
-        }
-        catch (InvalidOperationException e)
-        {
-            Console.WriteLine(e.Message);
-            return 69;
-        }
-        using var tool = t;
+        using var tool = await GetSearchingToolAsync(context, profile);
         ArtifactToolListOptions options = new();
         ArtifactToolListProxy proxy = new(tool, options, Common.GetDefaultToolLogHandler());
         bool listResource = context.ParseResult.GetValueForOption(ListResourceOption);

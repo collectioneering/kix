@@ -90,16 +90,7 @@ internal class ArcCommand : ToolCommandBase
         profiles = profiles.Select(p => p.GetWithConsoleOptions(cookieFile, properties)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
-            Plugin plugin;
-            try
-            {
-                plugin = Plugin.LoadForToolString(profile.Tool);
-            }
-            catch (InvalidOperationException e)
-            {
-                Console.WriteLine(e.Message);
-                return 69;
-            }
+            Plugin plugin = Plugin.LoadForToolString(profile.Tool);
             await ArtifactDumping.DumpAsync(plugin.Context, profile, arm, adm, options, l).ConfigureAwait(false);
         }
         return 0;

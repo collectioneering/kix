@@ -86,17 +86,7 @@ internal class DumpCommand : ToolCommandBase
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile, IArtifactRegistrationManager arm, ArtifactDataManager adm)
     {
         ArtifactToolDumpOptions options = new();
-        IArtifactTool t;
-        try
-        {
-            t = await GetToolAsync(context, profile, arm, adm);
-        }
-        catch (InvalidOperationException e)
-        {
-            Console.WriteLine(e.Message);
-            return 69;
-        }
-        using var tool = t;
+        using var tool = await GetToolAsync(context, profile, arm, adm);
         ArtifactToolDumpProxy dProxy = new(tool, options, Common.GetDefaultToolLogHandler());
         await dProxy.DumpAsync();
         return 0;
