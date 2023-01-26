@@ -1,11 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Art;
 using Art.Common;
 
-namespace kix;
+namespace Art.Modular;
 
-internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Assembly BaseAssembly)
+public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Context, Assembly BaseAssembly)
 {
     public bool TryLoadTool(ArtifactToolProfile artifactToolProfile, [NotNullWhen(true)] out IArtifactTool? t)
     {
@@ -24,17 +23,17 @@ internal record Plugin(KixManifest Manifest, KixAssemblyLoadContext Context, Ass
             throw new ArtUserException(e.Message);
         }
         string assembly = id.Assembly;
-        if (!KixManifest.TryFind(assembly, out var manifest))
+        if (!ModuleManifest.TryFind(assembly, out var manifest))
         {
             throw new ManifestNotFoundException(assembly);
         }
         return LoadForManifest(manifest);
     }
 
-    public static Plugin LoadForManifest(KixManifest manifest)
+    public static Plugin LoadForManifest(ModuleManifest manifest)
     {
         string baseDir = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path) ? Path.Combine(manifest.BasePath, manifest.Content.Path) : manifest.BasePath;
-        var ctx = new KixAssemblyLoadContext(baseDir);
+        var ctx = new ArtModuleAssemblyLoadContext(baseDir);
         return new Plugin(manifest, ctx, ctx.LoadFromAssemblyName(new AssemblyName(manifest.Content.Assembly)));
     }
 }

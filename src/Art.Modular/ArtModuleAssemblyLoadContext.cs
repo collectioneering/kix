@@ -2,15 +2,15 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace kix;
+namespace Art.Modular;
 
-public class KixAssemblyLoadContext : AssemblyLoadContext
+public class ArtModuleAssemblyLoadContext : AssemblyLoadContext
 {
     // Need to share the core library so everyone uses the same Assembly instance and interface types from that instance
     private static readonly ImmutableHashSet<string> s_shared = new HashSet<string> { "Art" }.ToImmutableHashSet();
     public readonly string BasePath;
 
-    public KixAssemblyLoadContext(string basePath)
+    public ArtModuleAssemblyLoadContext(string basePath)
     {
         BasePath = basePath;
     }

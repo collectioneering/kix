@@ -4,6 +4,7 @@ using System.CommandLine.Parsing;
 using Art;
 using Art.Common;
 using Art.Common.Management;
+using Art.Modular;
 
 namespace kix.Commands;
 

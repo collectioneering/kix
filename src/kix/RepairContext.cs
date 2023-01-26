@@ -1,6 +1,7 @@
 ﻿using Art;
 using Art.Common;
 using Art.Common.Proxies;
+using Art.Modular;
 
 namespace kix;
 

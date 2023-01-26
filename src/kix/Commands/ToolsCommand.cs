@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Art;
 using Art.Common;
+using Art.Modular;
 
 namespace kix.Commands;
 
@@ -27,9 +28,9 @@ internal class ToolsCommand : CommandBase
 
     protected override Task<int> RunAsync(InvocationContext context)
     {
-        var manifests = new Dictionary<string, KixManifest>();
-        KixManifest.LoadManifests(manifests);
-        foreach (KixManifest manifest in manifests.Values)
+        var manifests = new Dictionary<string, ModuleManifest>();
+        ModuleManifest.LoadManifests(manifests);
+        foreach (ModuleManifest manifest in manifests.Values)
         {
             Plugin plugin;
             try

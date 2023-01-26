@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kix", "kix\kix.csproj", "{4F431DE6-8E2E-4D33-9D9D-9ED8021F5667}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.Modular", "Art.Modular\Art.Modular.csproj", "{68005DD2-792D-417E-AEDE-21414163611E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{4F431DE6-8E2E-4D33-9D9D-9ED8021F5667}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F431DE6-8E2E-4D33-9D9D-9ED8021F5667}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F431DE6-8E2E-4D33-9D9D-9ED8021F5667}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68005DD2-792D-417E-AEDE-21414163611E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68005DD2-792D-417E-AEDE-21414163611E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68005DD2-792D-417E-AEDE-21414163611E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68005DD2-792D-417E-AEDE-21414163611E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

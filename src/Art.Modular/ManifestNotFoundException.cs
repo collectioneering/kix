@@ -1,6 +1,4 @@
-﻿using Art;
-
-namespace kix;
+﻿namespace Art.Modular;
 
 public class ManifestNotFoundException : ArtUserException
 {
