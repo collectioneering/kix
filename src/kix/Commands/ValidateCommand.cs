@@ -5,6 +5,7 @@ using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
+using Art.Modular;
 
 namespace kix.Commands;
 
@@ -63,7 +64,7 @@ internal class ValidateCommand : ToolCommandBase
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in context.ParseResult.GetValueForArgument(ProfileFilesArg))
-            profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options));
+            profiles.AddRange(ModularProfileUtil.DeserializeProfilesFromFile(profileFile));
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
         profiles = profiles.Select(p => p.GetWithConsoleOptions(cookieFile, properties)).ToList();

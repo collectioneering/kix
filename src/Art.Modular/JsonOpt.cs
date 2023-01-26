@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace kix;
+namespace Art.Modular;
 
 public static class JsonOpt
 {

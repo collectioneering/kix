@@ -31,6 +31,7 @@ public class ValidationContext
 
     public async Task<ValidationProcessResult> ProcessAsync(List<ArtifactInfo> artifacts, string? hashForAdd)
     {
+        // TODO context should accept ChecksumSource
         int artifactCount = 0, resourceCount = 0;
         if (hashForAdd == null)
         {
@@ -66,6 +67,7 @@ public class ValidationContext
 
     public async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, string? hashForAdd)
     {
+        // TODO context should accept ChecksumSource
         ValidationProcessResult result;
         if (hashForAdd == null)
         {
@@ -135,6 +137,7 @@ public class ValidationContext
 
     public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactToolProfile> profiles, string? hashForAdd)
     {
+        // TODO context should accept ChecksumSource
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {

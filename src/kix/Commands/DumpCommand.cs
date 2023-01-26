@@ -6,6 +6,7 @@ using Art.Common;
 using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
+using Art.Modular;
 
 namespace kix.Commands;
 
@@ -88,7 +89,7 @@ internal class DumpCommand : ToolCommandBase
         string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
         if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "default", null), arm, adm, hash);
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
+        foreach (ArtifactToolProfile profile in ModularProfileUtil.DeserializeProfilesFromFile(profileFile))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
             ec = Common.AccumulateErrorCode(await ExecAsync(context, profile, arm, adm, hash), ec);

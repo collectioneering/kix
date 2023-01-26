@@ -22,6 +22,7 @@ public class RepairContext
 
     public async Task<bool> RepairAsync(List<ArtifactToolProfile> profiles, bool detailed, string? hashAlgorithm)
     {
+        // TODO context should accept ChecksumSource
         foreach (ArtifactToolProfile profile in profiles)
         {
             ArtifactToolProfile artifactToolProfile = profile;

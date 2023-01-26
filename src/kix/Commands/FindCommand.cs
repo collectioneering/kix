@@ -4,6 +4,7 @@ using System.CommandLine.Parsing;
 using Art;
 using Art.Common;
 using Art.Common.Proxies;
+using Art.Modular;
 
 namespace kix.Commands;
 
@@ -59,7 +60,7 @@ internal class FindCommand : ToolCommandBase
             return await ExecAsync(context, profile);
         }
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile, JsonOpt.Options))
+        foreach (ArtifactToolProfile profile in ModularProfileUtil.DeserializeProfilesFromFile(profileFile))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
             ec = Common.AccumulateErrorCode(await ExecAsync(context, profile), ec);
