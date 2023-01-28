@@ -10,9 +10,12 @@ public class ArtModuleAssemblyLoadContext : AssemblyLoadContext
     private static readonly ImmutableHashSet<string> s_shared = new HashSet<string> { "Art" }.ToImmutableHashSet();
     public readonly string BasePath;
 
-    public ArtModuleAssemblyLoadContext(string basePath)
+    private readonly AssemblyDependencyResolver _resolver;
+
+    public ArtModuleAssemblyLoadContext(string basePath, string assembly)
     {
         BasePath = basePath;
+        _resolver = new AssemblyDependencyResolver(Path.Combine(basePath, assembly + ".dll"));
     }
 
     protected override Assembly? Load(AssemblyName assemblyName)
@@ -21,6 +24,11 @@ public class ArtModuleAssemblyLoadContext : AssemblyLoadContext
         if (s_shared.Contains(name))
         {
             return null;
+        }
+        string? asmPath = _resolver.ResolveAssemblyToPath(assemblyName);
+        if (asmPath != null)
+        {
+            return LoadFromAssemblyPath(asmPath);
         }
         try
         {

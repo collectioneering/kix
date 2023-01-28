@@ -33,7 +33,7 @@ public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Conte
     public static Plugin LoadForManifest(ModuleManifest manifest)
     {
         string baseDir = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path) ? Path.Combine(manifest.BasePath, manifest.Content.Path) : manifest.BasePath;
-        var ctx = new ArtModuleAssemblyLoadContext(baseDir);
+        var ctx = new ArtModuleAssemblyLoadContext(baseDir, manifest.Content.Assembly);
         return new Plugin(manifest, ctx, ctx.LoadFromAssemblyName(new AssemblyName(manifest.Content.Assembly)));
     }
 }
