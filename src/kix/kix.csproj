@@ -6,17 +6,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <Copyright>Copyright (C) 2021 Lucina</Copyright>
-    <LangVersion>11</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art.Common" Version="0.43.0" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.43.0" />
+    <PackageReference Include="Art.Common" Version="0.44.0" />
+    <PackageReference Include="Art.EF.Sqlite" Version="0.44.0" />
     <PackageReference Include="EA" Version="1.1.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     <PackageReference Include="System.CommandLine.NamingConventionBinder" Version="2.0.0-beta4.22272.1" />
