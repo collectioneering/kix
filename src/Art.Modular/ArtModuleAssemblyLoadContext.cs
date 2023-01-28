@@ -30,13 +30,6 @@ public class ArtModuleAssemblyLoadContext : AssemblyLoadContext
         {
             return LoadFromAssemblyPath(asmPath);
         }
-        try
-        {
-            return LoadFromAssemblyPath(Path.Combine(BasePath, $"{assemblyName.Name!}.dll"));
-        }
-        catch
-        {
-            return null;
-        }
+        return null;
     }
 }
