@@ -9,6 +9,7 @@ namespace kix.Commands.Database;
 internal class DatabaseCommandDelete : DatabaseCommandBase
 {
     protected Option<bool> ListOption;
+
     protected Option<bool> AllOption;
 
     protected Option<bool> DoDeleteOption;
