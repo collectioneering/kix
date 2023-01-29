@@ -32,28 +32,28 @@ internal class DumpCommand : ToolCommandBase
 
     public DumpCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
         HashOption.SetDefaultValue("SHA256");
         AddOption(HashOption);
-        NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources.");
+        NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources");
         AddOption(NoDatabaseOption);
-        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.") { ArgumentHelpName = "file" };
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file") { ArgumentHelpName = "file" };
         AddOption(ProfileFileOption);
-        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.") { ArgumentHelpName = "name" };
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by") { ArgumentHelpName = "name" };
         AddOption(ToolOption);
-        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.") { ArgumentHelpName = "name" };
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by") { ArgumentHelpName = "name" };
         AddOption(GroupOption);
         AddValidator(v =>
         {
             if (v.GetValueForOption(ProfileFileOption) == null && v.GetValueForOption(ToolOption) == null)
             {
-                v.ErrorMessage = $"At least one of {ProfileFileOption.Aliases.First()} or {ToolOption.Aliases.First()} must be passed";
+                v.ErrorMessage = $"At least one of {ProfileFileOption.Aliases.First()} or {ToolOption.Aliases.First()} must be passed.";
             }
         });
     }

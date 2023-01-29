@@ -16,9 +16,9 @@ public abstract class ToolCommandBase : CommandBase
 
     protected ToolCommandBase(string name, string? description = null) : base(name, description)
     {
-        CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file.") { ArgumentHelpName = "file" };
+        CookieFileOption = new Option<string>(new[] { "-c", "--cookie-file" }, "Cookie file") { ArgumentHelpName = "file" };
         AddOption(CookieFileOption);
-        PropertiesOption = new Option<List<string>>(new[] { "-p", "--property" }, "Add a property.") { ArgumentHelpName = "key:value", Arity = ArgumentArity.ZeroOrMore };
+        PropertiesOption = new Option<List<string>>(new[] { "-p", "--property" }, "Add a property") { ArgumentHelpName = "key:value", Arity = ArgumentArity.ZeroOrMore };
         AddOption(PropertiesOption);
     }
 

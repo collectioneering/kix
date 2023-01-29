@@ -20,9 +20,9 @@ internal class ToolsCommand : CommandBase
 
     public ToolsCommand(string name, string? description = null) : base(name, description)
     {
-        SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern.") { ArgumentHelpName = "pattern" };
+        SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern") { ArgumentHelpName = "pattern" };
         AddOption(SearchOption);
-        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries");
         AddOption(DetailedOption);
     }
 

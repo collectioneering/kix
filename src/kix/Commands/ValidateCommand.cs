@@ -31,22 +31,22 @@ internal class ValidateCommand : ToolCommandBase
 
     public ValidateCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
         HashOption.SetDefaultValue("SHA256");
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with.") { HelpName = "file", Arity = ArgumentArity.ZeroOrMore };
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with") { HelpName = "file", Arity = ArgumentArity.ZeroOrMore };
         AddArgument(ProfileFilesArg);
         RepairOption = new Option<bool>(new[] { "--repair" }, "Re-obtain resources that failed validation (requires appropriate profiles)");
         AddOption(RepairOption);
-        AddChecksumOption = new Option<bool>(new[] { "--add-checksum" }, "Add checksum to resources without checksum during validation.");
+        AddChecksumOption = new Option<bool>(new[] { "--add-checksum" }, "Add checksum to resources without checksum during validation");
         AddOption(AddChecksumOption);
-        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries");
         AddOption(DetailedOption);
     }
 

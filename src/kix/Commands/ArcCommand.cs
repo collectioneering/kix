@@ -36,29 +36,29 @@ internal class ArcCommand : ToolCommandBase
 
     public ArcCommand(string name, string? description = null) : base(name, description)
     {
-        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file.") { ArgumentHelpName = "file" };
+        DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
         DatabaseOption.SetDefaultValue(Common.DefaultDbFile);
         AddOption(DatabaseOption);
-        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory.") { ArgumentHelpName = "directory" };
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output directory") { ArgumentHelpName = "directory" };
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
-        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms}).");
+        HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
         HashOption.SetDefaultValue("SHA256");
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s).") { HelpName = "file", Arity = ArgumentArity.OneOrMore };
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s)") { HelpName = "file", Arity = ArgumentArity.OneOrMore };
         AddArgument(ProfileFilesArg);
-        UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({Common.ResourceUpdateModes}).") { ArgumentHelpName = "mode" };
+        UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({Common.ResourceUpdateModes})") { ArgumentHelpName = "mode" };
         UpdateOption.SetDefaultValue(ResourceUpdateMode.ArtifactHard);
         AddOption(UpdateOption);
-        FullOption = new Option<bool>(new[] { "-f", "--full" }, "Only process full artifacts.");
+        FullOption = new Option<bool>(new[] { "-f", "--full" }, "Only process full artifacts");
         AddOption(FullOption);
-        SkipOption = new Option<ArtifactSkipMode>(new[] { "-s", "--skip" }, $"Skip artifacts ({Common.ArtifactSkipModes}).");
+        SkipOption = new Option<ArtifactSkipMode>(new[] { "-s", "--skip" }, $"Skip artifacts ({Common.ArtifactSkipModes})");
         SkipOption.ArgumentHelpName = "mode";
         SkipOption.SetDefaultValue(ArtifactSkipMode.None);
         AddOption(SkipOption);
-        FastExitOption = new Option<bool>(new[] { "-z", "--fast-exit" }, $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}.");
+        FastExitOption = new Option<bool>(new[] { "-z", "--fast-exit" }, $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}");
         AddOption(FastExitOption);
-        NullOutputOption = new Option<bool>(new[] { "--null-output" }, "Send resources to the void.");
+        NullOutputOption = new Option<bool>(new[] { "--null-output" }, "Send resources to the void");
         AddOption(NullOutputOption);
     }
 

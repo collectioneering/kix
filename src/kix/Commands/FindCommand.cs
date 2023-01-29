@@ -28,23 +28,23 @@ internal class FindCommand : ToolCommandBase
 
     public FindCommand(string name, string? description = null) : base(name, description)
     {
-        IdsArg = new Argument<List<string>>("ids", "IDs.") { HelpName = "id", Arity = ArgumentArity.OneOrMore };
+        IdsArg = new Argument<List<string>>("ids", "IDs") { HelpName = "id", Arity = ArgumentArity.OneOrMore };
         AddArgument(IdsArg);
-        ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources.");
+        ListResourceOption = new Option<bool>(new[] { "-l", "--list-resource" }, "List associated resources");
         AddOption(ListResourceOption);
-        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file.") { ArgumentHelpName = "file" };
+        ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file") { ArgumentHelpName = "file" };
         AddOption(ProfileFileOption);
-        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by.") { ArgumentHelpName = "name" };
+        ToolOption = new Option<string>(new[] { "-t", "--tool" }, "Tool to use or filter profiles by") { ArgumentHelpName = "name" };
         AddOption(ToolOption);
-        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by.") { ArgumentHelpName = "name" };
+        GroupOption = new Option<string>(new[] { "-g", "--group" }, "Group to use or filter profiles by") { ArgumentHelpName = "name" };
         AddOption(GroupOption);
-        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries.");
+        DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries");
         AddOption(DetailedOption);
         AddValidator(v =>
         {
             if (v.GetValueForOption(ProfileFileOption) == null && v.GetValueForOption(ToolOption) == null)
             {
-                v.ErrorMessage = $"At least one of {ProfileFileOption.Aliases.First()} or {ToolOption.Aliases.First()} must be passed";
+                v.ErrorMessage = $"At least one of {ProfileFileOption.Aliases.First()} or {ToolOption.Aliases.First()} must be passed.";
             }
         });
     }
