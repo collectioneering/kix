@@ -49,7 +49,7 @@ public class RepairContext
                     }
                 case IArtifactToolList:
                     {
-                        await foreach (ArtifactData data in (new ArtifactToolListProxy(tool, ArtifactToolListOptions.Default, _l).ListAsync()))
+                        await foreach (IArtifactData data in (new ArtifactToolListProxy(tool, ArtifactToolListOptions.Default, _l).ListAsync()))
                             if (_failed.TryGetValue(data.Info.Key, out List<ArtifactResourceInfo>? list))
                                 await Fixup(tool, data.Info.Key, list, data, hashAlgorithm);
                         break;
@@ -68,7 +68,7 @@ public class RepairContext
         return true;
     }
 
-    private async Task Fixup(IArtifactTool tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, ArtifactData data, string? hashAlgorithm)
+    private async Task Fixup(IArtifactTool tool, ArtifactKey key, ICollection<ArtifactResourceInfo> list, IArtifactData data, string? hashAlgorithm)
     {
         foreach (ArtifactResourceInfo resource in list.ToList())
         {

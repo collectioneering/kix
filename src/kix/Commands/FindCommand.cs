@@ -2,7 +2,6 @@
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using Art;
-using Art.Common;
 using Art.Common.Proxies;
 using Art.Modular;
 
@@ -76,7 +75,7 @@ internal class FindCommand : ToolCommandBase
         bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
         foreach (string id in context.ParseResult.GetValueForArgument(IdsArg))
         {
-            ArtifactData? data = null;
+            IArtifactData? data = null;
             try
             {
                 data = await proxy.FindAsync(id);

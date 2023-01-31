@@ -2,7 +2,6 @@
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using Art;
-using Art.Common;
 using Art.Common.Proxies;
 using Art.Modular;
 
@@ -67,7 +66,7 @@ internal class ListCommand : ToolCommandBase
         ArtifactToolListProxy proxy = new(tool, options, Common.GetDefaultToolLogHandler());
         bool listResource = context.ParseResult.GetValueForOption(ListResourceOption);
         bool detailed = context.ParseResult.GetValueForOption(DetailedOption);
-        await foreach (ArtifactData data in proxy.ListAsync())
+        await foreach (IArtifactData data in proxy.ListAsync())
             if (listResource)
                 await Common.DisplayAsync(data.Info, data.Values, detailed);
             else

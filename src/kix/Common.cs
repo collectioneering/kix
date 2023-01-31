@@ -125,7 +125,7 @@ internal static class Common
         Dictionary<string, JsonElement> opts = artifactToolProfile.Options != null
             ? new Dictionary<string, JsonElement>(artifactToolProfile.Options)
             : new Dictionary<string, JsonElement>();
-        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", cookieFile.J());
+        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile));
         opts.AddProps(properties);
         return artifactToolProfile with { Options = opts };
     }
