@@ -92,11 +92,7 @@ Cookies can be extracted from supported browsers via the `cookieBrowser`, `cooki
 - `cookieBrowserDomains`: array of base domains to filter by, e.g. `["contoso.com", "fabrikam.com"]`
 - `cookieBrowserProfile`: user profile name (can be profile data directory name, or user-facing profile name)
 
-Note: The `cookieFile` option is also provided for rudimentary Netscape cookie format support. Avoid using unknown third-party extensions - find, validate, and build an open-source plugin for this if possible.
-
-## Pending
-
-- User agent library to keep user agent up to date
+Note: The `cookieFile` option is also provided for rudimentary Netscape cookie format support. Avoid using unknown third-party extensions - find, validate, and build an open-source browser plugin for this if possible.
 
 ## Related
 
