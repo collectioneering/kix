@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using kix.Commands;
+using kix.Commands.Cookie;
 using kix.Commands.Database;
 
 namespace kix;
@@ -17,7 +18,8 @@ internal static class Program
             new RehashCommand(),
             new ToolsCommand(),
             new ValidateCommand(),
-            new DatabaseCommand()
+            new DatabaseCommand(),
+            new CookieCommand()
         };
         return await rootCommand.InvokeAsync(args);
     }
