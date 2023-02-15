@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Art;
@@ -118,6 +119,13 @@ internal static class Common
             enumerable = enumerable.Where(v => v.Name != null && r.IsMatch(v.Name));
         }
         return enumerable;
+    }
+
+    internal static string GetInvalidHashMessage(string hash)
+    {
+        return new StringBuilder($"Failed to find hash algorithm {hash}\nKnown algorithms:")
+            .AppendJoin(Console.Error.NewLine, ChecksumSource.DefaultSources.Values.Select(v => v.Id))
+            .ToString();
     }
 
     internal static ArtifactToolProfile GetWithConsoleOptions(this ArtifactToolProfile artifactToolProfile, string? cookieFile, IEnumerable<string> properties)

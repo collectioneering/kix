@@ -82,12 +82,12 @@ internal class FindCommand : ToolCommandBase
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                PrintExceptionMessage(ex);
                 continue;
             }
             finally
             {
-                if (data == null) Console.WriteLine($"!! [{id}] not found");
+                if (data == null) PrintWarningMessage($"!! [{id}] not found");
             }
             if (data != null)
             {

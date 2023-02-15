@@ -24,10 +24,22 @@ public abstract class CommandBase : Command
         }
     }
 
-    private static void PrintExceptionMessage(Exception e)
+    protected static void PrintExceptionMessage(Exception e)
+    {
+        PrintErrorMessage(e.Message);
+    }
+
+    protected static void PrintErrorMessage(string message)
     {
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.Error.WriteLine(e.Message);
+        Console.Error.WriteLine(message);
+        Console.ResetColor();
+    }
+
+    protected static void PrintWarningMessage(string message)
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.Error.WriteLine(message);
         Console.ResetColor();
     }
 

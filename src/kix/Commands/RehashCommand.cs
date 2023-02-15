@@ -42,9 +42,7 @@ internal class RehashCommand : CommandBase
         string hash = context.ParseResult.GetValueForOption(HashOption)!;
         if (!ChecksumSource.DefaultSources.ContainsKey(hash))
         {
-            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
-            foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
-                Console.WriteLine(id);
+            PrintErrorMessage(Common.GetInvalidHashMessage(hash));
             return 2;
         }
         ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
@@ -72,7 +70,7 @@ internal class RehashCommand : CommandBase
             }
             if (!ChecksumSource.DefaultSources.TryGetValue(hash, out ChecksumSource? haNewV))
             {
-                Console.WriteLine("Failed to instantiate new hash algorithm");
+                PrintErrorMessage($"Failed to instantiate new hash algorithm for {hash}");
                 return 2;
             }
             Common.PrintFormat(rInf.GetInfoPathString(), detailed, () => rInf.GetInfoString());
@@ -95,8 +93,9 @@ internal class RehashCommand : CommandBase
         Console.WriteLine();
         if (failed.Count != 0)
         {
-            Console.WriteLine($"{failed.Sum(v => v.Value.Count)} resources with checksums failed validation before rehash.");
+            PrintErrorMessage($"{failed.Sum(v => v.Value.Count)} resources with checksums failed validation before rehash.");
             foreach (ArtifactResourceInfo value in failed.Values.SelectMany(v => v)) Common.Display(value, detailed);
+            return 1;
         }
         Console.WriteLine($"{rehashed} resources successfully rehashed.");
         return 0;

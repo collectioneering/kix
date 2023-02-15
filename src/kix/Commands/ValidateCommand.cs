@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Text;
 using Art;
 using Art.Common;
 using Art.Common.Management;
@@ -56,9 +57,7 @@ internal class ValidateCommand : ToolCommandBase
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
         if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
         {
-            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
-            foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
-                Console.WriteLine(id);
+            PrintErrorMessage(Common.GetInvalidHashMessage(hash));
             return 2;
         }
         IToolLogHandler l = Common.GetDefaultToolLogHandler();

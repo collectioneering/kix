@@ -39,7 +39,7 @@ internal class ToolsCommand : CommandBase
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
+                PrintErrorMessage($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
                 continue;
             }
             string? search = context.ParseResult.GetValueForOption(SearchOption);

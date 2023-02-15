@@ -79,9 +79,7 @@ internal class DumpCommand : ToolCommandBase
         hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
         if (hash != null && !ChecksumSource.DefaultSources.ContainsKey(hash))
         {
-            Console.WriteLine($"Failed to find hash algorithm {hash}\nKnown algorithms:");
-            foreach (string id in ChecksumSource.DefaultSources.Values.Select(v => v.Id))
-                Console.WriteLine(id);
+            PrintErrorMessage(Common.GetInvalidHashMessage(hash));
             return 2;
         }
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
