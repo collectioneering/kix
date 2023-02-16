@@ -78,7 +78,7 @@ Example:
 
 For `ArtifactTool` types, automatic parsing of string options to `long`, `ulong`, and `bool` is supported.
 
-Note: The `artifactList` option is a list of artifact IDs generated for profiles exported via the `db list` command. However, this option is not yet respected by any built-in behavior for listing or list-dumping, and such functionality must be manually implemented. This may be changed at a later time.
+Note: The `artifactList` option is a list of artifact IDs generated for profiles exported via the `db list` command.
 
 ## Browser Cookies
 
