@@ -11,9 +11,11 @@ namespace kix;
 
 internal static class Common
 {
-    internal const string ChecksumAlgorithms = "None|SHA1|SHA256|SHA384|SHA512|MD5";
+    private static readonly string[] ChecksumAlgorithmArray = ChecksumSource.DefaultSources.Values.Select(v => v.Id).ToArray();
+    internal static readonly string ChecksumAlgorithms = new StringBuilder().AppendJoin('|', ChecksumAlgorithmArray.Prepend("None")).ToString();
     internal const string ResourceUpdateModes = $"{nameof(ResourceUpdateMode.ArtifactSoft)}|{nameof(ResourceUpdateMode.ArtifactHard)}|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}";
     internal const string ArtifactSkipModes = $"{nameof(ArtifactSkipMode.None)}|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}";
+    internal const string DefaultChecksumAlgorithm = "SHA256";
     internal const string DefaultDbFile = "kix_data.db";
 
     internal static IToolLogHandler GetDefaultToolLogHandler() => OperatingSystem.IsMacOS() ? ConsoleLogHandler.Fancy : ConsoleLogHandler.Default;
@@ -128,7 +130,7 @@ internal static class Common
             .Append(Console.Error.NewLine)
             .Append("Known algorithms:")
             .Append(Console.Error.NewLine)
-            .AppendJoin(Console.Error.NewLine, ChecksumSource.DefaultSources.Values.Select(v => v.Id))
+            .AppendJoin(Console.Error.NewLine, ChecksumAlgorithmArray)
             .ToString();
     }
 

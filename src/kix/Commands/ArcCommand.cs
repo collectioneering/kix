@@ -43,9 +43,9 @@ internal class ArcCommand : ToolCommandBase
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
-        HashOption.SetDefaultValue("SHA256");
+        HashOption.SetDefaultValue(Common.DefaultChecksumAlgorithm);
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s)") { HelpName = "file", Arity = ArgumentArity.OneOrMore };
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s)") { HelpName = "profile", Arity = ArgumentArity.OneOrMore };
         AddArgument(ProfileFilesArg);
         UpdateOption = new Option<ResourceUpdateMode>(new[] { "-u", "--update" }, $"Resource update mode ({Common.ResourceUpdateModes})") { ArgumentHelpName = "mode" };
         UpdateOption.SetDefaultValue(ResourceUpdateMode.ArtifactHard);

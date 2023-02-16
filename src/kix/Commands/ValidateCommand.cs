@@ -38,9 +38,9 @@ internal class ValidateCommand : ToolCommandBase
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
-        HashOption.SetDefaultValue("SHA256");
+        HashOption.SetDefaultValue(Common.DefaultChecksumAlgorithm);
         AddOption(HashOption);
-        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with") { HelpName = "file", Arity = ArgumentArity.ZeroOrMore };
+        ProfileFilesArg = new Argument<List<string>>("profile", "Profile file(s) to filter and repair with") { HelpName = "profile", Arity = ArgumentArity.ZeroOrMore };
         AddArgument(ProfileFilesArg);
         RepairOption = new Option<bool>(new[] { "--repair" }, "Re-obtain resources that failed validation (requires appropriate profiles)");
         AddOption(RepairOption);

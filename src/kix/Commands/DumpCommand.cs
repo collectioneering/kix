@@ -39,7 +39,7 @@ internal class DumpCommand : ToolCommandBase
         OutputOption.SetDefaultValue(Directory.GetCurrentDirectory());
         AddOption(OutputOption);
         HashOption = new Option<string>(new[] { "-h", "--hash" }, $"Checksum algorithm ({Common.ChecksumAlgorithms})");
-        HashOption.SetDefaultValue("SHA256");
+        HashOption.SetDefaultValue(Common.DefaultChecksumAlgorithm);
         AddOption(HashOption);
         NoDatabaseOption = new Option<bool>(new[] { "--no-database" }, "Don't use database to track resources");
         AddOption(NoDatabaseOption);
