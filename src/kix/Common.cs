@@ -144,12 +144,16 @@ internal static class Common
             .ToString();
     }
 
-    internal static ArtifactToolProfile GetWithConsoleOptions(this ArtifactToolProfile artifactToolProfile, string? cookieFile, IEnumerable<string> properties)
+    internal static ArtifactToolProfile GetWithConsoleOptions(this ArtifactToolProfile artifactToolProfile,
+        IEnumerable<string> properties,
+        string? cookieFile,
+        string? userAgent)
     {
         Dictionary<string, JsonElement> opts = artifactToolProfile.Options != null
             ? new Dictionary<string, JsonElement>(artifactToolProfile.Options)
             : new Dictionary<string, JsonElement>();
         if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile));
+        if (userAgent != null) opts.AddPropWithWarning("userAgent", JsonSerializer.SerializeToElement(userAgent));
         opts.AddProps(properties);
         return artifactToolProfile with { Options = opts };
     }
