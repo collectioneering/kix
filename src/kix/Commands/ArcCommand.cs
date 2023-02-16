@@ -84,8 +84,9 @@ internal class ArcCommand : ToolCommandBase
         foreach (string profileFile in context.ParseResult.GetValueForArgument(ProfileFilesArg))
             profiles.AddRange(ModularProfileUtil.DeserializeProfilesFromFile(profileFile));
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
+        string? userAgent = context.ParseResult.HasOption(UserAgentOption) ? context.ParseResult.GetValueForOption(UserAgentOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
-        profiles = profiles.Select(p => p.GetWithConsoleOptions(cookieFile, properties)).ToList();
+        profiles = profiles.Select(p => p.GetWithConsoleOptions(properties, cookieFile, userAgent)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
             Plugin plugin = Plugin.LoadForToolString(profile.Tool);
