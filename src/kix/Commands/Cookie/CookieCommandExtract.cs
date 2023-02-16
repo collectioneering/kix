@@ -52,6 +52,7 @@ public class CookieCommandExtract : CommandBase
     {
         CookieContainer cc = new();
         await source.LoadCookiesAsync(cc, domains.Select(v => new CookieFilter(v)).ToList());
+        await output.WriteAsync("# Netscape HTTP Cookie File\n");
         StringBuilder sb = new();
         foreach (object? cookie in cc.GetAllCookies())
         {
@@ -60,7 +61,7 @@ public class CookieCommandExtract : CommandBase
             sb.Append(c.Domain.StartsWith('.') ? "TRUE" : "FALSE").Append('\t');
             sb.Append(c.Path).Append('\t');
             sb.Append(c.Secure ? "TRUE" : "FALSE").Append('\t');
-            sb.Append((long)c.Expires.Subtract(DateTime.UnixEpoch).TotalSeconds).Append('\t');
+            sb.Append(c.Expires == DateTime.MinValue ? 0 : (long)c.Expires.Subtract(DateTime.UnixEpoch).TotalSeconds).Append('\t');
             sb.Append(c.Name).Append('\t');
             sb.Append(c.Value).Append('\n');
             await output.WriteAsync(sb.ToString());
