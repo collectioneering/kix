@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common;
 using Art.Common.Management;
@@ -30,10 +31,12 @@ internal class ArcCommand : ToolCommandBase
 
     protected Option<bool> NullOutputOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ArcCommand() : this("arc", "Execute archival artifact tools.")
     {
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ArcCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
@@ -62,6 +65,7 @@ internal class ArcCommand : ToolCommandBase
         AddOption(NullOutputOption);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;

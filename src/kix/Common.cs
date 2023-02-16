@@ -78,11 +78,11 @@ internal static class Common
             string k = match.Groups[1].Value;
             string val = match.Groups[2].Value;
             JsonElement v;
-            if (val.StartsWith('{') || val.StartsWith('[')) v = JsonSerializer.Deserialize<JsonElement>(val);
-            else if (long.TryParse(val, out long valLong)) v = JsonSerializer.SerializeToElement(valLong);
-            else if (ulong.TryParse(val, out ulong valULong)) v = JsonSerializer.SerializeToElement(valULong);
-            else if (double.TryParse(val, out double valDouble)) v = JsonSerializer.SerializeToElement(valDouble);
-            else v = JsonSerializer.SerializeToElement(val);
+            if (val.StartsWith('{') || val.StartsWith('[')) v = JsonSerializer.Deserialize(val, SourceGenerationContext.Default.JsonElement);
+            else if (long.TryParse(val, out long valLong)) v = JsonSerializer.SerializeToElement(valLong, SourceGenerationContext.Default.Int64);
+            else if (ulong.TryParse(val, out ulong valULong)) v = JsonSerializer.SerializeToElement(valULong, SourceGenerationContext.Default.UInt64);
+            else if (double.TryParse(val, out double valDouble)) v = JsonSerializer.SerializeToElement(valDouble, SourceGenerationContext.Default.Double);
+            else v = JsonSerializer.SerializeToElement(val, SourceGenerationContext.Default.String);
             dictionary.AddPropWithWarning(k, v);
         }
     }
@@ -152,8 +152,8 @@ internal static class Common
         Dictionary<string, JsonElement> opts = artifactToolProfile.Options != null
             ? new Dictionary<string, JsonElement>(artifactToolProfile.Options)
             : new Dictionary<string, JsonElement>();
-        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile));
-        if (userAgent != null) opts.AddPropWithWarning("userAgent", JsonSerializer.SerializeToElement(userAgent));
+        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile, SourceGenerationContext.Default.String));
+        if (userAgent != null) opts.AddPropWithWarning("userAgent", JsonSerializer.SerializeToElement(userAgent, SourceGenerationContext.Default.String));
         opts.AddProps(properties);
         return artifactToolProfile with { Options = opts };
     }

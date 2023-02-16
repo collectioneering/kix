@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common;
 using Art.Common.Management;
@@ -26,10 +27,12 @@ internal class DumpCommand : ToolCommandBase
 
     protected Option<string> GroupOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public DumpCommand() : this("dump", "Execute artifact dump tools.")
     {
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public DumpCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
@@ -58,6 +61,7 @@ internal class DumpCommand : ToolCommandBase
         });
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         ArtifactDataManager adm = new DiskArtifactDataManager(context.ParseResult.GetValueForOption(OutputOption)!);
@@ -73,6 +77,7 @@ internal class DumpCommand : ToolCommandBase
         }
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> RunAsync(InvocationContext context, ArtifactDataManager adm, IArtifactRegistrationManager arm)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
@@ -95,6 +100,7 @@ internal class DumpCommand : ToolCommandBase
         return ec;
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile, IArtifactRegistrationManager arm, ArtifactDataManager adm, string? hash)
     {
         ArtifactToolDumpOptions options = new(ChecksumId: hash);

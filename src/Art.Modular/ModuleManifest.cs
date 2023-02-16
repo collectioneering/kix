@@ -12,6 +12,7 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
     private static readonly string s_filePath = AppDomain.CurrentDomain.BaseDirectory;
     private static readonly string s_pluginDirectory = Path.Combine(s_filePath, "Plugins");
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public static bool TryFind(string assembly, [NotNullWhen(true)] out ModuleManifest? manifest)
     {
         if (s_manifests.TryGetValue(assembly, out manifest))
@@ -31,12 +32,14 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
         return false;
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public static void LoadManifests(IDictionary<string, ModuleManifest> dictionary)
     {
         if (!Directory.Exists(s_pluginDirectory)) return;
         LoadManifests(dictionary, s_pluginDirectory, s_searched);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static bool TryFind(string assembly, string dir, [NotNullWhen(true)] out ModuleManifest? manifest, IDictionary<string, ModuleManifest>? toAugment = null, ISet<string>? searched = null)
     {
         foreach (string directory in Directory.EnumerateDirectories(dir, $"*{DirectorySuffix}", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }))
@@ -54,6 +57,7 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
         return false;
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static bool TryFindAtTarget(string assembly, string directory, [NotNullWhen(true)] out ModuleManifest? manifest, IDictionary<string, ModuleManifest>? toAugment = null)
     {
         foreach (string file in Directory.EnumerateFiles(directory, $"*{FileNameSuffix}", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }))
@@ -77,6 +81,7 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
         return false;
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static void LoadManifests(IDictionary<string, ModuleManifest> dictionary, string dir, ISet<string>? searched = null)
     {
         foreach (string directory in Directory.EnumerateDirectories(dir, $"*{DirectorySuffix}", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }))
@@ -89,6 +94,7 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
         }
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static void LoadManifestsAtTarget(IDictionary<string, ModuleManifest> dictionary, string directory)
     {
         foreach (string file in Directory.EnumerateFiles(directory, $"*{FileNameSuffix}", new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive }))
@@ -100,6 +106,7 @@ public record ModuleManifest(string BasePath, ModuleManifestContent Content)
         }
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static bool TryLoad(string file, [NotNullWhen(true)] out ModuleManifestContent? content)
     {
         try

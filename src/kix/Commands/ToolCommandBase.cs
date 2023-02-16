@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common;
 using Art.Common.Management;
@@ -16,6 +17,7 @@ public abstract class ToolCommandBase : CommandBase
 
     protected Option<List<string>> PropertiesOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected ToolCommandBase(string name, string? description = null) : base(name, description)
     {
         UserAgentOption = new Option<string>(new[] { "--user-agent" }, "Custom user agent string") { ArgumentHelpName = "user-agent" };
@@ -26,12 +28,14 @@ public abstract class ToolCommandBase : CommandBase
         AddOption(PropertiesOption);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected async Task<IArtifactTool> GetSearchingToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, CancellationToken cancellationToken = default)
     {
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         return await GetToolAsync(context, artifactToolProfile, new InMemoryArtifactRegistrationManager(), new NullArtifactDataManager(), cancellationToken);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected async Task<IArtifactTool> GetToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
         var plugin = Plugin.LoadForToolString(artifactToolProfile.Tool);

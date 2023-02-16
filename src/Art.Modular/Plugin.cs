@@ -6,11 +6,13 @@ namespace Art.Modular;
 
 public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Context, Assembly BaseAssembly)
 {
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public bool TryLoadTool(ArtifactToolProfile artifactToolProfile, [NotNullWhen(true)] out IArtifactTool? t)
     {
         return ArtifactToolLoader.TryLoad(BaseAssembly, artifactToolProfile.Tool, out t);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public static Plugin LoadForToolString(string toolString)
     {
         ArtifactToolID id;
@@ -30,6 +32,7 @@ public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Conte
         return LoadForManifest(manifest);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public static Plugin LoadForManifest(ModuleManifest manifest)
     {
         string baseDir = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path) ? Path.Combine(manifest.BasePath, manifest.Content.Path) : manifest.BasePath;

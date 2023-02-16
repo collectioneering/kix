@@ -1,9 +1,11 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.Loader;
 
 namespace Art.Modular;
 
+[RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
 public class ArtModuleAssemblyLoadContext : AssemblyLoadContext
 {
     // Need to share the core library so everyone uses the same Assembly instance and interface types from that instance

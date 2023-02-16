@@ -10,12 +10,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Copyright>Copyright (C) 2021 Lucina</Copyright>
+    <!--<PublishTrimmed>true</PublishTrimmed>-->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art.Common" Version="0.47.1" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.47.0" />
-    <PackageReference Include="Art.BrowserCookies" Version="0.47.1" />
+    <PackageReference Include="Art.Common" Version="0.48.0" />
+    <PackageReference Include="Art.EF.Sqlite" Version="0.48.0" />
+    <PackageReference Include="Art.BrowserCookies" Version="0.48.0" />
     <PackageReference Include="EA" Version="1.1.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>

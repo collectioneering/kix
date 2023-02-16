@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 using Art;
@@ -14,10 +15,12 @@ internal class ToolsCommand : CommandBase
 
     protected Option<bool> DetailedOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ToolsCommand() : this("tools", "List available tools.")
     {
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ToolsCommand(string name, string? description = null) : base(name, description)
     {
         SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern") { ArgumentHelpName = "pattern" };
@@ -26,6 +29,7 @@ internal class ToolsCommand : CommandBase
         AddOption(DetailedOption);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override Task<int> RunAsync(InvocationContext context)
     {
         var manifests = new Dictionary<string, ModuleManifest>();

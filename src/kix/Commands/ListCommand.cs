@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common.Proxies;
 using Art.Modular;
@@ -19,10 +20,12 @@ internal class ListCommand : ToolCommandBase
 
     protected Option<bool> DetailedOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ListCommand() : this("list", "Execute artifact list tools.")
     {
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ListCommand(string name, string? description = null) : base(name, description)
     {
         ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file") { ArgumentHelpName = "file" };
@@ -44,6 +47,7 @@ internal class ListCommand : ToolCommandBase
         });
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
@@ -59,6 +63,7 @@ internal class ListCommand : ToolCommandBase
         return ec;
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile)
     {
         using var tool = await GetSearchingToolAsync(context, profile);

@@ -4,11 +4,12 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art.Common" Version="0.47.1" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.47.0" />
+    <PackageReference Include="Art.Common" Version="0.48.0" />
+    <PackageReference Include="Art.EF.Sqlite" Version="0.48.0" />
   </ItemGroup>
 
 </Project>

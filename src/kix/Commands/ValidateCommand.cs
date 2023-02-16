@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common;
 using Art.Common.Management;
@@ -25,10 +26,12 @@ internal class ValidateCommand : ToolCommandBase
 
     protected Option<bool> DetailedOption;
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ValidateCommand() : this("validate", "Verify resource integrity.")
     {
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ValidateCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
@@ -50,6 +53,7 @@ internal class ValidateCommand : ToolCommandBase
         AddOption(DetailedOption);
     }
 
+    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? hash = context.ParseResult.HasOption(HashOption) ? context.ParseResult.GetValueForOption(HashOption) : null;
