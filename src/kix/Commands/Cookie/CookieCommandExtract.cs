@@ -12,6 +12,7 @@ public class CookieCommandExtract : CommandBase
     protected Option<string> BrowserOption;
     protected Option<string> BrowserProfileOption;
     protected Option<List<string>> DomainsOption;
+    protected Option<string> OutputOption;
 
     public CookieCommandExtract(string name, string? description = null) : base(name, description)
     {
@@ -21,6 +22,8 @@ public class CookieCommandExtract : CommandBase
         AddOption(BrowserProfileOption);
         DomainsOption = new Option<List<string>>(new[] { "-d", "--domain" }, "Domain(s) to filter by") { ArgumentHelpName = "domain", IsRequired = true, Arity = ArgumentArity.OneOrMore };
         AddOption(DomainsOption);
+        OutputOption = new Option<string>(new[] { "-o", "--output" }, "Output filename") { ArgumentHelpName = "file" };
+        AddOption(OutputOption);
     }
 
     protected override async Task<int> RunAsync(InvocationContext context)
@@ -30,17 +33,25 @@ public class CookieCommandExtract : CommandBase
         List<string> domains = context.ParseResult.GetValueForOption(DomainsOption)!;
         if (!CookieSource.TryGetBrowserFromName(browserName, out var source, browserProfile))
         {
-            PrintErrorMessage($"Failed to find browser with name {browserName}");
+            PrintErrorMessage(Common.GetInvalidCookieSourceBrowserMessage(browserName));
             return 2;
         }
-        CookieContainer cc = new();
-        foreach (string domain in domains)
+        if (context.ParseResult.HasOption(OutputOption))
         {
-            // TODO better api from doing multiple queries in one call, reusing cached context to avoid repeated auth
-            // TODO expand implementation, to allow considering subdomains
-            await source.LoadCookiesAsync(cc, domain);
+            await using var output = File.CreateText(context.ParseResult.GetValueForOption(OutputOption)!);
+            await ExportAsync(source, domains, output);
         }
-        TextWriter output = Console.Out;
+        else
+        {
+            await ExportAsync(source, domains, Console.Out);
+        }
+        return 0;
+    }
+
+    private static async Task ExportAsync(CookieSource source, IEnumerable<string> domains, TextWriter output)
+    {
+        CookieContainer cc = new();
+        await source.LoadCookiesAsync(cc, domains.Select(v => new CookieFilter(v)).ToList());
         StringBuilder sb = new();
         foreach (object? cookie in cc.GetAllCookies())
         {
@@ -55,6 +66,5 @@ public class CookieCommandExtract : CommandBase
             await output.WriteAsync(sb.ToString());
             sb.Clear();
         }
-        return 0;
     }
 }
