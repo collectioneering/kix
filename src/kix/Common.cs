@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Art;
+using Art.BrowserCookies;
 using Art.Common;
 using Art.Common.Logging;
 using EA;
@@ -123,8 +124,21 @@ internal static class Common
 
     internal static string GetInvalidHashMessage(string hash)
     {
-        return new StringBuilder($"Failed to find hash algorithm {hash}\nKnown algorithms:")
+        return new StringBuilder($"Failed to find hash algorithm {hash}")
+            .Append(Console.Error.NewLine)
+            .Append("Known algorithms:")
+            .Append(Console.Error.NewLine)
             .AppendJoin(Console.Error.NewLine, ChecksumSource.DefaultSources.Values.Select(v => v.Id))
+            .ToString();
+    }
+
+    internal static string GetInvalidCookieSourceBrowserMessage(string browserName)
+    {
+        return new StringBuilder($"Failed to find browser with name {browserName}")
+            .Append(Console.Error.NewLine)
+            .Append("Supported browsers:")
+            .Append(Console.Error.NewLine)
+            .AppendJoin(Console.Error.NewLine, CookieSource.GetSupportedBrowserNames())
             .ToString();
     }
 

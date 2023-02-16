@@ -1,7 +1,6 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Text;
 using Art;
 using Art.Common;
 using Art.Common.Management;
