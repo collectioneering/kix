@@ -11,5 +11,3 @@ public interface IPlugin
 
     IEnumerable<ToolDescription> GetToolDescriptions();
 }
-
-public readonly record struct ToolDescription(Type Type, ArtifactToolID Id);

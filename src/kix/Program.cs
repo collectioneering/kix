@@ -20,7 +20,7 @@ internal static class Program
             new FindCommand<PluginStore>(pluginStore),
             new ListCommand<PluginStore>(pluginStore),
             new RehashCommand(),
-            new ToolsCommand(),
+            new ToolsCommand<PluginStore>(pluginStore),
             new ValidateCommand<PluginStore>(pluginStore),
             new DatabaseCommand(),
             new CookieCommand()

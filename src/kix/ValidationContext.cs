@@ -143,7 +143,7 @@ public class ValidationContext<TPluginStore> where TPluginStore : IPluginStore
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var context = _pluginStore.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadPluginFromToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoadTool(profile, out var t))
                 throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             using IArtifactTool tool = t;

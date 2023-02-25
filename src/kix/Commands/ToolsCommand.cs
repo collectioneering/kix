@@ -8,18 +8,21 @@ using Art.Modular;
 
 namespace kix.Commands;
 
-internal class ToolsCommand : CommandBase
+internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPluginStore
 {
+    protected TPluginStore PluginStore;
+
     protected Option<string> SearchOption;
 
     protected Option<bool> DetailedOption;
 
-    public ToolsCommand() : this("tools", "List available tools.")
+    public ToolsCommand(TPluginStore pluginStore) : this(pluginStore, "tools", "List available tools.")
     {
     }
 
-    public ToolsCommand(string name, string? description = null) : base(name, description)
+    public ToolsCommand(TPluginStore pluginStore, string name, string? description = null) : base(name, description)
     {
+        PluginStore = pluginStore;
         SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern") { ArgumentHelpName = "pattern" };
         AddOption(SearchOption);
         DetailedOption = new Option<bool>(new[] { "--detailed" }, "Show detailed information on entries");
@@ -30,16 +33,16 @@ internal class ToolsCommand : CommandBase
     {
         var manifests = new Dictionary<string, ModuleManifest>();
         ModuleManifest.LoadManifests(manifests);
-        foreach (ModuleManifest manifest in manifests.Values)
+        foreach (var pluginDesc in PluginStore.GetPluginDescriptions())
         {
             IPlugin plugin;
             try
             {
-                plugin = PluginStore.LoadForManifest(manifest);
+                plugin = PluginStore.LoadPluginFromDescription(pluginDesc);
             }
             catch (Exception ex)
             {
-                PrintErrorMessage($"Failed to load assembly {manifest.Content.Assembly}:\n{ex}");
+                PrintErrorMessage($"Failed to load plugin {pluginDesc.Name}:\n{ex}");
                 continue;
             }
             string? search = context.ParseResult.GetValueForOption(SearchOption);

@@ -2,5 +2,9 @@
 
 public interface IPluginStore
 {
-    IPlugin LoadForToolString(string toolString);
+    IPlugin LoadPluginFromToolString(string toolString);
+
+    IPlugin LoadPluginFromDescription(IPluginDescription pluginDescription);
+
+    IEnumerable<IPluginDescription> GetPluginDescriptions();
 }
