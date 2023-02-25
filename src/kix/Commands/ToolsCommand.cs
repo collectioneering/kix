@@ -50,7 +50,7 @@ internal class ToolsCommand : CommandBase
             Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
             foreach ((Type toolType, string toolString) in plugin.BaseAssembly.GetExportedTypes()
                          .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
-                         .Select(v => (ToolType: v, ToolString: ArtifactToolStringUtil.CreateToolString(v)))
+                         .Select(v => (ToolType: v, ToolString: ArtifactToolIdUtil.CreateToolString(v)))
                          .Where(v => re?.IsMatch(v.ToolString) ?? true))
                 Common.PrintFormat(toolString, context.ParseResult.GetValueForOption(DetailedOption), () =>
                 {

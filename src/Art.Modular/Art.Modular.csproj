@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art.Common" Version="0.48.0" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.48.0" />
+    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj"/>
   </ItemGroup>
 
 </Project>

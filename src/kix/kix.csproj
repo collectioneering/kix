@@ -14,9 +14,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Art.Common" Version="0.48.0" />
-    <PackageReference Include="Art.EF.Sqlite" Version="0.48.0" />
-    <PackageReference Include="Art.BrowserCookies" Version="0.48.0" />
+    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj"/>
+    <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj"/>
+    <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EA" Version="1.1.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
