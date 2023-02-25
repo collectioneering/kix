@@ -1,0 +1,3 @@
+[submodule "ext/art"]
+	path = ext/art
+	url = https://github.com/collectioneering/Art.git
