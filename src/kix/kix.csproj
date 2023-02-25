@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Art.Modular\Art.Modular.csproj" />
-    <ProjectReference Include="..\Art.Tesler\Art.Tesler.csproj" />
+    <ProjectReference Include="..\..\ext\art\src\Art.Modular\Art.Modular.csproj" />
+    <ProjectReference Include="..\..\ext\art\src\Art.Tesler\Art.Tesler.csproj" />
   </ItemGroup>
 
 </Project>
