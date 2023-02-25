@@ -7,18 +7,7 @@ namespace Art.Tesler;
 
 public class TeslerRootCommand : RootCommand
 {
-}
-
-public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginStore : IPluginStore
-{
-    protected TPluginStore PluginStore;
-
-    public TeslerRootCommand(TPluginStore pluginStore)
-    {
-        PluginStore = pluginStore;
-    }
-
-    public static TeslerRootCommand Create(TPluginStore pluginStore)
+    public static TeslerRootCommand Create<TPluginStore>(TPluginStore pluginStore) where TPluginStore : IPluginStore
     {
         return new TeslerRootCommand<TPluginStore>(pluginStore)
         {
@@ -32,5 +21,15 @@ public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginSt
             new DatabaseCommand(),
             new CookieCommand()
         };
+    }
+}
+
+public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginStore : IPluginStore
+{
+    protected TPluginStore PluginStore;
+
+    public TeslerRootCommand(TPluginStore pluginStore)
+    {
+        PluginStore = pluginStore;
     }
 }
