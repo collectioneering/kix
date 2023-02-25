@@ -6,7 +6,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-internal class FindCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
+internal class FindCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IRegistryStore
 {
     protected Argument<List<string>> IdsArg;
 

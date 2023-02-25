@@ -4,7 +4,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-public class ValidationContext<TPluginStore> where TPluginStore : IPluginStore
+public class ValidationContext<TPluginStore> where TPluginStore : IRegistryStore
 {
     private readonly TPluginStore _pluginStore;
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
@@ -142,7 +142,7 @@ public class ValidationContext<TPluginStore> where TPluginStore : IPluginStore
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var context = _pluginStore.LoadPluginFromToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadRegistryFromToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoad(profile.GetID(), out var t))
                 throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             using IArtifactTool tool = t;

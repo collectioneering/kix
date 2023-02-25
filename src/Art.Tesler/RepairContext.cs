@@ -4,7 +4,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-public class RepairContext<TPluginStore> where TPluginStore : IPluginStore
+public class RepairContext<TPluginStore> where TPluginStore : IRegistryStore
 {
     private readonly TPluginStore _pluginStore;
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed;
@@ -28,7 +28,7 @@ public class RepairContext<TPluginStore> where TPluginStore : IPluginStore
         {
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-            var context = _pluginStore.LoadPluginFromToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadRegistryFromToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoad(artifactToolProfile.GetID(), out IArtifactTool? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
             ArtifactToolConfig config = new(_arm, _adm);

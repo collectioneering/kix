@@ -2,12 +2,11 @@
 using System.CommandLine.Invocation;
 using System.Text;
 using System.Text.RegularExpressions;
-using Art.Common;
 using Art.Modular;
 
 namespace Art.Tesler;
 
-internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPluginStore
+internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IRegistryStore
 {
     protected TPluginStore PluginStore;
 
@@ -30,18 +29,8 @@ internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPl
 
     protected override Task<int> RunAsync(InvocationContext context)
     {
-        foreach (var pluginDesc in PluginStore.GetPluginDescriptions())
+        foreach (var plugin in PluginStore.LoadAllRegistries())
         {
-            IArtifactToolRegistry plugin;
-            try
-            {
-                plugin = PluginStore.LoadPluginFromDescription(pluginDesc);
-            }
-            catch (Exception ex)
-            {
-                PrintErrorMessage($"Failed to load plugin {pluginDesc.Name}:\n{ex}");
-                continue;
-            }
             string? search = context.ParseResult.GetValueForOption(SearchOption);
             Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
             foreach (var desc in plugin.GetToolDescriptions()

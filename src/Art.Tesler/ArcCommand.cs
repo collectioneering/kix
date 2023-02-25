@@ -9,7 +9,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-internal class ArcCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
+internal class ArcCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IRegistryStore
 {
     protected Option<string> DatabaseOption;
 
@@ -88,7 +88,7 @@ internal class ArcCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TP
         profiles = profiles.Select(p => p.GetWithConsoleOptions(properties, cookieFile, userAgent)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var plugin = PluginStore.LoadPluginFromToolString(profile.Tool);
+            var plugin = PluginStore.LoadRegistryFromToolString(profile.Tool);
             await ArtifactDumping.DumpAsync(plugin, profile, arm, adm, options, l).ConfigureAwait(false);
         }
         return 0;

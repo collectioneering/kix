@@ -9,7 +9,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-internal class DumpCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
+internal class DumpCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IRegistryStore
 {
     protected Option<string> DatabaseOption;
 

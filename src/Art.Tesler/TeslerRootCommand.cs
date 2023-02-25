@@ -8,7 +8,7 @@ namespace Art.Tesler;
 
 public class TeslerRootCommand : RootCommand
 {
-    public static TeslerRootCommand Create<TPluginStore>(TPluginStore pluginStore) where TPluginStore : IPluginStore
+    public static TeslerRootCommand Create<TPluginStore>(TPluginStore pluginStore) where TPluginStore : IRegistryStore
     {
         return new TeslerRootCommand<TPluginStore>(pluginStore)
         {
@@ -26,11 +26,11 @@ public class TeslerRootCommand : RootCommand
 
     public static TeslerRootCommand Create(IArtifactToolRegistry artifactToolRegistry)
     {
-        return Create(new RegistryPluginStore(artifactToolRegistry));
+        return Create(new StaticRegistryStore(artifactToolRegistry));
     }
 }
 
-public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginStore : IPluginStore
+public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginStore : IRegistryStore
 {
     protected TPluginStore PluginStore;
 

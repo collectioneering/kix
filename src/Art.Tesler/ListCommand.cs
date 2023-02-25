@@ -6,7 +6,7 @@ using Art.Modular;
 
 namespace Art.Tesler;
 
-internal class ListCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
+internal class ListCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IRegistryStore
 {
     protected Option<string> ProfileFileOption;
 
