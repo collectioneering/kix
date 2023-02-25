@@ -5,7 +5,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Art.Common;
 using Art.EF.Sqlite;
-using Art.Modular;
 
 namespace Art.Tesler.Database;
 
@@ -51,7 +50,7 @@ internal class DatabaseCommandList : DatabaseCommandBase
             if (augment != null)
             {
                 await using FileStream afs = File.OpenRead(augment);
-                var augmentProfiles = ModularProfileUtil.DeserializeProfiles(afs);
+                var augmentProfiles = ArtifactToolProfileUtil.DeserializeProfiles(afs);
                 Dictionary<ToolAndGroup, ArtifactToolProfile> adict = augmentProfiles.ToDictionary(x => new ToolAndGroup(x.Tool, x.Group), x => x);
                 foreach ((ToolAndGroup profile, List<string> value) in dict)
                     adict[profile] = adict.TryGetValue(profile, out ArtifactToolProfile? aprofile)

@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using Art.Common;
 using Art.Common.Proxies;
 using Art.Modular;
 
@@ -58,7 +59,7 @@ internal class FindCommand<TPluginStore> : ToolCommandBase<TPluginStore> where T
             return await ExecAsync(context, profile);
         }
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ModularProfileUtil.DeserializeProfilesFromFile(profileFile))
+        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
             ec = Common.AccumulateErrorCode(await ExecAsync(context, profile), ec);

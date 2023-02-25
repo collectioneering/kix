@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
+using Art.Common;
 using Art.Common.Proxies;
 using Art.Modular;
 
@@ -50,7 +51,7 @@ internal class ListCommand<TPluginStore> : ToolCommandBase<TPluginStore> where T
         string? group = context.ParseResult.HasOption(GroupOption) ? context.ParseResult.GetValueForOption(GroupOption) : null;
         if (profileFile == null) return await ExecAsync(context, new ArtifactToolProfile(tool!, group ?? "", null));
         int ec = 0;
-        foreach (ArtifactToolProfile profile in ModularProfileUtil.DeserializeProfilesFromFile(profileFile))
+        foreach (ArtifactToolProfile profile in ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile))
         {
             if (group != null && group != profile.Group || tool != null && tool != profile.Tool) continue;
             ec = Common.AccumulateErrorCode(await ExecAsync(context, profile), ec);

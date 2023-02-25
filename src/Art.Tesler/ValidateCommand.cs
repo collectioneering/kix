@@ -61,7 +61,7 @@ internal class ValidateCommand<TPluginStore> : ToolCommandBase<TPluginStore> whe
         IToolLogHandler l = Common.GetDefaultToolLogHandler();
         List<ArtifactToolProfile> profiles = new();
         foreach (string profileFile in context.ParseResult.GetValueForArgument(ProfileFilesArg))
-            profiles.AddRange(ModularProfileUtil.DeserializeProfilesFromFile(profileFile));
+            profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile));
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
         string? userAgent = context.ParseResult.HasOption(UserAgentOption) ? context.ParseResult.GetValueForOption(UserAgentOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();

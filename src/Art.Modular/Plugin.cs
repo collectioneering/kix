@@ -29,6 +29,6 @@ public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Conte
     {
         return BaseAssembly.GetExportedTypes()
             .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
-            .Select(v => new ToolDescription(v, ArtifactToolIdUtil.CreateToolId(v)));
+            .Select(v => new ToolDescription(v, ArtifactToolIDUtil.CreateToolId(v)));
     }
 }
