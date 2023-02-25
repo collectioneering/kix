@@ -1,9 +1,8 @@
-﻿using Art;
-using Art.Common;
+﻿using Art.Common;
 using Art.Common.Proxies;
 using Art.Modular;
 
-namespace kix;
+namespace Art.Tesler;
 
 public class RepairContext<TPluginStore> where TPluginStore : IPluginStore
 {

@@ -1,8 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
-using Art;
 
-namespace kix;
+namespace Art.Tesler;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(ulong))]

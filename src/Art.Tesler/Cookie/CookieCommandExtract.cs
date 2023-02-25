@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using Art.BrowserCookies;
 
-namespace kix.Commands.Cookie;
+namespace Art.Tesler.Cookie;
 
 public class CookieCommandExtract : CommandBase
 {

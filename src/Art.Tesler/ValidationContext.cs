@@ -1,9 +1,8 @@
 ﻿using System.Security.Cryptography;
-using Art;
 using Art.Common;
 using Art.Modular;
 
-namespace kix;
+namespace Art.Tesler;
 
 public class ValidationContext<TPluginStore> where TPluginStore : IPluginStore
 {

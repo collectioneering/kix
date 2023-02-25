@@ -3,12 +3,11 @@ using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Art;
 using Art.Common;
 using Art.EF.Sqlite;
 using Art.Modular;
 
-namespace kix.Commands.Database;
+namespace Art.Tesler.Database;
 
 internal class DatabaseCommandList : DatabaseCommandBase
 {

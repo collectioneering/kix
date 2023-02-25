@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.EF", "..\ext\art\src\Ar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.EF.Sqlite", "..\ext\art\src\Art.EF.Sqlite\Art.EF.Sqlite.csproj", "{B5F9E469-4D9E-4CA5-AE21-58EDB6D75E3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.Tesler", "Art.Tesler\Art.Tesler.csproj", "{24B9DAEA-406B-4870-BF15-2CD719ABCABA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{B5F9E469-4D9E-4CA5-AE21-58EDB6D75E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5F9E469-4D9E-4CA5-AE21-58EDB6D75E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5F9E469-4D9E-4CA5-AE21-58EDB6D75E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24B9DAEA-406B-4870-BF15-2CD719ABCABA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24B9DAEA-406B-4870-BF15-2CD719ABCABA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24B9DAEA-406B-4870-BF15-2CD719ABCABA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24B9DAEA-406B-4870-BF15-2CD719ABCABA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

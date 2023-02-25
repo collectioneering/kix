@@ -1,10 +1,9 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using Art;
 using Art.Common;
 using Art.EF.Sqlite;
 
-namespace kix.Commands.Database;
+namespace Art.Tesler.Database;
 
 internal class DatabaseCommandDelete : DatabaseCommandBase
 {

@@ -2,11 +2,10 @@
 using System.CommandLine.Invocation;
 using System.Text;
 using System.Text.RegularExpressions;
-using Art;
 using Art.Common;
 using Art.Modular;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPluginStore
 {
@@ -31,8 +30,6 @@ internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPl
 
     protected override Task<int> RunAsync(InvocationContext context)
     {
-        var manifests = new Dictionary<string, ModuleManifest>();
-        ModuleManifest.LoadManifests(manifests);
         foreach (var pluginDesc in PluginStore.GetPluginDescriptions())
         {
             IPlugin plugin;

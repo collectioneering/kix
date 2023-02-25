@@ -1,12 +1,11 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.Modular;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 public abstract class ToolCommandBase<TPluginStore> : CommandBase where TPluginStore : IPluginStore
 {

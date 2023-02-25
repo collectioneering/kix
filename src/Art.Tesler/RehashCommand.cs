@@ -1,12 +1,11 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Security.Cryptography;
-using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 internal class RehashCommand : CommandBase
 {

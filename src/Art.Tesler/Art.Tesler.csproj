@@ -1,31 +1,21 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.2.0</Version>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Copyright>Copyright (C) 2021 Lucina</Copyright>
-    <!--<PublishTrimmed>true</PublishTrimmed>-->
+    <IsTrimmable>true</IsTrimmable>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj" />
     <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" />
     <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj" />
+    <ProjectReference Include="../Art.Modular/Art.Modular.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EA" Version="1.1.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Art.Tesler\Art.Tesler.csproj" />
   </ItemGroup>
 
 </Project>

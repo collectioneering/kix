@@ -1,13 +1,12 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using Art;
 using Art.BrowserCookies;
 using Art.Common;
 using Art.Common.Logging;
 using EA;
 
-namespace kix;
+namespace Art.Tesler;
 
 internal static class Common
 {

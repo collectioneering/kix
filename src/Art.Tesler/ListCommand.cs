@@ -1,11 +1,10 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using Art;
 using Art.Common.Proxies;
 using Art.Modular;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 internal class ListCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
 {

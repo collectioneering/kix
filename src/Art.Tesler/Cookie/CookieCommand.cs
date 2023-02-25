@@ -1,6 +1,6 @@
 using System.CommandLine;
 
-namespace kix.Commands.Cookie;
+namespace Art.Tesler.Cookie;
 
 public class CookieCommand : Command
 {

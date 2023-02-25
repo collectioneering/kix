@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace kix.Commands.Database;
+namespace Art.Tesler.Database;
 
 internal abstract class DatabaseCommandBase : CommandBase
 {

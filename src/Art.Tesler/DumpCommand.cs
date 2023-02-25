@@ -1,14 +1,13 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using Art;
 using Art.Common;
 using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
 using Art.Modular;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 internal class DumpCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
 {

@@ -1,8 +1,7 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using Art;
 
-namespace kix.Commands;
+namespace Art.Tesler;
 
 public abstract class CommandBase : Command
 {
