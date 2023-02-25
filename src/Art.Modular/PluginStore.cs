@@ -7,18 +7,9 @@ namespace Art.Modular;
 [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
 public class PluginStore : IPluginStore
 {
-    public IPlugin LoadPluginFromToolString(string toolString)
+    public IPlugin LoadPluginFromArtifactToolId(ArtifactToolID artifactToolId)
     {
-        ArtifactToolID id;
-        try
-        {
-            id = ArtifactToolProfileUtil.GetID(toolString);
-        }
-        catch (ArgumentException e)
-        {
-            throw new ArtUserException(e.Message);
-        }
-        string assembly = id.Assembly;
+        string assembly = artifactToolId.Assembly;
         if (!ModuleManifest.TryFind(assembly, out var manifest))
         {
             throw new ManifestNotFoundException(assembly);

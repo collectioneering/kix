@@ -5,7 +5,11 @@ using Art.Tesler.Database;
 
 namespace Art.Tesler;
 
-public class TeslerRootCommand<TPluginStore> : RootCommand where TPluginStore : IPluginStore
+public class TeslerRootCommand : RootCommand
+{
+}
+
+public class TeslerRootCommand<TPluginStore> : TeslerRootCommand where TPluginStore : IPluginStore
 {
     protected TPluginStore PluginStore;
 
@@ -14,7 +18,7 @@ public class TeslerRootCommand<TPluginStore> : RootCommand where TPluginStore : 
         PluginStore = pluginStore;
     }
 
-    public static TeslerRootCommand<TPluginStore> Create(TPluginStore pluginStore)
+    public static TeslerRootCommand Create(TPluginStore pluginStore)
     {
         return new TeslerRootCommand<TPluginStore>(pluginStore)
         {

@@ -10,6 +10,6 @@ internal static class Program
     [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private static async Task<int> Main(string[] args)
     {
-        return await new TeslerRootCommand<PluginStore>(new PluginStore()).InvokeAsync(args);
+        return await TeslerRootCommand<PluginStore>.Create(new PluginStore()).InvokeAsync(args);
     }
 }
