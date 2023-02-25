@@ -1,14 +1,13 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common.Proxies;
 using Art.Modular;
 
 namespace kix.Commands;
 
-internal class FindCommand : ToolCommandBase
+internal class FindCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
 {
     protected Argument<List<string>> IdsArg;
 
@@ -22,13 +21,11 @@ internal class FindCommand : ToolCommandBase
 
     protected Option<bool> DetailedOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
-    public FindCommand() : this("find", "Execute artifact finder tools.")
+    public FindCommand(TPluginStore pluginStore) : this(pluginStore, "find", "Execute artifact finder tools.")
     {
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
-    public FindCommand(string name, string? description = null) : base(name, description)
+    public FindCommand(TPluginStore pluginStore, string name, string? description = null) : base(pluginStore, name, description)
     {
         IdsArg = new Argument<List<string>>("ids", "IDs") { HelpName = "id", Arity = ArgumentArity.OneOrMore };
         AddArgument(IdsArg);
@@ -51,7 +48,6 @@ internal class FindCommand : ToolCommandBase
         });
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
@@ -71,7 +67,6 @@ internal class FindCommand : ToolCommandBase
         return ec;
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile)
     {
         using var tool = await GetSearchingToolAsync(context, profile);

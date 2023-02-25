@@ -5,8 +5,9 @@ using Art.Modular;
 
 namespace kix;
 
-public class ValidationContext
+public class ValidationContext<TPluginStore> where TPluginStore : IPluginStore
 {
+    private readonly TPluginStore _pluginStore;
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
     private readonly IArtifactRegistrationManager _arm;
     private readonly ArtifactDataManager _adm;
@@ -16,8 +17,9 @@ public class ValidationContext
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
+    public ValidationContext(TPluginStore pluginStore, IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
     {
+        _pluginStore = pluginStore;
         _arm = arm;
         _adm = adm;
         _l = l;
@@ -141,7 +143,7 @@ public class ValidationContext
         int artifactCount = 0, resourceCount = 0;
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadForToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoadTool(profile, out var t))
                 throw new InvalidOperationException($"Unknown tool {profile.Tool}");
             using IArtifactTool tool = t;
@@ -155,7 +157,7 @@ public class ValidationContext
         return new ValidationProcessResult(artifactCount, resourceCount);
     }
 
-    public RepairContext CreateRepairContext() => new(_failed, _arm, _adm, _l);
+    public RepairContext<TPluginStore> CreateRepairContext() => new(_pluginStore, _failed, _arm, _adm, _l);
 }
 
 public readonly record struct ValidationProcessResult(int Artifacts, int Resources);

@@ -5,15 +5,17 @@ using Art.Modular;
 
 namespace kix;
 
-public class RepairContext
+public class RepairContext<TPluginStore> where TPluginStore : IPluginStore
 {
+    private readonly TPluginStore _pluginStore;
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed;
     private readonly IArtifactRegistrationManager _arm;
     private readonly ArtifactDataManager _adm;
     private readonly IToolLogHandler _l;
 
-    public RepairContext(IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
+    public RepairContext(TPluginStore pluginStore, IReadOnlyDictionary<ArtifactKey, List<ArtifactResourceInfo>> failed, IArtifactRegistrationManager arm, ArtifactDataManager adm, IToolLogHandler l)
     {
+        _pluginStore = pluginStore;
         _failed = new Dictionary<ArtifactKey, List<ArtifactResourceInfo>>(failed);
         _arm = arm;
         _adm = adm;
@@ -27,7 +29,7 @@ public class RepairContext
         {
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-            var context = Plugin.LoadForToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadForToolString(profile.Tool); // InvalidOperationException
             if (!context.TryLoadTool(artifactToolProfile, out IArtifactTool? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
             ArtifactToolConfig config = new(_arm, _adm);

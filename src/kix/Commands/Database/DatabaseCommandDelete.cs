@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common;
 using Art.EF.Sqlite;
@@ -15,7 +14,6 @@ internal class DatabaseCommandDelete : DatabaseCommandBase
 
     protected Option<bool> DoDeleteOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public DatabaseCommandDelete(string name, string? description = null) : base(name, description)
     {
         ListOption = new Option<bool>(new[] { "--list" }, "List items");
@@ -48,7 +46,6 @@ internal class DatabaseCommandDelete : DatabaseCommandBase
         });
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         using SqliteArtifactRegistrationManager arm = new(context.ParseResult.GetValueForOption(DatabaseOption)!);

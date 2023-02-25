@@ -1,19 +1,16 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Diagnostics.CodeAnalysis;
 using Art;
 
 namespace kix.Commands;
 
 public abstract class CommandBase : Command
 {
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected CommandBase(string name, string? description = null) : base(name, description)
     {
         this.SetHandler(RunInternalAsync);
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> RunInternalAsync(InvocationContext context)
     {
         try
@@ -46,6 +43,5 @@ public abstract class CommandBase : Command
         Console.ResetColor();
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected abstract Task<int> RunAsync(InvocationContext context);
 }

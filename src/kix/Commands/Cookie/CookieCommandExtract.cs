@@ -1,7 +1,6 @@
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text;
 using Art.BrowserCookies;
@@ -15,7 +14,6 @@ public class CookieCommandExtract : CommandBase
     protected Option<List<string>> DomainsOption;
     protected Option<string> OutputOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public CookieCommandExtract(string name, string? description = null) : base(name, description)
     {
         BrowserOption = new Option<string>(new[] { "-b", "--browser" }, "Browser name") { ArgumentHelpName = "name", IsRequired = true };
@@ -28,7 +26,6 @@ public class CookieCommandExtract : CommandBase
         AddOption(OutputOption);
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string browserName = context.ParseResult.GetValueForOption(BrowserOption)!;

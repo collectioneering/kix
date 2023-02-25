@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using Art;
 using Art.Common;
@@ -19,12 +18,10 @@ internal class RehashCommand : CommandBase
 
     protected Option<bool> DetailedOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public RehashCommand() : this("rehash", "Recompute hashes for archive contents.")
     {
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public RehashCommand(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
@@ -39,7 +36,6 @@ internal class RehashCommand : CommandBase
         AddOption(DetailedOption);
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string hash = context.ParseResult.GetValueForOption(HashOption)!;

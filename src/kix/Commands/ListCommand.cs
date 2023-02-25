@@ -1,14 +1,13 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
 using Art;
 using Art.Common.Proxies;
 using Art.Modular;
 
 namespace kix.Commands;
 
-internal class ListCommand : ToolCommandBase
+internal class ListCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TPluginStore : IPluginStore
 {
     protected Option<string> ProfileFileOption;
 
@@ -20,13 +19,11 @@ internal class ListCommand : ToolCommandBase
 
     protected Option<bool> DetailedOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
-    public ListCommand() : this("list", "Execute artifact list tools.")
+    public ListCommand(TPluginStore pluginStore) : this(pluginStore, "list", "Execute artifact list tools.")
     {
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
-    public ListCommand(string name, string? description = null) : base(name, description)
+    public ListCommand(TPluginStore pluginStore, string name, string? description = null) : base(pluginStore, name, description)
     {
         ProfileFileOption = new Option<string>(new[] { "-i", "--input" }, "Profile file") { ArgumentHelpName = "file" };
         AddOption(ProfileFileOption);
@@ -47,7 +44,6 @@ internal class ListCommand : ToolCommandBase
         });
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override async Task<int> RunAsync(InvocationContext context)
     {
         string? profileFile = context.ParseResult.HasOption(ProfileFileOption) ? context.ParseResult.GetValueForOption(ProfileFileOption) : null;
@@ -63,7 +59,6 @@ internal class ListCommand : ToolCommandBase
         return ec;
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     private async Task<int> ExecAsync(InvocationContext context, ArtifactToolProfile profile)
     {
         using var tool = await GetSearchingToolAsync(context, profile);

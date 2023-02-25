@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.RegularExpressions;
 using Art;
@@ -15,12 +14,10 @@ internal class ToolsCommand : CommandBase
 
     protected Option<bool> DetailedOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ToolsCommand() : this("tools", "List available tools.")
     {
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     public ToolsCommand(string name, string? description = null) : base(name, description)
     {
         SearchOption = new Option<string>(new[] { "-s", "--search" }, "Search pattern") { ArgumentHelpName = "pattern" };
@@ -29,17 +26,16 @@ internal class ToolsCommand : CommandBase
         AddOption(DetailedOption);
     }
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected override Task<int> RunAsync(InvocationContext context)
     {
         var manifests = new Dictionary<string, ModuleManifest>();
         ModuleManifest.LoadManifests(manifests);
         foreach (ModuleManifest manifest in manifests.Values)
         {
-            Plugin plugin;
+            IPlugin plugin;
             try
             {
-                plugin = Plugin.LoadForManifest(manifest);
+                plugin = PluginStore.LoadForManifest(manifest);
             }
             catch (Exception ex)
             {
@@ -48,15 +44,14 @@ internal class ToolsCommand : CommandBase
             }
             string? search = context.ParseResult.GetValueForOption(SearchOption);
             Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
-            foreach ((Type toolType, string toolString) in plugin.BaseAssembly.GetExportedTypes()
-                         .Where(t => t.IsAssignableTo(typeof(IArtifactTool)) && !t.IsAbstract && t.GetConstructor(Array.Empty<Type>()) != null)
-                         .Select(v => (ToolType: v, ToolString: ArtifactToolIdUtil.CreateToolString(v)))
-                         .Where(v => re?.IsMatch(v.ToolString) ?? true))
-                Common.PrintFormat(toolString, context.ParseResult.GetValueForOption(DetailedOption), () =>
+            foreach (var desc in plugin.GetToolDescriptions()
+                         .Where(v => re?.IsMatch(GetToolString(v.Id)) ?? true))
+            {
+                Common.PrintFormat(GetToolString(desc.Id), context.ParseResult.GetValueForOption(DetailedOption), () =>
                 {
-                    bool canFind = toolType.IsAssignableTo(typeof(IArtifactToolFind));
-                    bool canList = toolType.IsAssignableTo(typeof(IArtifactToolList));
-                    bool canDump = canList || toolType.IsAssignableTo(typeof(IArtifactToolDump));
+                    bool canFind = desc.Type.IsAssignableTo(typeof(IArtifactToolFind));
+                    bool canList = desc.Type.IsAssignableTo(typeof(IArtifactToolList));
+                    bool canDump = canList || desc.Type.IsAssignableTo(typeof(IArtifactToolDump));
                     IEnumerable<string> capabilities = Enumerable.Empty<string>();
                     if (canFind) capabilities = capabilities.Append("find");
                     if (canList) capabilities = capabilities.Append("list");
@@ -64,7 +59,14 @@ internal class ToolsCommand : CommandBase
                     capabilities = capabilities.DefaultIfEmpty("none");
                     return new StringBuilder("Capabilities: ").AppendJoin(", ", capabilities).ToString();
                 });
+            }
         }
         return Task.FromResult(0);
+    }
+
+    private static string GetToolString(ArtifactToolID artifactToolId)
+    {
+        // TODO this should be an api in art
+        return $"{artifactToolId.Assembly}::{artifactToolId.Type}";
     }
 }

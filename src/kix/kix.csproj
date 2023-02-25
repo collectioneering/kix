@@ -14,9 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj"/>
-    <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj"/>
-    <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj"/>
+    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj" />
+    <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" />
+    <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj" />
   </ItemGroup>
 
   <ItemGroup>

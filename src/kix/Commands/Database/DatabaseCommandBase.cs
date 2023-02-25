@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using System.Diagnostics.CodeAnalysis;
 
 namespace kix.Commands.Database;
 
@@ -25,7 +24,6 @@ internal abstract class DatabaseCommandBase : CommandBase
 
     protected Option<bool> DetailedOption;
 
-    [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
     protected DatabaseCommandBase(string name, string? description = null) : base(name, description)
     {
         DatabaseOption = new Option<string>(new[] { "-d", "--database" }, "Sqlite database file") { ArgumentHelpName = "file" };
