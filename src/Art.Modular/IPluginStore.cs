@@ -4,7 +4,7 @@ namespace Art.Modular;
 
 public interface IPluginStore
 {
-    IPlugin LoadPluginFromToolString(string toolString)
+    IArtifactToolRegistry LoadPluginFromToolString(string toolString)
     {
         ArtifactToolID id;
         try
@@ -18,9 +18,9 @@ public interface IPluginStore
         return LoadPluginFromArtifactToolId(id);
     }
 
-    IPlugin LoadPluginFromArtifactToolId(ArtifactToolID artifactToolId);
+    IArtifactToolRegistry LoadPluginFromArtifactToolId(ArtifactToolID artifactToolId);
 
-    IPlugin LoadPluginFromDescription(IPluginDescription pluginDescription);
+    IArtifactToolRegistry LoadPluginFromDescription(IPluginDescription pluginDescription);
 
     IEnumerable<IPluginDescription> GetPluginDescriptions();
 }

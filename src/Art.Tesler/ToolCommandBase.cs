@@ -42,7 +42,7 @@ public abstract class ToolCommandBase<TPluginStore> : CommandBase where TPluginS
         string? userAgent = context.ParseResult.HasOption(UserAgentOption) ? context.ParseResult.GetValueForOption(UserAgentOption) : null;
         IEnumerable<string> properties = context.ParseResult.HasOption(PropertiesOption) ? context.ParseResult.GetValueForOption(PropertiesOption)! : Array.Empty<string>();
         artifactToolProfile = artifactToolProfile.GetWithConsoleOptions(properties, cookieFile, userAgent);
-        IArtifactTool t = await ArtifactTool.PrepareToolAsync(plugin.ArtifactToolRegistry, artifactToolProfile, arm, adm, cancellationToken);
+        IArtifactTool t = await ArtifactTool.PrepareToolAsync(plugin, artifactToolProfile, arm, adm, cancellationToken);
         return t;
     }
 }

@@ -32,7 +32,7 @@ internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPl
     {
         foreach (var pluginDesc in PluginStore.GetPluginDescriptions())
         {
-            IPlugin plugin;
+            IArtifactToolRegistry plugin;
             try
             {
                 plugin = PluginStore.LoadPluginFromDescription(pluginDesc);
@@ -45,9 +45,9 @@ internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPl
             string? search = context.ParseResult.GetValueForOption(SearchOption);
             Regex? re = search != null ? Common.GetFilterRegex(search, false, false) : null;
             foreach (var desc in plugin.GetToolDescriptions()
-                         .Where(v => re?.IsMatch(GetToolString(v.Id)) ?? true))
+                         .Where(v => re?.IsMatch(v.Id.GetToolString()) ?? true))
             {
-                Common.PrintFormat(GetToolString(desc.Id), context.ParseResult.GetValueForOption(DetailedOption), () =>
+                Common.PrintFormat(desc.Id.GetToolString(), context.ParseResult.GetValueForOption(DetailedOption), () =>
                 {
                     bool canFind = desc.Type.IsAssignableTo(typeof(IArtifactToolFind));
                     bool canList = desc.Type.IsAssignableTo(typeof(IArtifactToolList));
@@ -62,11 +62,5 @@ internal class ToolsCommand<TPluginStore> : CommandBase where TPluginStore : IPl
             }
         }
         return Task.FromResult(0);
-    }
-
-    private static string GetToolString(ArtifactToolID artifactToolId)
-    {
-        // TODO this should be an api in art
-        return $"{artifactToolId.Assembly}::{artifactToolId.Type}";
     }
 }

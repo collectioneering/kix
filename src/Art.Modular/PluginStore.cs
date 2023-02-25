@@ -7,7 +7,7 @@ namespace Art.Modular;
 [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
 public class PluginStore : IPluginStore
 {
-    public IPlugin LoadPluginFromArtifactToolId(ArtifactToolID artifactToolId)
+    public IArtifactToolRegistry LoadPluginFromArtifactToolId(ArtifactToolID artifactToolId)
     {
         string assembly = artifactToolId.Assembly;
         if (!ModuleManifest.TryFind(assembly, out var manifest))
@@ -17,7 +17,7 @@ public class PluginStore : IPluginStore
         return LoadForManifest(manifest);
     }
 
-    public IPlugin LoadPluginFromDescription(IPluginDescription pluginDescription)
+    public IArtifactToolRegistry LoadPluginFromDescription(IPluginDescription pluginDescription)
     {
         if (pluginDescription is not PluginDescription desc)
         {
@@ -26,7 +26,7 @@ public class PluginStore : IPluginStore
         return LoadForManifest(desc.Manifest);
     }
 
-    private static IPlugin LoadForManifest(ModuleManifest manifest)
+    private static IArtifactToolRegistry LoadForManifest(ModuleManifest manifest)
     {
         string baseDir = manifest.Content.Path != null && !Path.IsPathFullyQualified(manifest.Content.Path) ? Path.Combine(manifest.BasePath, manifest.Content.Path) : manifest.BasePath;
         var ctx = new ArtModuleAssemblyLoadContext(baseDir, manifest.Content.Assembly);

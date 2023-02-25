@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using Art.Common;
 using Art.Modular;
 using Art.Tesler.Cookie;
 using Art.Tesler.Database;
@@ -21,6 +22,11 @@ public class TeslerRootCommand : RootCommand
             new DatabaseCommand(),
             new CookieCommand()
         };
+    }
+
+    public static TeslerRootCommand Create(IArtifactToolRegistry artifactToolRegistry)
+    {
+        return Create(new RegistryPluginStore(artifactToolRegistry));
     }
 }
 

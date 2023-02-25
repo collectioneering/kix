@@ -5,13 +5,24 @@ using Art.Common;
 namespace Art.Modular;
 
 [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
-public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Context, Assembly BaseAssembly) : IPlugin
+public record Plugin(ModuleManifest Manifest, ArtModuleAssemblyLoadContext Context, Assembly BaseAssembly) : IArtifactToolRegistry
 {
-    public IArtifactToolRegistry ArtifactToolRegistry => Context;
-
-    public bool TryLoadTool(ArtifactToolProfile artifactToolProfile, [NotNullWhen(true)] out IArtifactTool? t)
+    public bool Contains(ArtifactToolID artifactToolId)
     {
-        return ArtifactToolLoader.TryLoad(BaseAssembly, artifactToolProfile.Tool, out t);
+        try
+        {
+            Assembly assembly = Context.LoadFromAssemblyName(new AssemblyName(artifactToolId.Assembly));
+            return assembly.GetType(artifactToolId.Type) != null;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool TryLoad(ArtifactToolID artifactToolId, [NotNullWhen(true)] out IArtifactTool? tool)
+    {
+        return ArtifactToolLoader.TryLoad(Context, artifactToolId, out tool);
     }
 
     public IEnumerable<ToolDescription> GetToolDescriptions()
