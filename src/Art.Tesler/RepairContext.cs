@@ -28,7 +28,7 @@ public class RepairContext<TPluginStore> where TPluginStore : IRegistryStore
         {
             ArtifactToolProfile artifactToolProfile = profile;
             if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
-            var context = _pluginStore.LoadRegistryFromToolString(profile.Tool); // InvalidOperationException
+            var context = _pluginStore.LoadRegistry(ArtifactToolProfileUtil.GetID(profile.Tool)); // InvalidOperationException
             if (!context.TryLoad(artifactToolProfile.GetID(), out IArtifactTool? t))
                 throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
             ArtifactToolConfig config = new(_arm, _adm);

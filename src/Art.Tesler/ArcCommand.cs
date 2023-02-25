@@ -88,7 +88,7 @@ internal class ArcCommand<TPluginStore> : ToolCommandBase<TPluginStore> where TP
         profiles = profiles.Select(p => p.GetWithConsoleOptions(properties, cookieFile, userAgent)).ToList();
         foreach (ArtifactToolProfile profile in profiles)
         {
-            var plugin = PluginStore.LoadRegistryFromToolString(profile.Tool);
+            var plugin = PluginStore.LoadRegistry(ArtifactToolProfileUtil.GetID(profile.Tool));
             await ArtifactDumping.DumpAsync(plugin, profile, arm, adm, options, l).ConfigureAwait(false);
         }
         return 0;

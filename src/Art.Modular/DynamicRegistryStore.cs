@@ -7,7 +7,7 @@ namespace Art.Modular;
 [RequiresUnreferencedCode("Loading artifact tools might require types that cannot be statically analyzed.")]
 public class DynamicRegistryStore : IRegistryStore
 {
-    public IArtifactToolRegistry LoadRegistryFromArtifactToolId(ArtifactToolID artifactToolId)
+    public IArtifactToolRegistry LoadRegistry(ArtifactToolID artifactToolId)
     {
         string assembly = artifactToolId.Assembly;
         if (!ModuleManifest.TryFind(assembly, out var manifest))

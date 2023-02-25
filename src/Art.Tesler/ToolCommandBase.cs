@@ -36,7 +36,7 @@ public abstract class ToolCommandBase<TPluginStore> : CommandBase where TPluginS
 
     protected async Task<IArtifactTool> GetToolAsync(InvocationContext context, ArtifactToolProfile artifactToolProfile, IArtifactRegistrationManager arm, IArtifactDataManager adm, CancellationToken cancellationToken = default)
     {
-        var plugin = PluginStore.LoadRegistryFromToolString(artifactToolProfile.Tool);
+        var plugin = PluginStore.LoadRegistry(ArtifactToolProfileUtil.GetID(artifactToolProfile.Tool));
         if (artifactToolProfile.Group == null) throw new IOException("Group not specified in profile");
         string? cookieFile = context.ParseResult.HasOption(CookieFileOption) ? context.ParseResult.GetValueForOption(CookieFileOption) : null;
         string? userAgent = context.ParseResult.HasOption(UserAgentOption) ? context.ParseResult.GetValueForOption(UserAgentOption) : null;

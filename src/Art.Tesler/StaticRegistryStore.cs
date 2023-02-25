@@ -9,7 +9,7 @@ internal class StaticRegistryStore : IRegistryStore
 
     public StaticRegistryStore(IArtifactToolRegistry artifactToolRegistry) => _artifactToolRegistry = artifactToolRegistry;
 
-    public IArtifactToolRegistry LoadRegistryFromArtifactToolId(ArtifactToolID artifactToolId)
+    public IArtifactToolRegistry LoadRegistry(ArtifactToolID artifactToolId)
     {
         if (_artifactToolRegistry.Contains(artifactToolId))
         {
