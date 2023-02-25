@@ -2,7 +2,7 @@
 using System.CommandLine.Invocation;
 using System.Text;
 using System.Text.RegularExpressions;
-using Art.Modular;
+using Art.Common;
 
 namespace Art.Tesler;
 

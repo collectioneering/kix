@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
 using Art.Common;
-using Art.Modular;
 using Art.Tesler.Cookie;
 using Art.Tesler.Database;
 

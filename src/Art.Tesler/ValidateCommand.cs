@@ -4,7 +4,6 @@ using System.CommandLine.Parsing;
 using Art.Common;
 using Art.Common.Management;
 using Art.EF.Sqlite;
-using Art.Modular;
 
 namespace Art.Tesler;
 

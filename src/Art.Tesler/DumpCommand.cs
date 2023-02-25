@@ -5,7 +5,6 @@ using Art.Common;
 using Art.Common.Management;
 using Art.Common.Proxies;
 using Art.EF.Sqlite;
-using Art.Modular;
 
 namespace Art.Tesler;
 

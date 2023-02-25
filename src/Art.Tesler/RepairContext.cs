@@ -1,6 +1,5 @@
 ﻿using Art.Common;
 using Art.Common.Proxies;
-using Art.Modular;
 
 namespace Art.Tesler;
 
