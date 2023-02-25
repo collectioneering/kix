@@ -4,5 +4,5 @@ namespace Art.Modular;
 
 public static class JsonOpt
 {
-    public static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
+    public static JsonSerializerOptions GetOptions() => new() { PropertyNameCaseInsensitive = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Skip };
 }
