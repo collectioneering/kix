@@ -10,7 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" />
     <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj" />
-    <ProjectReference Include="../Art.Modular/Art.Modular.csproj" />
+    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
