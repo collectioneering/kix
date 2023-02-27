@@ -13,4 +13,5 @@ if (!File.Exists(defaultPropFile))
     defaultPropFile = null;
 }
 var propProvider = new DirectoryJsonDefaultPropertyProvider(baseDir, defaultPropFile);
-return await TeslerRootCommand.Create(new ModularArtifactToolRegistryStore(provider), propProvider).InvokeAsync(args);
+var console = new ErrorOnlySystemConsole();
+return await TeslerRootCommand.Create(new ModularArtifactToolRegistryStore(provider), propProvider).InvokeAsync(args, console);
