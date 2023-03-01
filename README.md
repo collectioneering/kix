@@ -28,9 +28,9 @@ Plugins are loaded into separate [`AssemblyLoadContext`](https://learn.microsoft
 
 ### Plugin Creation
 
-Plugins should contain one or more tools that implement one of `IArtifactTool`'s sub-interfaces, such as `IArtifactToolList`, `IArtifactToolFind`, or `IArtifactToolDump`. The base classes `ArtifactTool` (from package [Art.Common](https://www.nuget.org/packages/Art.Common)), `HttpArtifactTool` (from package [Art.Http](https://www.nuget.org/packages/Art.Http)), and `HtmlArtifactTool` (from package [Art.Html](https://www.nuget.org/packages/Art.Html)) are useful starting points.
+Plugins should contain one or more tools that implement one of `IArtifactTool`'s sub-interfaces, such as `IArtifactListTool`, `IArtifactFindTool`, or `IArtifactDumpTool`. The base classes `ArtifactTool` (from package [Art.Common](https://www.nuget.org/packages/Art.Common)), `HttpArtifactTool` (from package [Art.Http](https://www.nuget.org/packages/Art.Http)), and `HtmlArtifactTool` (from package [Art.Html](https://www.nuget.org/packages/Art.Html)) are useful starting points.
 
-It is recommended to create an `IArtifactToolFind` tool as a base type when applicable, and mark it with `CoreAttribute`. This lets different derived tools - such as an `IArtifactToolList` that performs queries and another `IArtifactToolList` that lists items based on author - create artifacts keyed by the base type (at least by default for `ArtifactTool` subtypes). This facilitates unified management, updating, and repairing of artifacts.
+It is recommended to create an `IArtifactFindTool` tool as a base type when applicable, and mark it with `CoreAttribute`. This lets different derived tools - such as an `IArtifactListTool` that performs queries and another `IArtifactListTool` that lists items based on author - create artifacts keyed by the base type (at least by default for `ArtifactTool` subtypes). This facilitates unified management, updating, and repairing of artifacts.
 
 Plugins are recognized by the presence of a `.kix.json` manifest file, which simply tells `kix` what assembly to load. For example:
 
