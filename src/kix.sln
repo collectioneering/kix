@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.EF.Sqlite", "..\ext\art
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Art.Tesler", "..\ext\art\src\Art.Tesler\Art.Tesler.csproj", "{EA24FB19-32C5-4D11-94EF-16F8F562B890}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BarHelper", "..\ext\art\src\BarHelper\BarHelper.csproj", "{72D954B7-6727-4DFF-B139-82068CBD83BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,5 +56,9 @@ Global
 		{EA24FB19-32C5-4D11-94EF-16F8F562B890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA24FB19-32C5-4D11-94EF-16F8F562B890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA24FB19-32C5-4D11-94EF-16F8F562B890}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72D954B7-6727-4DFF-B139-82068CBD83BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72D954B7-6727-4DFF-B139-82068CBD83BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72D954B7-6727-4DFF-B139-82068CBD83BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72D954B7-6727-4DFF-B139-82068CBD83BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

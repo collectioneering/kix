@@ -12,7 +12,7 @@ if (!File.Exists(defaultPropFile))
     defaultPropFile = null;
 }
 var provider = ModuleManifestProvider.Create(cfg, Path.Combine(baseDir, "Plugins"), ".kix", ".kix.json");
-var toolLogHandlerProvider = new StyledToolLogHandlerProvider(Console.Out, Console.Error, Console.OpenStandardOutput);
+var toolLogHandlerProvider = new ConsoleStyledToolLogHandlerProvider(Console.Out, Console.Error, static () => Console.IsErrorRedirected, static () => Console.BufferWidth, Console.OpenStandardOutput);
 var registryStore = new ModularArtifactToolRegistryStore(provider);
 var propProvider = new DirectoryJsonDefaultPropertyProvider(baseDir, defaultPropFile);
 var console = new ErrorOnlyConsole(Console.Error, static () => Console.IsErrorRedirected, static () => Console.IsInputRedirected, static () => Console.WindowWidth);
