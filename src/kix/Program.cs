@@ -2,7 +2,6 @@
 using System.CommandLine;
 using Art.Common;
 using Art.Common.Modular;
-using Art.Modular;
 using Art.Tesler;
 
 var cfg = new ModuleLoadConfiguration(new[] { "Art" }.ToImmutableHashSet());
