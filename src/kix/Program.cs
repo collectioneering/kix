@@ -3,6 +3,7 @@ using System.CommandLine;
 using Art.Common;
 using Art.Common.Modular;
 using Art.Tesler;
+using Art.Tesler.Profiles;
 using Art.Tesler.Properties;
 
 var cfg = new ModuleLoadConfiguration(new[] { "Art" }.ToImmutableHashSet());
