@@ -28,6 +28,7 @@ var toolPropProvider = new GlobalLocalToolPropertyProvider(globalToolPropProvide
 var console = new ErrorOnlyConsole(Console.Error, static () => Console.IsErrorRedirected, static () => Console.IsInputRedirected, static () => Console.WindowWidth);
 var dataProvider = new DiskTeslerDataProvider();
 var registrationProvider = new SqliteTeslerRegistrationProvider();
+var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<string>(new[] { "--input-database" }, "Sqlite database file (input)") { ArgumentHelpName = "file", IsRequired = true });
 var diskProfileResolver = new DiskProfileResolver();
 var selectableToolProfileResolver = new SelectableToolProfileResolver(registryStore);
 var profileResolver = new AggregateProfileResolver(new IProfileResolver[] { diskProfileResolver, selectableToolProfileResolver });
@@ -38,4 +39,5 @@ return await TeslerRootCommand.Create(
     toolPropProvider,
     dataProvider,
     registrationProvider,
+    inputRegistrationProvider,
     profileResolver).InvokeAsync(args, console);
