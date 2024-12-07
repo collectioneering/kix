@@ -40,4 +40,5 @@ return await TeslerRootCommand.Create(
     dataProvider,
     registrationProvider,
     inputRegistrationProvider,
+    TimeProvider.System,
     profileResolver).InvokeAsync(args, console);
