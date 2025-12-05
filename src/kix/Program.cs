@@ -26,7 +26,6 @@ var globalToolPropProvider = new DirectoryJsonToolPropertyProvider(globalDir, Di
 var localToolPropProvider = new DirectoryJsonToolPropertyProvider(localDir, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
 var toolPropProvider = new GlobalLocalToolPropertyProvider(globalToolPropProvider, localToolPropProvider);
 
-var console = new ErrorOnlyConsole(Console.Error);
 var dataProvider = new DiskTeslerDataProvider();
 var registrationProvider = new SqliteTeslerRegistrationProvider();
 var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<string>("--input-database") { HelpName = "file", Required = true, Description = "Sqlite database file (input)" });
