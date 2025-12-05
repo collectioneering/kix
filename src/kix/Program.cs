@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.CommandLine;
+using System.CommandLine.Help;
 using Art.Common;
 using Art.Common.Modular;
 using Art.Tesler;
@@ -25,14 +26,14 @@ var globalToolPropProvider = new DirectoryJsonToolPropertyProvider(globalDir, Di
 var localToolPropProvider = new DirectoryJsonToolPropertyProvider(localDir, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
 var toolPropProvider = new GlobalLocalToolPropertyProvider(globalToolPropProvider, localToolPropProvider);
 
-var console = new ErrorOnlyConsole(Console.Error, static () => Console.IsErrorRedirected, static () => Console.IsInputRedirected, static () => Console.WindowWidth);
+var console = new ErrorOnlyConsole(Console.Error);
 var dataProvider = new DiskTeslerDataProvider();
 var registrationProvider = new SqliteTeslerRegistrationProvider();
-var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<string>(new[] { "--input-database" }, "Sqlite database file (input)") { ArgumentHelpName = "file", IsRequired = true });
+var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<string>("--input-database") { HelpName = "file", Required = true, Description = "Sqlite database file (input)" });
 var diskProfileResolver = new DiskProfileResolver();
 var selectableToolProfileResolver = new SelectableToolProfileResolver(registryStore);
 var profileResolver = new AggregateProfileResolver(new IProfileResolver[] { diskProfileResolver, selectableToolProfileResolver });
-return await TeslerRootCommand.Create(
+var rootCommand = TeslerRootCommand.Create(
     toolLogHandlerProvider,
     registryStore,
     runnerPropProvider,
@@ -41,4 +42,17 @@ return await TeslerRootCommand.Create(
     registrationProvider,
     inputRegistrationProvider,
     TimeProvider.System,
-    profileResolver).InvokeAsync(args, console);
+    profileResolver);
+var parseResult = rootCommand.Parse(args);
+parseResult.InvocationConfiguration.Output = Console.Error;
+parseResult.InvocationConfiguration.Error = Console.Error;
+if (parseResult.Errors.Count > 0)
+{
+    foreach (var error in parseResult.Errors)
+    {
+        Console.Error.WriteLine(error);
+    }
+    new HelpAction().Invoke(parseResult);
+    return -1;
+}
+return await parseResult.InvokeAsync();

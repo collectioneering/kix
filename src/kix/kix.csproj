@@ -6,7 +6,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Copyright>Copyright (C) 2021 Lucina</Copyright>
@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="EA" Version="1.1.1" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
