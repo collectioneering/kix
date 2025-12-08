@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EA" Version="1.1.1" />
+    <PackageReference Include="EA" Version="1.1.17100" />
     <PackageReference Include="System.CommandLine" Version="2.0.0" />
   </ItemGroup>
 

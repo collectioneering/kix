@@ -31,7 +31,7 @@ var registrationProvider = new SqliteTeslerRegistrationProvider();
 var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<string>("--input-database") { HelpName = "file", Required = true, Description = "Sqlite database file (input)" });
 var diskProfileResolver = new DiskProfileResolver();
 var selectableToolProfileResolver = new SelectableToolProfileResolver(registryStore);
-var profileResolver = new AggregateProfileResolver(new IProfileResolver[] { diskProfileResolver, selectableToolProfileResolver });
+var profileResolver = new AggregateProfileResolver([diskProfileResolver, selectableToolProfileResolver]);
 var rootCommand = TeslerRootCommand.Create(
     toolLogHandlerProvider,
     registryStore,
@@ -45,13 +45,4 @@ var rootCommand = TeslerRootCommand.Create(
 var parseResult = rootCommand.Parse(args);
 parseResult.InvocationConfiguration.Output = Console.Error;
 parseResult.InvocationConfiguration.Error = Console.Error;
-if (parseResult.Errors.Count > 0)
-{
-    foreach (var error in parseResult.Errors)
-    {
-        Console.Error.WriteLine(error);
-    }
-    new HelpAction().Invoke(parseResult);
-    return -1;
-}
 return await parseResult.InvokeAsync();
