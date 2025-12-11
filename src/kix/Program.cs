@@ -11,7 +11,15 @@ var cfg = new ModuleLoadConfiguration(new[] { "Art" }.ToImmutableHashSet());
 // TODO plugin dir...
 var provider = ModuleManifestProvider.Create(cfg, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"), ".kix", ".kix.json");
 var registryStore = new ModularArtifactToolRegistryStore(provider);
-var toolLogHandlerProvider = new ConsoleStyledToolLogHandlerProvider(Console.Out, Console.Error, Console.Error, static () => Console.IsErrorRedirected, static () => Console.BufferWidth, Console.OpenStandardOutput);
+var toolLogHandlerProvider = new ConsoleStyledToolLogHandlerProvider(
+    Console.Out,
+    Console.Error,
+    Console.Error,
+    static () => Console.IsErrorRedirected,
+    static () => Console.BufferWidth,
+    static () => Console.WindowHeight,
+    static () => Console.CursorTop - Console.WindowTop,
+    Console.OpenStandardOutput);
 // prop dirs
 const string kixDirName = ".kix";
 const string kixConfigFileName = "runnerconfig-4f648146-4fbf-0346-33aa-897b930f7b23.json";
