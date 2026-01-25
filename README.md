@@ -8,15 +8,42 @@ No tools are directly provided with this program.
 
 ## Features
 
-- `arc`: Performs unified archival using tools by profile
-- `find`/`list`/`dump`: Executes tools by tool+group or profile
-  - Contrary to `arc`, `find` / `list` only display information on the artifacts found by the tool.
-  - `dump` is similar to `arc` and is present for parity with the `find` / `list` options. `arc` is preferred.
+- `arc`: Performs unified archival using tools by artifact location or profile file
+- `find`/`list`/`dump`: Executes tools by tool+group or profile file
+  - Contrary to `arc` and `dump`, `find` and `list` only display information on the artifacts found by the tool.
+  - `arc` and `dump` are similar in that they can both output artifact data.
+    - `arc` has the benefit of automatic tool selection for a passed artifact location
+    and options useful for operation against an existing database.
+    - `dump` always dumps the artifacts in question. It also supports running a specific tool without passing in a profile file.
+    - `arc` is preferred in most cases, especially for repeated archival against a profile or one-off runs against an artifact location. `dump` is preferred for one-off runs of dump tools that wouldn't require writing a profile file.
 - `rehash`: Recomputes resource hashes with the specified hash algorithm
 - `validate`: Validates resource data based on stored hash
   - Optionally repairs resources that failed validation
 - `tools`: Enumerates available plugins
+- `config`: Provides get/set/unset of options for a profile, a tool, or the runner program
+- `stream`: Streams the primary resource stream of the artifact identified by the passed profile file or artifact location
+- `cookie`: Provides cookie extraction for a few supported OS+browser+cookie combinations
 - `db`: Provides limited Sqlite database management (list, delete, merge, cleanup)
+
+## Artifact location
+
+For the `arc` and `stream` commands, if an input argument does not appear to be a profile file, all tool factory classes implementing `IArtifactToolSelector<string>` in the available plugins are queried. One can declare that the passed value points to an artifact that should be processed by a certain tool (typically the same tool type as the one the factory class creates).
+
+For example, a tool for a website `example.com` could know that articles are available under `https://example.com/posts/<ID>`, so the value `https://example.com/posts/123` should be processed by the find tool with the artifact ID `123`. The `IArtifactToolRegexSelector<TSelf>` interface provides syntax sugar for regex-based selectors.
+
+Example:
+
+```csharp
+internal partial class ExampleTool : ArtifactTool, IArtifactToolSelfFactory<ExampleTool>, IArtifactToolRegexSelector<ExampleTool>
+{
+    // Regex to test inputs against
+    [GeneratedRegex(@"^https://example\.com/id/(?<ID_GROUP>\d+)$")]
+    public static partial Regex GetArtifactToolSelectorRegex();
+
+    // Regex group name that represents the ID portion
+    public static string GetArtifactToolSelectorRegexIdGroupName() => "ID_GROUP";
+}
+```
 
 ## Plugins
 
@@ -86,6 +113,10 @@ Note: The `artifactList` option is a list of artifact IDs generated for profiles
 
 Some tools may require HTTP cookies to function properly or to get as complete data as possible.
 
+### Browser Cookies with HttpArtifactTool
+
+For `HttpArtifactTool`-derived tools, cookies are loaded based on the presence of specific options.
+
 Cookies can be extracted from supported browsers via the `cookieBrowser`, `cookieBrowserDomains`, and `cookieBrowserProfile` profile options.
 
 - `cookieBrowser`: short name of browser
@@ -94,7 +125,9 @@ Cookies can be extracted from supported browsers via the `cookieBrowser`, `cooki
 - `cookieBrowserDomains`: array of base domains to filter by, e.g. `["contoso.com", "fabrikam.com"]`
 - `cookieBrowserProfile`: user profile name (can be profile data directory name, or user-facing profile name)
 
-Note: The `cookieFile` option is also provided for rudimentary Netscape cookie format support. Avoid using unknown third-party extensions - find, validate, and build an open-source browser plugin for this if possible.
+[Details on specific supported cookie types are available here.](https://github.com/collectioneering/Art/blob/main/src/Art.BrowserCookies/README.md)
+
+The `cookieFile` option is also provided for rudimentary Netscape cookie format support. Avoid using unknown third-party extensions - find, validate, and build an open-source browser plugin for this if possible.
 
 ## Related
 
