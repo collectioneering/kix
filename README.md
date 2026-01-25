@@ -37,7 +37,7 @@ Example:
 internal partial class ExampleTool : ArtifactTool, IArtifactToolSelfFactory<ExampleTool>, IArtifactToolRegexSelector<ExampleTool>
 {
     // Regex to test inputs against
-    [GeneratedRegex(@"^https://example\.com/id/(?<ID_GROUP>\d+)$")]
+    [GeneratedRegex(@"^https://example\.com/posts/(?<ID_GROUP>\d+)$")]
     public static partial Regex GetArtifactToolSelectorRegex();
 
     // Regex group name that represents the ID portion
