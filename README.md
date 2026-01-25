@@ -8,13 +8,15 @@ No tools are directly provided with this program.
 
 ## Features
 
-- `arc`: Performs unified archival from list/dump tools by profile
+- `arc`: Performs unified archival using tools by profile
 - `find`/`list`/`dump`: Executes tools by tool+group or profile
+  - Contrary to `arc`, `find` / `list` only display information on the artifacts found by the tool.
+  - `dump` is similar to `arc` and is present for parity with the `find` / `list` options. `arc` is preferred.
 - `rehash`: Recomputes resource hashes with the specified hash algorithm
 - `validate`: Validates resource data based on stored hash
   - Optionally repairs resources that failed validation
 - `tools`: Enumerates available plugins
-- `db`: Provides limited Sqlite database management (only artifact listing and deletion at this time)
+- `db`: Provides limited Sqlite database management (list, delete, merge, cleanup)
 
 ## Plugins
 
