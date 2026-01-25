@@ -21,7 +21,7 @@ No tools are directly provided with this program.
   - Optionally repairs resources that failed validation
 - `tools`: Enumerates available plugins
 - `config`: Provides get/set/unset of options for a profile, a tool, or the runner program
-- `stream`: Streams the primary resource stream of the artifact identified by the passed profile file or artifact location
+- `stream`: For the artifact identified by the passed profile file or artifact location, streams the primary resource stream to stdout
 - `cookie`: Provides cookie extraction for a few supported OS+browser+cookie combinations
 - `db`: Provides limited Sqlite database management (list, delete, merge, cleanup)
 
