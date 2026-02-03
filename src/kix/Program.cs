@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.CommandLine;
-using System.CommandLine.Help;
 using Art.Common;
 using Art.Common.Modular;
 using Art.Tesler;
@@ -8,8 +7,15 @@ using Art.Tesler.Profiles;
 using Art.Tesler.Properties;
 
 var cfg = new ModuleLoadConfiguration(new[] { "Art" }.ToImmutableHashSet());
-// TODO plugin dir...
-var provider = ModuleManifestProvider.Create(cfg, Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins"), ".kix", ".kix.json");
+var providers = new List<IModuleProvider>();
+string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+providers.AddRange(await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
+    cfg,
+    baseDirectory,
+    Directory.GetFiles(baseDirectory, "*.kix_search_config.json")
+));
+providers.Add(ModuleManifestProvider.Create(cfg, Path.Combine(baseDirectory, "Plugins"), ".kix", ".kix.json"));
+var provider = new AggregateModuleProvider([..providers]);
 var registryStore = new ModularArtifactToolRegistryStore(provider);
 var toolLogHandlerProvider = new ConsoleStyledToolLogHandlerProvider(
     Console.Out,
