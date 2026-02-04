@@ -1,0 +1,9 @@
+{
+    "Entries": [
+        {
+            "Path": ".",
+            "DirectorySuffix": ".kix",
+            "FileNameSuffix": ".kix.json"
+        }
+    ]
+}

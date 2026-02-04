@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj" />
+  <Project Path="../ext/art/src/Art.Common/Art.Common.csproj" />
+  <Project Path="../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" />
+  <Project Path="../ext/art/src/Art.EF/Art.EF.csproj" />
+  <Project Path="../ext/art/src/Art.Tesler/Art.Tesler.csproj" />
+  <Project Path="../ext/art/src/Art/Art.csproj" />
+  <Project Path="../ext/art/src/Artcore/Artcore.csproj" />
+  <Project Path="kix/kix.csproj" />
+</Solution>
