@@ -8,12 +8,11 @@ using Artcore;
 
 // plugins
 string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-var registryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<IArtifactToolRegistry>(
+var registryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
     await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
         ModuleLoadConfiguration.Create(passthroughAssemblies: "Art"),
         baseDirectory,
-        Directory.GetFiles(baseDirectory, "*.kix_search_config.json"),
-        Plugin.Create)
+        Directory.GetFiles(baseDirectory, "*.kix_search_config.json"))
 ));
 // logging
 var toolLogHandlerProvider = ConsoleStyledToolLogHandlerProvider.FromSystemConsole();
