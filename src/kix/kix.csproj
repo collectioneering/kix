@@ -23,10 +23,10 @@
   <PropertyGroup>
     <Authors>riina</Authors>
     <Owners>riina</Owners>
-    <Description>Module system core designed for Art package set</Description>
+    <Description>Common runner for artifact retrieval tools</Description>
     <Copyright>Copyright ©2026 riina</Copyright>
-    <PackageProjectUrl>https://github.com/collectioneering/Art</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/collectioneering/Art</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/collectioneering/kix</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/collectioneering/kix</RepositoryUrl>
     <Company>riina</Company>
   </PropertyGroup>
 
