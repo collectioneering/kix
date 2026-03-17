@@ -8,4 +8,5 @@
   <Project Path="../ext/art/src/Art/Art.csproj" />
   <Project Path="../ext/art/src/Artcore/Artcore.csproj" />
   <Project Path="kix/kix.csproj" />
+  <Project Path="KixSample/KixSample.csproj" />
 </Solution>

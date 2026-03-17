@@ -1,4 +1,7 @@
 ﻿using System.CommandLine;
+using System.Reflection;
+using System.Runtime.Loader;
+using Art.Common;
 using Art.Modular;
 using Art.Tesler;
 using Art.Tesler.Profiles;
@@ -22,12 +25,16 @@ if (new DirectoryInfo(globalKixDirectory) is { Exists: true } globalKixDirectory
     searchConfigFiles.AddRange(globalKixDirectoryForSearch.GetFiles(searchConfigFilePattern).Select(static v => v.FullName));
 }
 // plugins
-var registryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
+// -- support embedding plugins in kix assembly itself
+var currentAssembly = Assembly.GetExecutingAssembly();
+var localRegistryStore = new StaticArtifactToolRegistryStore(Plugin.Create(AssemblyLoadContext.GetLoadContext(currentAssembly)!, currentAssembly));
+var modularRegistryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
     await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
         ModuleLoadConfiguration.Create(passthroughAssemblies: "Art"),
         baseDirectory,
         searchConfigFiles)
 ));
+var registryStore = new AggregateArtifactToolRegistryStore([localRegistryStore, modularRegistryStore]);
 // logging
 var toolLogHandlerProvider = ConsoleStyledToolLogHandlerProvider.FromSystemConsole();
 // prop dirs
