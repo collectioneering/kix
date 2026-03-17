@@ -142,7 +142,3 @@ Cookies can be extracted from supported browsers via the `cookieBrowser`, `cooki
 [Details on specific supported cookie types are available here.](https://github.com/collectioneering/Art/blob/main/src/Art.BrowserCookies/README.md)
 
 The `cookieFile` option is also provided for rudimentary Netscape cookie format support. Avoid using unknown third-party extensions - find, validate, and build an open-source browser plugin for this if possible.
-
-## Related
-
-[sqz269's BooruScraper](https://github.com/sqz269/BooruScraper) is epic for grabbing all the pics of your waifus.
