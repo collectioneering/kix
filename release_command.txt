@@ -1,0 +1,1 @@
+dotnet pack src/kix -p Version=<version> -p DebugSymbols=False -p DebugType=None -p GenerateDocumentationFile=false
