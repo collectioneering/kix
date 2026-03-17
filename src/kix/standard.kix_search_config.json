@@ -1,7 +1,7 @@
 {
     "Entries": [
         {
-            "Path": ".",
+            "Path": "Plugins",
             "DirectorySuffix": ".kix",
             "FileNameSuffix": ".kix.json"
         }

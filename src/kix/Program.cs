@@ -5,28 +5,40 @@ using Art.Tesler.Profiles;
 using Art.Tesler.Properties;
 using Artcore;
 
-// plugins
+// dirs
 string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+const string kixDirName = ".kix";
+string globalKixDirectory = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.DoNotVerify), kixDirName);
+string localKixDirectory = Path.Join(Environment.CurrentDirectory, kixDirName);
+// plugins
+const string searchConfigFilePattern = "*.kix_search_config.json";
+List<string> searchConfigFiles = [];
+if (new DirectoryInfo(baseDirectory) is { Exists: true } baseDirectoryForSearch)
+{
+    searchConfigFiles.AddRange(baseDirectoryForSearch.GetFiles(searchConfigFilePattern).Select(static v => v.FullName));
+}
+if (new DirectoryInfo(globalKixDirectory) is { Exists: true } globalKixDirectoryForSearch)
+{
+    searchConfigFiles.AddRange(globalKixDirectoryForSearch.GetFiles(searchConfigFilePattern).Select(static v => v.FullName));
+}
+// plugins
 var registryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
     await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
         ModuleLoadConfiguration.Create(passthroughAssemblies: "Art"),
         baseDirectory,
-        Directory.GetFiles(baseDirectory, "*.kix_search_config.json"))
+        searchConfigFiles)
 ));
 // logging
 var toolLogHandlerProvider = ConsoleStyledToolLogHandlerProvider.FromSystemConsole();
 // prop dirs
-const string kixDirName = ".kix";
 const string kixConfigFileName = "runnerconfig-4f648146-4fbf-0346-33aa-897b930f7b23.json";
-string globalDir = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.DoNotVerify), kixDirName);
-string localDir = Path.Join(Environment.CurrentDirectory, kixDirName);
 // runner props
-var globalRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(globalDir, kixConfigFileName));
-var localRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(localDir, kixConfigFileName));
+var globalRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(globalKixDirectory, kixConfigFileName));
+var localRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(localKixDirectory, kixConfigFileName));
 var runnerPropProvider = new GlobalLocalRunnerPropertyProvider(globalRunnerPropProvider, localRunnerPropProvider);
 // tool props
-var globalToolPropProvider = new DirectoryJsonToolPropertyProvider(globalDir, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
-var localToolPropProvider = new DirectoryJsonToolPropertyProvider(localDir, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
+var globalToolPropProvider = new DirectoryJsonToolPropertyProvider(globalKixDirectory, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
+var localToolPropProvider = new DirectoryJsonToolPropertyProvider(localKixDirectory, DirectoryJsonToolPropertyProvider.DefaultFileNameTransform);
 var toolPropProvider = new GlobalLocalToolPropertyProvider(globalToolPropProvider, localToolPropProvider);
 // backing
 var dataProvider = new DiskTeslerDataProvider();

@@ -49,7 +49,21 @@ internal partial class ExampleTool : ArtifactTool, IArtifactToolSelfFactory<Exam
 
 ### File Structure
 
-Each plugin should be placed under `Plugins/<some-name>.kix/`, e.g. `Plugins/MyToolAssembly.kix/`.
+By default, plugins can be loaded from `<directory-containing-kix>/Plugins`. Each plugin should be placed under `Plugins/<some-name>.kix/`, e.g. `Plugins/MyToolAssembly.kix/`, and contain a manifest file named as `<...>.kix.json`.
+
+Additional plugin search directories can be configured by adding `<...>.kix_search_config.json` files to `~/.kix`. For consistency between locations, it is recommended to leave `DirectorySuffix` as `.kix` and `FileNameSuffix` as `.kix.json`.
+
+```json
+{
+    "Entries": [
+        {
+            "Path": "<plugins-root-directory>",
+            "DirectorySuffix": "<.kix|search-suffix-for-plugin-directory>",
+            "FileNameSuffix": "<.kix.json|search-suffix-for-plugin-manifest>"
+        }
+    ]
+}
+```
 
 ### Plugin Loading
 
