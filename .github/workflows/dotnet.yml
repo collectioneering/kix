@@ -45,7 +45,7 @@ jobs:
     - name: Publish linux-x64
       run: |
         dotnet publish src/kix --configuration Release -f "$DN_TFM" \
-        --no-self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        --self-contained /p:PublishSingleFile=true --artifacts-path build/ \
         /p:Version="${{ steps.read_version.outputs.version }}" \
         -r linux-x64
     - name: Publish linux-arm64
