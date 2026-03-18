@@ -4,9 +4,11 @@
   <Project Path="../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" />
   <Project Path="../ext/art/src/Art.EF/Art.EF.csproj" />
   <Project Path="../ext/art/src/Art.Modular/Art.Modular.csproj" />
-  <Project Path="../ext/art/src/Art.Tesler/Art.Tesler.csproj" />
   <Project Path="../ext/art/src/Art/Art.csproj" />
   <Project Path="../ext/art/src/Artcore/Artcore.csproj" />
+  <Project Path="../ext/art/src/Art.TestsBase/Art.TestsBase.csproj" />
+  <Project Path="Art.Tesler.Tests/Art.Tesler.Tests.csproj" />
+  <Project Path="Art.Tesler/Art.Tesler.csproj" />
   <Project Path="kix/kix.csproj" />
   <Project Path="KixSample/KixSample.csproj" />
 </Solution>

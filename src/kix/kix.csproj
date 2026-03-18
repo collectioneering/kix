@@ -31,13 +31,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EA" Version="1.1.17100" />
-    <PackageReference Include="System.CommandLine" Version="2.0.2" />
+    <PackageReference Include="EA" />
+    <PackageReference Include="System.CommandLine" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\ext\art\src\Art.Modular\Art.Modular.csproj" />
-    <ProjectReference Include="..\..\ext\art\src\Art.Tesler\Art.Tesler.csproj" />
+    <ProjectReference Include="..\Art.Tesler\Art.Tesler.csproj" />
   </ItemGroup>
 
   <ItemGroup>

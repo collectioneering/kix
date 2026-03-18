@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageVersion>0.50.1</PackageVersion>
+    <InformationalVersion>$(PackageVersion)</InformationalVersion>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ReferenceLocalProject_Art_EF_Sqlite>true</ReferenceLocalProject_Art_EF_Sqlite>
+    <ReferenceLocalProject_Art_BrowserCookies>true</ReferenceLocalProject_Art_BrowserCookies>
+    <ReferenceLocalProject_Art_Common>true</ReferenceLocalProject_Art_Common>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Art.EF.Sqlite" Condition="'$(ReferenceLocalProject_Art_EF_Sqlite)'!='true'" />
+    <ProjectReference Include="../../ext/art/src/Art.EF.Sqlite/Art.EF.Sqlite.csproj" Condition="'$(ReferenceLocalProject_Art_EF_Sqlite)'=='true'" />
+    <PackageReference Include="Art.BrowserCookies" Condition="'$(ReferenceLocalProject_Art_BrowserCookies)'!='true'" />
+    <ProjectReference Include="../../ext/art/src/Art.BrowserCookies/Art.BrowserCookies.csproj" Condition="'$(ReferenceLocalProject_Art_BrowserCookies)'=='true'" />
+    <PackageReference Include="Art.Common" Condition="'$(ReferenceLocalProject_Art_Common)'!='true'" />
+    <ProjectReference Include="../../ext/art/src/Art.Common/Art.Common.csproj" Condition="'$(ReferenceLocalProject_Art_Common)'=='true'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ConFormat" />
+    <PackageReference Include="EA" />
+    <PackageReference Include="System.CommandLine" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsTrimmable>true</IsTrimmable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackOnBuild>true</PackOnBuild>
+    <PathMap>$(MSBuildProjectDirectory)=.</PathMap>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <!--<GenerateDocumentationFile>true</GenerateDocumentationFile>-->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>riina</Authors>
+    <Owners>riina</Owners>
+    <Description>Artifact retrieval toolkit (command-line support)</Description>
+    <Copyright>Copyright ©2023 riina</Copyright>
+    <PackageProjectUrl>https://github.com/collectioneering/Art</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/collectioneering/Art</RepositoryUrl>
+    <Company>riina</Company>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
