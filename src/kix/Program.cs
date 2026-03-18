@@ -66,6 +66,10 @@ var rootCommand = TeslerRootCommand.Create(
     inputRegistrationProvider: inputRegistrationProvider,
     timeProvider: TimeProvider.System,
     profileResolver: profileResolver);
+rootCommand.Add(new CoreInfoCommand(
+    toolLogHandlerProvider,
+    new CoreInfoLookup(null, [Assembly.GetExecutingAssembly()])
+));
 var parseResult = rootCommand.Parse(args);
 parseResult.InvocationConfiguration.Output = Console.Error;
 parseResult.InvocationConfiguration.Error = Console.Error;

@@ -5,7 +5,7 @@
 using System.Text.RegularExpressions;
 using Art;
 using Art.Common;
-using KixSample;
+using Art.Common.Resources;
 
 [Core]
 public partial class Disk : ArtifactTool, IArtifactFindTool, IArtifactToolSelfFactory<Disk>, IArtifactToolRegexSelector<Disk>
