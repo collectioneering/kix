@@ -4,9 +4,16 @@
 
 using System.Runtime.CompilerServices;
 using Art;
+using Art.Common;
 
-public sealed class DiskList : Disk, IArtifactListTool
+public sealed class DiskList : Disk, IArtifactListTool, IArtifactToolSelfFactory<DiskList>
 {
+    static IArtifactTool IArtifactToolFactory.CreateArtifactTool() => new DiskList();
+
+    static Type IArtifactToolFactory.GetArtifactToolType() => typeof(DiskList);
+
+    static ArtifactToolID IArtifactToolFactory.GetArtifactToolId() => ArtifactToolIDUtil.CreateToolID<DiskList>();
+
     public const string BaseDirectoryOptionName = "BaseDirectory";
 
     public string BaseDirectory { get; set; } = null!;
