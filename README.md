@@ -1,10 +1,24 @@
 # kix
 
+[![NuGet](https://img.shields.io/nuget/v/kix.svg)](https://www.nuget.org/packages/kix/)
+
 The `kix` program provides a simple way to run tools designed with the [Art](https://github.com/collectioneering/Art) library.
 
 Artifact registration is managed by Sqlite database files, and artifact data (resources) are written to a selected folder on disk.
 
 No tools are directly provided with this program.
+
+## Installation
+
+Prebuilt self-contained binaries with an embedded .NET runtime are available under the [Releases](https://github.com/collectioneering/kix/releases) in this repository.
+
+This program requires the .NET 10 runtime to run and .NET 10 SDK to build. [You can install the necessary component here.](https://get.dot.net/)
+
+This program can be installed as a dotnet global tool via the NuGet Gallery.
+
+```bash
+dotnet tool install --global kix --prerelease
+```
 
 ## Features
 
