@@ -24,7 +24,6 @@ if (new DirectoryInfo(globalKixDirectory) is { Exists: true } globalKixDirectory
 {
     searchConfigFiles.AddRange(globalKixDirectoryForSearch.GetFiles(searchConfigFilePattern).Select(static v => v.FullName));
 }
-// plugins
 // -- support embedding plugins in kix assembly itself
 var currentAssembly = Assembly.GetExecutingAssembly();
 var localRegistryStore = new StaticArtifactToolRegistryStore(Plugin.Create(AssemblyLoadContext.GetLoadContext(currentAssembly)!, currentAssembly));
@@ -37,9 +36,8 @@ var modularRegistryStore = new ModularArtifactToolRegistryStore(new AggregateMod
 var registryStore = new AggregateArtifactToolRegistryStore([localRegistryStore, modularRegistryStore]);
 // logging
 var toolLogHandlerProvider = ConsoleStyledToolLogHandlerProvider.FromSystemConsole();
-// prop dirs
-const string kixConfigFileName = "runnerconfig-4f648146-4fbf-0346-33aa-897b930f7b23.json";
 // runner props
+const string kixConfigFileName = "runnerconfig-4f648146-4fbf-0346-33aa-897b930f7b23.json";
 var globalRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(globalKixDirectory, kixConfigFileName));
 var localRunnerPropProvider = new FileJsonRunnerPropertyProvider(Path.Join(localKixDirectory, kixConfigFileName));
 var runnerPropProvider = new GlobalLocalRunnerPropertyProvider(globalRunnerPropProvider, localRunnerPropProvider);
