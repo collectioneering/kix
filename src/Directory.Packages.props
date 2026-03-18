@@ -5,9 +5,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- Package dependenices -->
-    <PackageVersion Update="ConFormat" Version="0.4.0" />
-    <PackageVersion Update="EA" Version="1.1.17100" />
-    <PackageVersion Update="System.CommandLine" Version="2.0.2" />
+    <PackageVersion Include="ConFormat" Version="0.4.0" />
+    <PackageVersion Include="EA" Version="1.1.17100" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.2" />
     <!-- Test dependenices -->
     <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageVersion Update="coverlet.collector" Version="8.0.0" />
