@@ -1,0 +1,80 @@
+name: .NET
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    env:
+      DN_TFM: "net10.0"
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          10.0.x
+    - name: Install dependencies
+      run: dotnet restore src
+    - name: Build
+      run: dotnet build src --configuration Release -f "$DN_TFM" --no-restore
+    - name: Test
+      run: dotnet test src --configuration Release -f "$DN_TFM" --no-build --verbosity normal
+    - name: Read version
+      id: read_version
+      run: echo "version=$(cat version.txt)" >> "$GITHUB_OUTPUT"
+    - name: Publish osx-x64
+      run: |
+        dotnet publish src/kix --configuration Release -f "$DN_TFM" \
+        --self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        /p:Version="${{ steps.read_version.outputs.version }}"
+        -r osx-x64
+    - name: Publish osx-arm64
+      run: |
+        dotnet publish src/kix --configuration Release -f "$DN_TFM" \
+        --self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        /p:Version="${{ steps.read_version.outputs.version }}"
+        -r osx-x64
+    - name: Publish linux-x64
+      run: |
+        dotnet publish src/kix --configuration Release -f "$DN_TFM" \
+        --no-self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        /p:Version="${{ steps.read_version.outputs.version }}"
+        -r osx-x64
+    - name: Publish linux-arm64
+      run: |
+        dotnet publish src/kix --configuration Release -f "$DN_TFM" \
+        --self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        /p:Version="${{ steps.read_version.outputs.version }}"
+        -r osx-x64
+    - name: Publish win-x64
+      run: |
+        dotnet publish src/kix --configuration Release -f "$DN_TFM" \
+        --self-contained /p:PublishSingleFile=true --artifacts-path build/ \
+        /p:Version="${{ steps.read_version.outputs.version }}"
+        -r osx-x64
+    - uses: actions/upload-artifact@v7
+      with:
+        name: kix-net10.0-osx-x64
+        path: build/publish/kix/release_osx-x64
+    - uses: actions/upload-artifact@v7
+      with:
+        name: kix-net10.0-osx-arm64
+        path: build/publish/kix/release_osx-arm64
+    - uses: actions/upload-artifact@v7
+      with:
+        name: kix-net10.0-linux-x64
+        path: build/publish/kix/release_linux-x64
+    - uses: actions/upload-artifact@v7
+      with:
+        name: kix-net10.0-linux-arm64
+        path: build/publish/kix/release_linux-arm64
+    - uses: actions/upload-artifact@v7
+      with:
+        name: kix-net10.0-win-x64
+        path: build/publish/kix/release_win-x64
