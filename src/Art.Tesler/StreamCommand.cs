@@ -66,9 +66,9 @@ public class StreamCommand : ToolCommandBase
         using var tool = await GetToolAsync(profile, arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, cancellationToken).ConfigureAwait(false);
         var listProxy = new ArtifactToolListProxy(tool, ArtifactToolListOptions.Default, l);
 #if NET10_0_OR_GREATER
-        var res = await AsyncEnumerable.ToListAsync(listProxy.ListAsync(cancellationToken), cancellationToken: cancellationToken).ConfigureAwait(false);
-#else
         var res = await listProxy.ListAsync(cancellationToken).ToListAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
+#else
+        var res = await listProxy.ListAsync(cancellationToken).ConvertToListAsync(cancellationToken: cancellationToken).ConfigureAwait(false);
 #endif
         if (res.Count == 0)
         {

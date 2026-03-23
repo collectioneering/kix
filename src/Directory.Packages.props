@@ -4,15 +4,15 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Local dependenices -->
+    <PackageVersion Include="Art.Tesler" Version="0.50.0" />
     <!-- Package dependenices -->
     <PackageVersion Include="ConFormat" Version="0.4.0" />
     <PackageVersion Include="EA" Version="1.1.17100" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.2" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.5" />
     <!-- Test dependenices -->
     <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageVersion Update="coverlet.collector" Version="8.0.0" />
-    <PackageVersion Update="RichardSzalay.MockHttp" Version="7.0.0" />
-    <PackageVersion Update="System.Linq.Async" Version="7.0.0" />
+    <PackageVersion Update="coverlet.collector" Version="8.0.1" />
     <PackageVersion Update="xunit" Version="2.9.3" />
     <PackageVersion Update="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
