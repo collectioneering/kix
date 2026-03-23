@@ -40,6 +40,7 @@ public class CookieCommandExtract : CommandBase
             PrintErrorMessage(Common.GetInvalidCookieSourceBrowserMessage(browserName), ToolOutput);
             return 2;
         }
+        source = source.Resolve();
         if (parseResult.GetValue(OutputOption) is { } outputPath)
         {
             var output = File.CreateText(outputPath);
@@ -56,10 +57,11 @@ public class CookieCommandExtract : CommandBase
     private async Task ExportAsync(CookieSource source, IEnumerable<string> domains, bool includeSubdomains, TextWriter output, CancellationToken cancellationToken)
     {
         CookieContainer cc = new();
+        var logHandler = _toolLogHandlerProvider.GetDefaultToolLogHandler(LogPreferences.Default);
         await source.LoadCookiesAsync(
                 cc,
                 domains.Select(v => new CookieFilter(v, includeSubdomains)).ToList(),
-                _toolLogHandlerProvider.GetDefaultToolLogHandler(LogPreferences.Default),
+                logHandler.LogInformation,
                 cancellationToken)
             .ConfigureAwait(false);
         await output.WriteAsync("# Netscape HTTP Cookie File\n").ConfigureAwait(false);

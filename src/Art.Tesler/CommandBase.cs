@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using Art.BrowserCookies;
 
 namespace Art.Tesler;
 
@@ -19,6 +20,11 @@ public abstract class CommandBase : Command
             return await RunAsync(parseResult, CancellationToken.None).ConfigureAwait(false);
         }
         catch (ArtUserException e)
+        {
+            PrintExceptionMessage(e, ToolOutput);
+            return -1;
+        }
+        catch (BrowserLookupConfigException e)
         {
             PrintExceptionMessage(e, ToolOutput);
             return -1;
