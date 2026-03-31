@@ -54,14 +54,12 @@ internal partial class StandardConfigPropertySourceGenerationContext : JsonSeria
 {
     static StandardConfigPropertySourceGenerationContext()
     {
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            WriteIndented = false,
-            AllowTrailingCommas = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
+        var options = new JsonSerializerOptions();
+        options.PropertyNameCaseInsensitive = true;
+        options.WriteIndented = false;
+        options.AllowTrailingCommas = true;
+        options.ReadCommentHandling = JsonCommentHandling.Skip;
+        options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         options.Converters.Add(new JsonStringEnumConverter());
         s_context = new StandardConfigPropertySourceGenerationContext(options);
     }

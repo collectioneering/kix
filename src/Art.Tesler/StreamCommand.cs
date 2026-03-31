@@ -47,7 +47,7 @@ public class StreamCommand : ToolCommandBase
     {
         var logPreferences = GetLogPreferences(parseResult);
         IToolLogHandler l = ToolLogHandlerProvider.GetStreamToolLogHandler(logPreferences);
-        List<ArtifactToolProfile> profiles = new();
+        List<ArtifactToolProfile> profiles = [];
         ResolveAndAddProfiles(ProfileResolver, profiles, parseResult.GetRequiredValue(ProfileFileArg));
         if (profiles.Count == 0)
         {

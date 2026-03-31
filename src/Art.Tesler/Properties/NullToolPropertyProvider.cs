@@ -6,7 +6,7 @@ public class NullToolPropertyProvider : IToolPropertyProvider
 {
     public IEnumerable<KeyValuePair<string, JsonElement>> GetProperties(ArtifactToolID artifactToolId)
     {
-        return Array.Empty<KeyValuePair<string, JsonElement>>();
+        return [];
     }
 
     public bool TryGetProperty(ArtifactToolID artifactToolId, string key, out JsonElement value)

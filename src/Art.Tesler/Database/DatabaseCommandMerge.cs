@@ -49,8 +49,7 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         Add(AllOption);
         DoMergeOption = new Option<bool>("--do-merge") { Description = "Perform actual merge" };
         Add(DoMergeOption);
-        MergeFilterOption = new Option<MergeFilter>("--merge-filter") { Description = "Filter artifacts to commit" };
-        MergeFilterOption.DefaultValueFactory = static _ => MergeFilter.Updated;
+        MergeFilterOption = new Option<MergeFilter>("--merge-filter") { Description = "Filter artifacts to commit", DefaultValueFactory = static _ => MergeFilter.Updated };
         Add(MergeFilterOption);
         Validators.Add(result =>
         {

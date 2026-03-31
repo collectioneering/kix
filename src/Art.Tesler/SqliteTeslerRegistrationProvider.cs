@@ -9,8 +9,7 @@ public class SqliteTeslerRegistrationProvider : ITeslerRegistrationProvider
 
     public SqliteTeslerRegistrationProvider()
     {
-        DatabaseOption = new Option<string>("-d", "--database") { HelpName = "file", Description = "Sqlite database file" };
-        DatabaseOption.DefaultValueFactory = static _ => Common.DefaultDbFile;
+        DatabaseOption = new Option<string>("-d", "--database") { HelpName = "file", Description = "Sqlite database file", DefaultValueFactory = static _ => Common.DefaultDbFile };
     }
 
     public SqliteTeslerRegistrationProvider(Option<string> databaseOption)

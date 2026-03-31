@@ -47,14 +47,11 @@ public class ArcCommand : ArcDumpCommandBase
         ProfileResolver = profileResolver;
         ProfileFilesArg = new Argument<List<string>>("profile") { HelpName = "profile", Arity = ArgumentArity.OneOrMore, Description = "Profile file(s)" };
         Add(ProfileFilesArg);
-        UpdateOption = new Option<ResourceUpdateMode>("-u", "--update") { HelpName = "mode", Description = $"Resource update mode ({Common.ResourceUpdateModes})" };
-        UpdateOption.DefaultValueFactory = static _ => ResourceUpdateMode.ArtifactHard;
+        UpdateOption = new Option<ResourceUpdateMode>("-u", "--update") { Description = "Resource update mode", DefaultValueFactory = static _ => ResourceUpdateMode.ArtifactHard };
         Add(UpdateOption);
         FullOption = new Option<bool>("-f", "--full") { Description = "Only process full artifacts" };
         Add(FullOption);
-        SkipOption = new Option<ArtifactSkipMode>("-s", "--skip") { Description = $"Skip artifacts ({Common.ArtifactSkipModes})" };
-        SkipOption.HelpName = "mode";
-        SkipOption.DefaultValueFactory = static _ => ArtifactSkipMode.None;
+        SkipOption = new Option<ArtifactSkipMode>("-s", "--skip") { Description = "Skip artifacts", DefaultValueFactory = static _ => ArtifactSkipMode.None };
         Add(SkipOption);
         FastExitOption = new Option<bool>("-z", "--fast-exit") { Description = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}" };
         Add(FastExitOption);

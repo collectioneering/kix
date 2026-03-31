@@ -18,7 +18,7 @@ public class FileJsonRunnerPropertyProvider : IWritableRunnerPropertyProvider
         {
             return map;
         }
-        return Array.Empty<KeyValuePair<string, JsonElement>>();
+        return [];
     }
 
     public bool TryGetProperty(string key, out JsonElement value)

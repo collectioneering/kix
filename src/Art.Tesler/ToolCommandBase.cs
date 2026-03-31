@@ -59,13 +59,9 @@ public abstract class ToolCommandBase : CommandBase
         Add(NoArtifactRetrievalTimestampsOption);
         NoResourceRetrievalTimestampsOption = new Option<bool>("--no-resource-retrieval-timestamps") { Description = "Don't apply resource retrieval timestamps" };
         Add(NoResourceRetrievalTimestampsOption);
-        LogDataUnitsOption = new Option<DataUnits>("--log-data-units") { Description = $"Data size units ({Common.DataUnitsModes})" };
-        LogDataUnitsOption.HelpName = "units";
-        LogDataUnitsOption.DefaultValueFactory = static _ => DataUnits.Binary;
+        LogDataUnitsOption = new Option<DataUnits>("--log-data-units") { Description = "Data size units", DefaultValueFactory = static _ => DataUnits.Binary };
         Add(LogDataUnitsOption);
-        LogDataUnitFormatOption = new Option<DataUnitFormat>("--log-data-unit-format") { Description = $"Data size format ({Common.DataUnitFormatModes})" };
-        LogDataUnitFormatOption.HelpName = "format";
-        LogDataUnitFormatOption.DefaultValueFactory = static _ => DataUnitFormat.Short;
+        LogDataUnitFormatOption = new Option<DataUnitFormat>("--log-data-unit-format") { Description = "Data size format)", DefaultValueFactory = static _ => DataUnitFormat.Short };
         Add(LogDataUnitFormatOption);
     }
 

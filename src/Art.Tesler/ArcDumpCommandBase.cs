@@ -36,7 +36,7 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
         RegistrationProvider = registrationProvider;
         RegistrationProvider.Initialize(this);
         TimeProvider = timeProvider;
-        HashOption = new Option<string>("-h", "--hash") { Description = $"Checksum algorithm ({Common.ChecksumAlgorithms})", DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm };
+        HashOption = new Option<string>("-h", "--hash") { HelpName = Common.ChecksumAlgorithms, Description = "Checksum algorithm", DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm };
         Add(HashOption);
         NoDatabaseOption = new Option<bool>("--no-database") { Description = "Don't use database to track resources" };
         Add(NoDatabaseOption);

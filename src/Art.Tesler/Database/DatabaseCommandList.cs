@@ -27,7 +27,7 @@ public class DatabaseCommandList : DatabaseCommandBase
     {
         string? augment = parseResult.GetValue(AugmentOption);
         string? output = parseResult.GetValue(OutputOption);
-        List<ArtifactKey>? selection = output != null ? new List<ArtifactKey>() : null;
+        List<ArtifactKey>? selection = output != null ? [] : null;
         using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
         string? tool = parseResult.GetValue(ToolOption);
         string? group = parseResult.GetValue(GroupOption);
@@ -47,7 +47,7 @@ public class DatabaseCommandList : DatabaseCommandBase
         if (output != null && selection != null)
         {
             Dictionary<ToolAndGroup, List<string>> dict = selection.GroupBy(x => new ToolAndGroup(x.Tool, x.Group)).ToDictionary(x => x.Key, x => x.Select(v => v.Id).ToList());
-            List<ArtifactToolProfile> profiles = new();
+            List<ArtifactToolProfile> profiles = [];
             if (augment != null)
             {
                 FileStream afs = File.OpenRead(augment);

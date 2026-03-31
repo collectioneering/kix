@@ -25,7 +25,7 @@ public class ValidationContext : ToolControlContext
 
     private void AddFail(ArtifactResourceInfo r)
     {
-        if (!_failed.TryGetValue(r.Key.Artifact, out var list)) list = _failed[r.Key.Artifact] = new List<ArtifactResourceInfo>();
+        if (!_failed.TryGetValue(r.Key.Artifact, out var list)) list = _failed[r.Key.Artifact] = [];
         list.Add(r);
     }
 

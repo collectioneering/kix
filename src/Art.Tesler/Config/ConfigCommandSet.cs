@@ -93,7 +93,8 @@ public class ConfigCommandSet : ConfigCommandGetSetBase
                     }
                     break;
                 case ConfigScope.Profile:
-                    List<ArtifactToolProfile> copy = new(profiles.Values) { [selectedIndex] = profile with { Options = TeslerPropertyUtility.GetOptionsMapWithAddedPair(profile.Options, key, value) } };
+                    List<ArtifactToolProfile> copy = new(profiles.Values);
+                    copy[selectedIndex] = profile with { Options = TeslerPropertyUtility.GetOptionsMapWithAddedPair(profile.Options, key, value) };
                     writableResolvedProfiles.WriteProfiles(copy);
                     break;
                 default:

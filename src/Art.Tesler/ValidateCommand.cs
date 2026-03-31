@@ -48,8 +48,7 @@ public class ValidateCommand : ToolCommandBase
         RegistrationProvider = registrationProvider;
         RegistrationProvider.Initialize(this);
         TimeProvider = timeProvider;
-        HashOption = new Option<string>("-h", "--hash") { Description = $"Checksum algorithm ({Common.ChecksumAlgorithms})" };
-        HashOption.DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm;
+        HashOption = new Option<string>("-h", "--hash") { HelpName = Common.ChecksumAlgorithms, Description = "Checksum algorithm", DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm };
         Add(HashOption);
         ProfileFilesArg = new Argument<List<string>>("profile") { HelpName = "profile", Arity = ArgumentArity.ZeroOrMore, Description = "Profile file(s) to filter and repair with" };
         Add(ProfileFilesArg);
@@ -80,7 +79,7 @@ public class ValidateCommand : ToolCommandBase
         }
         var logPreferences = GetLogPreferences(parseResult);
         IToolLogHandler l = ToolLogHandlerProvider.GetDefaultToolLogHandler(logPreferences);
-        List<ArtifactToolProfile> profiles = new();
+        List<ArtifactToolProfile> profiles = [];
         foreach (string profileFile in parseResult.GetRequiredValue(ProfileFilesArg))
         {
             profiles.AddRange(ArtifactToolProfileUtil.DeserializeProfilesFromFile(profileFile));

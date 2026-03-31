@@ -27,7 +27,7 @@ public class DirectoryJsonToolPropertyProvider : IWritableToolPropertyProvider
         {
             return map;
         }
-        return Array.Empty<KeyValuePair<string, JsonElement>>();
+        return [];
     }
 
     public bool TryGetProperty(ArtifactToolID artifactToolId, string key, out JsonElement value)

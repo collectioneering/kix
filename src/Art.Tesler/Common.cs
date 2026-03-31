@@ -13,17 +13,8 @@ internal static class Common
 {
     private static readonly string[] ChecksumAlgorithmArray = ChecksumSource.DefaultSources.Values.Select(v => v.Id).ToArray();
     internal static readonly string ChecksumAlgorithms = new StringBuilder().AppendJoin('|', ChecksumAlgorithmArray.Prepend("None")).ToString();
-    internal const string ResourceUpdateModes = $"{nameof(ResourceUpdateMode.ArtifactSoft)}|{nameof(ResourceUpdateMode.ArtifactHard)}|{nameof(ResourceUpdateMode.Soft)}|{nameof(ResourceUpdateMode.Hard)}";
-    internal const string ArtifactSkipModes = $"{nameof(ArtifactSkipMode.None)}|{nameof(ArtifactSkipMode.FastExit)}|{nameof(ArtifactSkipMode.Known)}";
-    internal const string DataUnitsModes = $"{nameof(DataUnits.Binary)}|{nameof(DataUnits.Decimal)}";
-    internal const string DataUnitFormatModes = $"{nameof(DataUnitFormat.Short)}|{nameof(DataUnitFormat.Short)}";
     internal const string DefaultChecksumAlgorithm = "SHA256";
     internal const string DefaultDbFile = "kix_data.db";
-
-    internal static int AccumulateErrorCode(int errorCode, int existingErrorCode)
-    {
-        return errorCode != 0 ? errorCode : existingErrorCode;
-    }
 
     internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, IArtifactRegistrationManager arm, bool detailed, IOutputControl console)
     {

@@ -35,7 +35,7 @@ internal class RehashCommand : CommandBase
         DataProvider.Initialize(this);
         RegistrationProvider = registrationProvider;
         RegistrationProvider.Initialize(this);
-        HashOption = new Option<string>("-h", "--hash") { Required = true, Description = $"Checksum algorithm ({Common.ChecksumAlgorithms})" };
+        HashOption = new Option<string>("-h", "--hash") { HelpName = Common.ChecksumAlgorithms, Required = true, Description = "Checksum algorithm" };
         Add(HashOption);
         DetailedOption = new Option<bool>("--detailed") { Description = "Show detailed information on entries" };
         Add(DetailedOption);
@@ -53,12 +53,6 @@ internal class RehashCommand : CommandBase
         using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
         Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed = new();
         int rehashed = 0;
-
-        void AddFail(ArtifactResourceInfo r)
-        {
-            if (!failed.TryGetValue(r.Key.Artifact, out var list)) list = failed[r.Key.Artifact] = new List<ArtifactResourceInfo>();
-            list.Add(r);
-        }
 
         bool detailed = parseResult.GetValue(DetailedOption);
         foreach (ArtifactInfo inf in await arm.ListArtifactsAsync(cancellationToken).ConfigureAwait(false))
@@ -104,5 +98,14 @@ internal class RehashCommand : CommandBase
         }
         ToolOutput.Out.WriteLine($"{rehashed} resources successfully rehashed.");
         return 0;
+
+        void AddFail(ArtifactResourceInfo r)
+        {
+            if (!failed.TryGetValue(r.Key.Artifact, out var list))
+            {
+                list = failed[r.Key.Artifact] = [];
+            }
+            list.Add(r);
+        }
     }
 }

@@ -228,7 +228,8 @@ public class CommandTestBase
     [MemberNotNull(nameof(ProfileResolver))]
     internal DictionaryProfileResolver CreateDictionaryProfileResolver(string profileName, params ArtifactToolProfile[] profiles)
     {
-        return CreateDictionaryProfileResolver(new Dictionary<string, IReadOnlyList<ArtifactToolProfile>> { [profileName] = profiles });
+        Dictionary<string, IReadOnlyList<ArtifactToolProfile>> map = new() { [profileName] = profiles };
+        return CreateDictionaryProfileResolver(map);
     }
 
     protected static int InvokeCommand(Command command, IReadOnlyList<string> args, TestConsole testConsole)

@@ -29,7 +29,7 @@ var currentAssembly = Assembly.GetExecutingAssembly();
 var localRegistryStore = new StaticArtifactToolRegistryStore(Plugin.Create(AssemblyLoadContext.GetLoadContext(currentAssembly)!, currentAssembly));
 var modularRegistryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
     await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
-        ModuleLoadConfiguration.Create(passthroughAssemblies: "Art"),
+        ModuleLoadConfiguration.Create(passthroughAssemblies: "Art", isCollectible: false),
         searchConfigFiles)
 ));
 var registryStore = new AggregateArtifactToolRegistryStore([localRegistryStore, modularRegistryStore]);

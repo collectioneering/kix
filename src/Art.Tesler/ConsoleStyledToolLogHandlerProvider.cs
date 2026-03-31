@@ -84,7 +84,7 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
     private static readonly Guid s_downloadOperation = Guid.ParseExact("c6d42b18f0ae452385f180aa74e9ef29", "N");
     private static readonly Guid s_operationWaitingForResult = Guid.ParseExact("4fd5c851a88c430c8f8da54dbcf70ab2", "N");
     private readonly Dictionary<object, Guid> _multiObjects = new();
-    private readonly HashSet<Guid> _registeredMultiObjects = new();
+    private readonly HashSet<Guid> _registeredMultiObjects = [];
     private MultiBarContext<Guid>? _multiBarContext;
     private readonly object _lock = new();
 
