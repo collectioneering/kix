@@ -16,12 +16,21 @@ internal static class Common
     internal const string DefaultChecksumAlgorithm = "SHA256";
     internal const string DefaultDbFile = "kix_data.db";
 
-    internal static async Task DisplayAsync(ArtifactInfo i, bool listResource, IArtifactRegistrationManager arm, bool detailed, IOutputControl console)
+    internal static async Task DisplayAsync(
+        ArtifactInfo i,
+        bool listResource,
+        IArtifactRegistrationManager arm,
+        bool detailed,
+        IOutputControl console,
+        ArtifactKey? refactoredArtifactKey = null
+    )
     {
-        Display(i, detailed, console);
+        Display(refactoredArtifactKey != null ? i with { Key = refactoredArtifactKey } : i, detailed, console);
         if (listResource)
+        {
             foreach (ArtifactResourceInfo r in await arm.ListResourcesAsync(i.Key).ConfigureAwait(false))
-                Display(r, detailed, console);
+                Display(refactoredArtifactKey != null ? r with { Key = r.Key with { Artifact = refactoredArtifactKey } } : r, detailed, console);
+        }
     }
 
     internal static Task DisplayAsync(

@@ -16,6 +16,7 @@ namespace Art.Tesler;
 [JsonSerializable(typeof(JsonElement[]))]
 [JsonSerializable(typeof(IReadOnlyDictionary<string, JsonElement>))]
 [JsonSerializable(typeof(Dictionary<string, JsonElement>))]
+[JsonSerializable(typeof(Refactorings))]
 [JsonSerializable(typeof(object))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {

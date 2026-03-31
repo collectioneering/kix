@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.Text.Json;
 using Art.Common;
 
 namespace Art.Tesler.Database;
@@ -33,6 +34,8 @@ public class DatabaseCommandMerge : DatabaseCommandBase
 
     protected Option<MergeFilter> MergeFilterOption;
 
+    protected Option<FileInfo> RefactoringsFileOption;
+
     public DatabaseCommandMerge(
         IOutputControl toolOutput,
         ITeslerRegistrationProvider registrationProvider,
@@ -51,6 +54,9 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         Add(DoMergeOption);
         MergeFilterOption = new Option<MergeFilter>("--merge-filter") { Description = "Filter artifacts to commit", DefaultValueFactory = static _ => MergeFilter.Updated };
         Add(MergeFilterOption);
+        RefactoringsFileOption = new Option<FileInfo>("--refactorings-file") { HelpName = "file", Description = "Use this file to apply type or assembly refactorings" };
+        RefactoringsFileOption.AcceptExistingOnly();
+        Add(RefactoringsFileOption);
         Validators.Add(result =>
         {
             bool anyFilters = false;
@@ -77,9 +83,22 @@ public class DatabaseCommandMerge : DatabaseCommandBase
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
+        FileInfo? refactoringsFile = parseResult.GetValue(RefactoringsFileOption);
         using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
         using var inputArm = InputRegistrationProvider.CreateArtifactRegistrationManager(parseResult);
         IEnumerable<ArtifactInfo> en;
+        Refactorings? refactorings = null;
+        if (refactoringsFile != null)
+        {
+            await using (var afs = refactoringsFile.OpenRead())
+            {
+                refactorings = await JsonSerializer.DeserializeAsync(afs, SourceGenerationContext.Default.Refactorings, cancellationToken);
+            }
+            if (refactorings == null)
+            {
+                throw new InvalidDataException($"Unexpected null JSON in {refactoringsFile.FullName}");
+            }
+        }
         if (parseResult.GetValue(AllOption))
         {
             en = await inputArm.ListArtifactsAsync(cancellationToken).ConfigureAwait(false);
@@ -101,19 +120,21 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         bool doMerge = parseResult.GetValue(DoMergeOption);
         bool listResource = parseResult.GetValue(ListResourceOption);
         bool detailed = parseResult.GetValue(DetailedOption);
-        foreach (ArtifactInfo i in en.ToList())
+        foreach (ArtifactInfo inputArtifactInfo in en.ToList())
         {
-            ArtifactInfo? existing = await arm.TryGetArtifactAsync(i.Key, cancellationToken).ConfigureAwait(false);
+            ArtifactKey? refactoredKey = refactorings != null && refactorings.TryGetRefactoredArtifactKey(inputArtifactInfo.Key, out var tmpRefactoredKey) ? tmpRefactoredKey : null;
+            ArtifactInfo finalArtifactInfo = refactoredKey != null ? inputArtifactInfo with { Key = refactoredKey } : inputArtifactInfo;
+            ArtifactInfo? existing = await arm.TryGetArtifactAsync(finalArtifactInfo.Key, cancellationToken).ConfigureAwait(false);
             switch (mergeFilter)
             {
                 case MergeFilter.Updated:
-                    if ((ItemStateFlagsUtility.GetItemStateFlags(existing, i) & ItemStateFlags.NewerIdentityMask) == 0)
+                    if ((ItemStateFlagsUtility.GetItemStateFlags(existing, finalArtifactInfo) & ItemStateFlags.NewerIdentityMask) == 0)
                     {
                         continue;
                     }
                     break;
                 case MergeFilter.New:
-                    if ((ItemStateFlagsUtility.GetItemStateFlags(existing, i) & ItemStateFlags.New) == 0)
+                    if ((ItemStateFlagsUtility.GetItemStateFlags(existing, finalArtifactInfo) & ItemStateFlags.New) == 0)
                     {
                         continue;
                     }
@@ -125,7 +146,7 @@ public class DatabaseCommandMerge : DatabaseCommandBase
             }
             if (list)
             {
-                await Common.DisplayAsync(i, listResource, inputArm, detailed, ToolOutput).ConfigureAwait(false);
+                await Common.DisplayAsync(inputArtifactInfo, listResource, inputArm, detailed, ToolOutput, refactoredKey).ConfigureAwait(false);
                 if (existing != null)
                 {
                     await Common.DisplayAsync(existing, listResource, arm, detailed, ToolOutput).ConfigureAwait(false);
@@ -135,12 +156,12 @@ public class DatabaseCommandMerge : DatabaseCommandBase
             {
                 if (existing != null)
                 {
-                    await arm.RemoveArtifactAsync(i.Key, cancellationToken).ConfigureAwait(false);
+                    await arm.RemoveArtifactAsync(existing.Key, cancellationToken).ConfigureAwait(false);
                 }
-                await arm.AddArtifactAsync(i, cancellationToken).ConfigureAwait(false);
-                foreach (var resource in await inputArm.ListResourcesAsync(i.Key, cancellationToken).ConfigureAwait(false))
+                await arm.AddArtifactAsync(finalArtifactInfo, cancellationToken).ConfigureAwait(false);
+                foreach (var resource in await inputArm.ListResourcesAsync(inputArtifactInfo.Key, cancellationToken).ConfigureAwait(false))
                 {
-                    await arm.AddResourceAsync(resource, cancellationToken).ConfigureAwait(false);
+                    await arm.AddResourceAsync(resource with { Key = resource.Key with { Artifact = finalArtifactInfo.Key } }, cancellationToken).ConfigureAwait(false);
                 }
             }
             v++;
