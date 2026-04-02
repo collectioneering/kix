@@ -24,8 +24,9 @@ public class SqliteTeslerRegistrationProvider : ITeslerRegistrationProvider
 
     public Type GetArtifactRegistrationManagerType() => typeof(SqliteArtifactRegistrationManager);
 
-    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult)
+    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult, bool isReadonly = false)
     {
-        return new SqliteArtifactRegistrationManager(parseResult.GetRequiredValue(DatabaseOption));
+        var config = new SqliteArtifactRegistrationManagerConfig(ApplyMigrationsOnStartup: !isReadonly, IsReadOnly: isReadonly, DisablePendingMigrationsCheck: false);
+        return new SqliteArtifactRegistrationManager(parseResult.GetRequiredValue(DatabaseOption), config);
     }
 }

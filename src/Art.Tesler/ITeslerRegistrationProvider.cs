@@ -8,5 +8,5 @@ public interface ITeslerRegistrationProvider
 
     Type GetArtifactRegistrationManagerType();
 
-    IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult);
+    IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult, bool isReadonly = false);
 }

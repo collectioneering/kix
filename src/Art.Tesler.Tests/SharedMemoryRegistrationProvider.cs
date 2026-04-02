@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.Runtime.CompilerServices;
 using Art.Common.Management;
 
 namespace Art.Tesler.Tests;
@@ -13,19 +14,21 @@ internal class SharedMemoryRegistrationProvider : ITeslerRegistrationProvider
 
     public Type GetArtifactRegistrationManagerType() => typeof(PersistentProxyArtifactRegistrationManager);
 
-    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult)
+    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult, bool isReadonly = false)
     {
-        return new PersistentProxyArtifactRegistrationManager(_artifactRegistrationManager);
+        return new PersistentProxyArtifactRegistrationManager(_artifactRegistrationManager, isReadonly);
     }
 
     private class PersistentProxyArtifactRegistrationManager : IArtifactRegistrationManager
     {
         private readonly IArtifactRegistrationManager _artifactRegistrationManager;
+        private readonly bool _isReadonly;
         private bool _disposed;
 
-        public PersistentProxyArtifactRegistrationManager(IArtifactRegistrationManager artifactRegistrationManager)
+        public PersistentProxyArtifactRegistrationManager(IArtifactRegistrationManager artifactRegistrationManager, bool isReadonly)
         {
             _artifactRegistrationManager = artifactRegistrationManager;
+            _isReadonly = isReadonly;
         }
 
         public Task<List<ArtifactInfo>> ListArtifactsAsync(CancellationToken cancellationToken = default)
@@ -55,6 +58,7 @@ internal class SharedMemoryRegistrationProvider : ITeslerRegistrationProvider
         public ValueTask AddArtifactAsync(ArtifactInfo artifactInfo, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
+            ThrowIfReadOnly();
             return _artifactRegistrationManager.AddArtifactAsync(artifactInfo, cancellationToken);
         }
 
@@ -67,6 +71,7 @@ internal class SharedMemoryRegistrationProvider : ITeslerRegistrationProvider
         public ValueTask AddResourceAsync(ArtifactResourceInfo artifactResourceInfo, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
+            ThrowIfReadOnly();
             return _artifactRegistrationManager.AddResourceAsync(artifactResourceInfo, cancellationToken);
         }
 
@@ -85,17 +90,28 @@ internal class SharedMemoryRegistrationProvider : ITeslerRegistrationProvider
         public ValueTask RemoveArtifactAsync(ArtifactKey key, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
+            ThrowIfReadOnly();
             return _artifactRegistrationManager.RemoveArtifactAsync(key, cancellationToken);
         }
 
         public ValueTask RemoveResourceAsync(ArtifactResourceKey key, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
+            ThrowIfReadOnly();
             return _artifactRegistrationManager.RemoveResourceAsync(key, cancellationToken);
         }
 
         private void EnsureNotDisposed()
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+        }
+
+        private void ThrowIfReadOnly([CallerMemberName] string? callerMemberName = null)
+        {
+            if (_isReadonly)
+            {
+                throw new InvalidOperationException($"Calling {callerMemberName ?? "this member"} is disallowed, this instance is read-only");
+            }
             ObjectDisposedException.ThrowIf(_disposed, this);
         }
 
