@@ -36,7 +36,7 @@ public class DatabaseCommandList : DatabaseCommandBase
         FileInfo? refactoringsFile = parseResult.GetValue(RefactoringsFileOption);
         FileInfo? output = parseResult.GetValue(OutputOption);
         List<ArtifactKey>? selection = output != null ? [] : null;
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: true);
         string? tool = parseResult.GetValue(ToolOption);
         string? group = parseResult.GetValue(GroupOption);
         string? toolLike = parseResult.GetValue(ToolLikeOption);

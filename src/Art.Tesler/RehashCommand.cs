@@ -50,7 +50,7 @@ internal class RehashCommand : CommandBase
             return 2;
         }
         using var adm = DataProvider.CreateArtifactDataManager(parseResult);
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: false);
         Dictionary<ArtifactKey, List<ArtifactResourceInfo>> failed = new();
         int rehashed = 0;
 

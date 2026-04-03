@@ -84,8 +84,8 @@ public class DatabaseCommandMerge : DatabaseCommandBase
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
         FileInfo? refactoringsFile = parseResult.GetValue(RefactoringsFileOption);
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
-        using var inputArm = InputRegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: true);
+        using var inputArm = InputRegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: true);
         IEnumerable<ArtifactInfo> en;
         Refactorings? refactorings = null;
         if (refactoringsFile != null)

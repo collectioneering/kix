@@ -14,7 +14,7 @@ internal class SharedMemoryRegistrationProvider : ITeslerRegistrationProvider
 
     public Type GetArtifactRegistrationManagerType() => typeof(PersistentProxyArtifactRegistrationManager);
 
-    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult, bool isReadonly = false)
+    public IArtifactRegistrationManager CreateArtifactRegistrationManager(ParseResult parseResult, bool isReadonly)
     {
         return new PersistentProxyArtifactRegistrationManager(_artifactRegistrationManager, isReadonly);
     }

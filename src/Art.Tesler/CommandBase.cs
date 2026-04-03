@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Art.BrowserCookies;
+using Art.EF;
 
 namespace Art.Tesler;
 
@@ -24,11 +25,35 @@ public abstract class CommandBase : Command
             PrintExceptionMessage(e, ToolOutput);
             return -1;
         }
-        catch (BrowserLookupConfigException e)
+        catch (Exception e)
         {
-            PrintExceptionMessage(e, ToolOutput);
-            return -1;
+            Type? exceptionType = e.GetType();
+            while (exceptionType != null)
+            {
+                if (exceptionType.FullName is { } fullName && s_filteredExceptions.TryGetValue(fullName, out var knownExceptionDelegate))
+                {
+                    PrintExceptionMessage(e, ToolOutput);
+                    knownExceptionDelegate?.Invoke(e, ToolOutput);
+                    return -1;
+                }
+                exceptionType = exceptionType.BaseType;
+            }
+            throw;
         }
+    }
+
+    private static readonly Dictionary<string, KnownExceptionDelegate?> s_filteredExceptions =
+        new()
+        {
+            { $"Art.BrowserCookies.{nameof(BrowserLookupConfigException)}", null }, //
+            { $"Art.EF.{nameof(EFPendingMigrationsPresentException)}", HandleEFPendingMigrationsPresent }, //
+        };
+
+    private delegate void KnownExceptionDelegate(Exception e, IOutputControl console);
+
+    private static void HandleEFPendingMigrationsPresent(Exception e, IOutputControl console)
+    {
+        PrintErrorMessage("Please run migrations on the database prior to using the database in read-only mode.", console);
     }
 
     protected static void PrintExceptionMessage(Exception e, IOutputControl console)

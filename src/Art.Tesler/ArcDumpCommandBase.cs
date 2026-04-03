@@ -64,8 +64,12 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
         }
         var profiles = GetProfiles(parseResult);
         var options = GetArtifactToolDumpOptions(parseResult, checksumSource);
-        using var adm = parseResult.GetValue(NullOutputOption) ? new NullArtifactDataManager() : DataProvider.CreateArtifactDataManager(parseResult);
-        using var arm = parseResult.GetValue(NoDatabaseOption) ? new NullArtifactRegistrationManager() : RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var adm = parseResult.GetValue(NullOutputOption)
+            ? new NullArtifactDataManager()
+            : DataProvider.CreateArtifactDataManager(parseResult);
+        using var arm = parseResult.GetValue(NoDatabaseOption)
+            ? new NullArtifactRegistrationManager()
+            : RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: false);
         var logPreferences = GetLogPreferences(parseResult);
         IToolLogHandler l = ToolLogHandlerProvider.GetDefaultToolLogHandler(logPreferences);
         (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps) = GetArtifactRetrievalOptions(parseResult);

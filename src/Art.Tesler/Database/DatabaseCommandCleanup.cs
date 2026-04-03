@@ -19,7 +19,7 @@ public class DatabaseCommandCleanup : CommandBase
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: false);
         if (arm is not IArtifactRegistrationManagerCleanup armCleanup)
         {
             ToolOutput.Error.WriteLine($"Artifact registration provider {arm} does not support cleanup.");

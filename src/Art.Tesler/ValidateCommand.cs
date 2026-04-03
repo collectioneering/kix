@@ -96,7 +96,7 @@ public class ValidateCommand : ToolCommandBase
             l.Log("No profiles provided, validating all artifacts and resources", null, LogLevel.Information);
         }
         using var adm = DataProvider.CreateArtifactDataManager(parseResult);
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: !repair);
         var validationContext = new ValidationContext(PluginStore, arm, adm, l);
         ValidationProcessResult result;
         ChecksumSource? checksumSourceForAdd = parseResult.GetValue(AddChecksumOption) ? checksumSource : null;

@@ -27,5 +27,6 @@ public class DatabaseCommand : Command
         }
         Add(new DatabaseCommandDelete(toolOutput, registrationProvider, "delete", "Delete archives in database."));
         Add(new DatabaseCommandMerge(toolOutput, registrationProvider, inputRegistrationProvider, "merge", "Merge from another database."));
+        Add(new DatabaseCommandMigrate(toolOutput, registrationProvider, "migrate", "Run database migrations as necessary."));
     }
 }

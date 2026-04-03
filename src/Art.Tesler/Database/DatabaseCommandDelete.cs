@@ -50,7 +50,8 @@ public class DatabaseCommandDelete : DatabaseCommandBase
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult);
+        bool doDelete = parseResult.GetValue(DoDeleteOption);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: !doDelete);
         IEnumerable<ArtifactInfo> en;
         if (parseResult.GetValue(AllOption))
         {
@@ -69,7 +70,6 @@ public class DatabaseCommandDelete : DatabaseCommandBase
         }
         int v = 0;
         bool list = parseResult.GetValue(ListOption);
-        bool doDelete = parseResult.GetValue(DoDeleteOption);
         bool listResource = parseResult.GetValue(ListResourceOption);
         bool detailed = parseResult.GetValue(DetailedOption);
         foreach (ArtifactInfo i in en.ToList())
