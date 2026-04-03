@@ -13,7 +13,7 @@
     <!-- Test dependencies -->
     <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageVersion Update="coverlet.collector" Version="8.0.1" />
-    <PackageVersion Update="xunit" Version="2.9.3" />
+    <PackageVersion Update="xunit.v3" Version="3.2.2" />
     <PackageVersion Update="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
 </Project>
