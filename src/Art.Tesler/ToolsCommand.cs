@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Art.Common;
 
 namespace Art.Tesler;
 
@@ -43,7 +44,8 @@ public class ToolsCommand : CommandBase
             foreach (var desc in plugin.GetToolDescriptions()
                          .Where(v => re?.IsMatch(v.Id.GetToolString()) ?? true))
             {
-                Common.PrintFormat(desc.Id.GetToolString(), parseResult.GetValue(DetailedOption), () =>
+                string toolString = desc.Id.GetToolString();
+                Common.PrintFormat(toolString, parseResult.GetValue(DetailedOption), () =>
                 {
                     bool canFind = desc.Type.IsAssignableTo(typeof(IArtifactFindTool));
                     bool canList = desc.Type.IsAssignableTo(typeof(IArtifactListTool));
@@ -71,7 +73,16 @@ public class ToolsCommand : CommandBase
                         capabilities.Add("none");
                     }
                     var stringBuilder = new StringBuilder("Capabilities: ").AppendJoin(", ", capabilities);
-                    stringBuilder.AppendLine().Append("Core: ").Append(desc.Type.GetCustomAttribute<CoreAttribute>() != null ? "true" : "false");
+                    bool isCore = desc.Type.GetCustomAttribute<CoreAttribute>() != null;
+                    stringBuilder.AppendLine().Append("IsCore: ").Append(isCore ? "true" : "false");
+                    if (!isCore)
+                    {
+                        string coreToolString = ArtifactToolIDUtil.CreateCoreToolString(desc.Type);
+                        if (!string.Equals(toolString, coreToolString, StringComparison.InvariantCulture))
+                        {
+                            stringBuilder.AppendLine().Append("CoreTool: ").Append(coreToolString);
+                        }
+                    }
                     if (desc.Type.GetCustomAttribute<ToolVersionAttribute>() is { } toolVersionAttribute)
                     {
                         stringBuilder.AppendLine().Append("ToolVersion: ").Append(toolVersionAttribute);
