@@ -17,6 +17,8 @@ public abstract class ToolCommandBase : CommandBase
 
     protected Option<string> CookieFileOption;
 
+    protected Option<bool> DebugModeOption;
+
     protected Option<List<string>> PropertiesOption;
 
     protected Option<List<string>> PropertyElementsOption;
@@ -47,6 +49,8 @@ public abstract class ToolCommandBase : CommandBase
         Add(UserAgentOption);
         CookieFileOption = new Option<string>("--cookie-file") { HelpName = "file", Description = "Cookie file" };
         Add(CookieFileOption);
+        DebugModeOption = new Option<bool>("--debug-mode") { Description = "Enable debug output on tools that support it" };
+        Add(DebugModeOption);
         PropertiesOption = new Option<List<string>>("-p", "--property") { HelpName = "key:value", Arity = ArgumentArity.ZeroOrMore, Description = "Add a property" };
         Add(PropertiesOption);
         PropertyElementsOption = new Option<List<string>>("--property-element") { HelpName = "key:value", Arity = ArgumentArity.ZeroOrMore, Description = "Add an element to a list property" };
@@ -92,12 +96,16 @@ public abstract class ToolCommandBase : CommandBase
         propertyElements = (IReadOnlyCollection<string>?)parseResult.GetValue(PropertyElementsOption) ?? [];
     }
 
-    protected (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps) GetArtifactRetrievalOptions(ParseResult parseResult)
+    protected (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps, bool debugMode) GetArtifactRetrievalOptions(ParseResult parseResult)
     {
         bool noRetrievalTimestamps = parseResult.GetValue(NoRetrievalTimestampsOption);
         bool noArtifactRetrievalTimestamps = noRetrievalTimestamps || parseResult.GetValue(NoArtifactRetrievalTimestampsOption);
         bool noResourceRetrievalTimestamps = noRetrievalTimestamps || parseResult.GetValue(NoResourceRetrievalTimestampsOption);
-        return (getArtifactRetrievalTimestamps: !noArtifactRetrievalTimestamps, getResourceRetrievalTimestamps: !noResourceRetrievalTimestamps);
+        bool debugMode = parseResult.GetValue(DebugModeOption);
+        return (
+            getArtifactRetrievalTimestamps: !noArtifactRetrievalTimestamps,
+            getResourceRetrievalTimestamps: !noResourceRetrievalTimestamps,
+            debugMode: debugMode);
     }
 
     protected LogPreferences GetLogPreferences(ParseResult parseResult)
@@ -114,13 +122,14 @@ public abstract class ToolCommandBase : CommandBase
         TimeProvider timeProvider,
         bool getArtifactRetrievalTimestamps,
         bool getResourceRetrievalTimestamps,
+        bool debugMode,
         CancellationToken cancellationToken = default)
     {
         if (!PluginStore.TryLoadRegistry(ArtifactToolIDUtil.ParseID(artifactToolProfile.Tool), out var plugin))
         {
             throw new ArtifactToolNotFoundException(artifactToolProfile.Tool);
         }
-        return await ArtifactTool.PrepareToolAsync(
+        var tool = await ArtifactTool.PrepareToolAsync(
                 plugin,
                 artifactToolProfile,
                 arm,
@@ -130,6 +139,8 @@ public abstract class ToolCommandBase : CommandBase
                 getResourceRetrievalTimestamps,
                 cancellationToken)
             .ConfigureAwait(false);
+        tool.DebugMode = debugMode;
+        return tool;
     }
 
     protected IToolPropertyProvider? GetOptionalToolPropertyProvider(ParseResult parseResult)

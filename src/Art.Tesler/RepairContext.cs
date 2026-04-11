@@ -31,6 +31,7 @@ public class RepairContext : ToolControlContext
         TimeProvider timeProvider,
         bool getArtifactRetrievalTimestamps,
         bool getResourceRetrievalTimestamps,
+        bool debugMode,
         IOutputControl console,
         CancellationToken cancellationToken)
     {
@@ -46,6 +47,7 @@ public class RepairContext : ToolControlContext
             }
             ArtifactToolConfig config = new(_arm, _adm, timeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps);
             await tool.InitializeAsync(config, actualProfile, cancellationToken).ConfigureAwait(false);
+            tool.DebugMode = debugMode;
             switch (tool)
             {
                 // ReSharper disable SuspiciousTypeConversion.Global

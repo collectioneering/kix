@@ -20,6 +20,8 @@ public class ArcCommand : ArcDumpCommandBase
 
     protected Option<bool> FastExitOption;
 
+    protected Option<bool> FastExitFullOption;
+
     public ArcCommand(
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
@@ -55,6 +57,8 @@ public class ArcCommand : ArcDumpCommandBase
         Add(SkipOption);
         FastExitOption = new Option<bool>("-z", "--fast-exit") { Description = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExit)}" };
         Add(FastExitOption);
+        FastExitFullOption = new Option<bool>("--fast-exit-full") { Description = $"Equivalent to -s/--skip {nameof(ArtifactSkipMode.FastExitFull)}" };
+        Add(FastExitFullOption);
     }
 
     protected override IReadOnlyList<ArtifactToolProfile> GetProfiles(ParseResult parseResult)
@@ -73,10 +77,11 @@ public class ArcCommand : ArcDumpCommandBase
         bool full = parseResult.GetValue(FullOption);
         ArtifactSkipMode skip = parseResult.GetValue(SkipOption);
         bool fastExit = parseResult.GetValue(FastExitOption);
+        bool fastExitFull = parseResult.GetValue(FastExitFullOption);
         return new ArtifactToolDumpOptions(
             update,
             !full,
-            fastExit ? ArtifactSkipMode.FastExit : skip,
+            fastExit ? ArtifactSkipMode.FastExit : fastExitFull ? ArtifactSkipMode.FastExitFull : skip,
             checksumSource);
     }
 }

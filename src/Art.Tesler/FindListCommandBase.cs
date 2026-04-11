@@ -58,7 +58,7 @@ public abstract class FindListCommandBase : ToolCommandBase, IToolGroupOrProfile
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
         var profiles = DumpFindListUtil.GetProfiles(this, parseResult);
-        (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps) = GetArtifactRetrievalOptions(parseResult);
+        (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps, bool debugMode) = GetArtifactRetrievalOptions(parseResult);
         var logPreferences = GetLogPreferences(parseResult);
         IToolLogHandler logHandler = ToolLogHandlerProvider.GetDefaultToolLogHandler(logPreferences);
         bool listResource = parseResult.GetValue(ListResourceOption);
@@ -69,7 +69,7 @@ public abstract class FindListCommandBase : ToolCommandBase, IToolGroupOrProfile
         {
             // keep registrations local to each run
             using var arm = new InMemoryArtifactRegistrationManager();
-            using var tool = await GetToolAsync(profile, arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, cancellationToken).ConfigureAwait(false);
+            using var tool = await GetToolAsync(profile, arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
             await ExecuteAsync(parseResult, logHandler, listResource, detailed, tool, cancellationToken);
         }
         return 0;
