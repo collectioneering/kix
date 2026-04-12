@@ -92,7 +92,7 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         {
             await using (var afs = refactoringsFile.OpenRead())
             {
-                refactorings = await JsonSerializer.DeserializeAsync(afs, SourceGenerationContext.Default.Refactorings, cancellationToken);
+                refactorings = await JsonSerializer.DeserializeAsync(afs, SourceGenerationContext.s_context.Refactorings, cancellationToken);
             }
             if (refactorings == null)
             {
