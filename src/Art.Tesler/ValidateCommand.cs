@@ -113,7 +113,7 @@ public class ValidateCommand : ToolCommandBase
         {
             result = await validationContext.ProcessAsync(profiles, checksumSourceForAdd, cancellationToken).ConfigureAwait(false);
         }
-        l.Log($"Total: {result.Artifacts} artifacts and {result.Resources} processed.", null, LogLevel.Information);
+        l.Log($"Total: {result.Artifacts} artifacts and {result.Resources} resources processed.", null, LogLevel.Information);
         if (!validationContext.AnyFailed)
         {
             l.Log("All resources for specified profiles successfully validated.", null, LogLevel.Information);

@@ -224,13 +224,17 @@ public class ValidationContext : ToolControlContext
                 group = actualProfile.GetGroupOrFallback(tool.GroupFallback);
                 isFindTool = tool is IArtifactFindTool;
             }
-            _l.Log($"Processing entries for profile {toolName}/{group}", null, LogLevel.Title);
-            var artifacts = await _arm.ListArtifactsAsync(toolName, group, cancellationToken).ConfigureAwait(false);
             // respect profile's artifact list
             // (checking against it being a find tool matches the behaviour of dump / list proxies)
+            HashSet<string>? set = null;
             if (originalProfile.Options.TryGetOption("artifactList", out string[]? artifactList, SourceGenerationContext.s_context.StringArray) && isFindTool)
             {
-                var set = artifactList.ToHashSet();
+                set = artifactList.ToHashSet();
+            }
+            _l.Log($"Processing {(set != null ? $"{set.Count} " : "")}entries for profile {toolName}/{group}", null, LogLevel.Title);
+            var artifacts = await _arm.ListArtifactsAsync(toolName, group, cancellationToken).ConfigureAwait(false);
+            if (set != null)
+            {
                 artifacts.RemoveAll(v => !set.Contains(v.Key.Id));
             }
             var result = await ProcessAsync(artifacts, checksumSourceForAdd, cancellationToken).ConfigureAwait(false);
