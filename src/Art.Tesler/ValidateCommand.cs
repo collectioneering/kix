@@ -10,6 +10,8 @@ public class ValidateCommand : ToolCommandBase
 
     protected ITeslerRegistrationProvider RegistrationProvider;
 
+    protected IExtensionsContext ExtensionsContext;
+
     protected TimeProvider TimeProvider;
 
     protected Option<string> HashOption;
@@ -30,8 +32,18 @@ public class ValidateCommand : ToolCommandBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider)
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, "validate", "Verify resource integrity.")
+        : this(
+            toolLogHandlerProvider,
+            pluginStore,
+            toolPropertyProvider,
+            dataProvider,
+            registrationProvider,
+            extensionsContext,
+            timeProvider,
+            "validate",
+            "Verify resource integrity.")
     {
     }
 
@@ -41,6 +53,7 @@ public class ValidateCommand : ToolCommandBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null) : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, name, description)
@@ -49,6 +62,7 @@ public class ValidateCommand : ToolCommandBase
         DataProvider.Initialize(this);
         RegistrationProvider = registrationProvider;
         RegistrationProvider.Initialize(this);
+        ExtensionsContext = extensionsContext;
         TimeProvider = timeProvider;
         HashOption = new Option<string>("-h", "--hash") { HelpName = Common.ChecksumAlgorithms, Description = "Checksum algorithm", DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm };
         Add(HashOption);
@@ -136,6 +150,7 @@ public class ValidateCommand : ToolCommandBase
             profiles,
             parseResult.GetValue(DetailedOption),
             checksumSource,
+            ExtensionsContext,
             TimeProvider,
             getArtifactRetrievalTimestamps,
             getResourceRetrievalTimestamps,

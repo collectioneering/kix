@@ -6,6 +6,8 @@ namespace Art.Tesler;
 
 public abstract class FindListCommandBase : ToolCommandBase, IToolGroupOrProfileFileOptions
 {
+    protected IExtensionsContext ExtensionsContext;
+
     protected TimeProvider TimeProvider;
 
     protected Option<string> ProfileFileOption;
@@ -22,11 +24,13 @@ public abstract class FindListCommandBase : ToolCommandBase, IToolGroupOrProfile
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null)
         : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, name, description)
     {
+        ExtensionsContext = extensionsContext;
         TimeProvider = timeProvider;
         ListResourceOption = new Option<bool>("-l", "--list-resource") { Description = "List associated resources" };
         Add(ListResourceOption);
@@ -69,7 +73,7 @@ public abstract class FindListCommandBase : ToolCommandBase, IToolGroupOrProfile
         {
             // keep registrations local to each run
             using var arm = new InMemoryArtifactRegistrationManager();
-            using var tool = await GetToolAsync(profile, arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
+            using var tool = await GetToolAsync(profile, arm, adm, ExtensionsContext, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
             await ExecuteAsync(parseResult, logHandler, listResource, detailed, tool, cancellationToken);
         }
         return 0;

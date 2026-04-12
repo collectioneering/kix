@@ -19,8 +19,18 @@ public class DumpCommand : ArcDumpCommandBase, IToolGroupOrProfileFileOptions
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider)
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, "dump", "Execute artifact dump tools.")
+        : this(
+            toolLogHandlerProvider,
+            pluginStore,
+            toolPropertyProvider,
+            dataProvider,
+            registrationProvider,
+            extensionsContext,
+            timeProvider,
+            "dump",
+            "Execute artifact dump tools.")
     {
     }
 
@@ -30,10 +40,11 @@ public class DumpCommand : ArcDumpCommandBase, IToolGroupOrProfileFileOptions
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null)
-        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, name, description)
+        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, name, description)
     {
         ProfileFileOption = new Option<string>("-i", "--input") { HelpName = "file", Description = "Profile file" };
         Add(ProfileFileOption);

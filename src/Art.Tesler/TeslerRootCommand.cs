@@ -25,21 +25,22 @@ public class TeslerRootCommand : RootCommand
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
         ITeslerRegistrationProvider inputRegistrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
     {
         return new TeslerRootCommand(pluginStore)
         {
-            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver),
-            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
-            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, profileResolver),
+            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, profileResolver),
+            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
+            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, profileResolver),
             new RehashCommand(toolLogHandlerProvider, dataProvider, registrationProvider),
             new ToolsCommand(toolLogHandlerProvider, pluginStore),
-            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
+            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
             new DatabaseCommand(toolLogHandlerProvider, registrationProvider, inputRegistrationProvider),
-            new CookieCommand(toolLogHandlerProvider),
+            new CookieCommand(toolLogHandlerProvider, extensionsContext),
             new ConfigCommand(toolLogHandlerProvider, runnerPropertyProvider, toolPropertyProvider, profileResolver, pluginStore)
         };
     }
@@ -51,6 +52,7 @@ public class TeslerRootCommand : RootCommand
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
         ITeslerRegistrationProvider inputRegistrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
         where TTool : IArtifactToolFactory
@@ -60,16 +62,16 @@ public class TeslerRootCommand : RootCommand
         var pluginStore = new StaticArtifactToolRegistryStore(registry);
         return new TeslerRootCommand(pluginStore)
         {
-            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver),
-            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
-            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, profileResolver),
+            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, profileResolver),
+            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
+            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, profileResolver),
             new RehashCommand(toolLogHandlerProvider, dataProvider, registrationProvider),
             new ToolsCommand(toolLogHandlerProvider, pluginStore),
-            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
+            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
             new DatabaseCommand(toolLogHandlerProvider, registrationProvider, inputRegistrationProvider),
-            new CookieCommand(toolLogHandlerProvider),
+            new CookieCommand(toolLogHandlerProvider, extensionsContext),
             new ConfigCommand(toolLogHandlerProvider, runnerPropertyProvider, toolPropertyProvider, profileResolver, pluginStore)
         };
     }
@@ -81,6 +83,7 @@ public class TeslerRootCommand : RootCommand
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
         ITeslerRegistrationProvider inputRegistrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
         where TTool : IArtifactToolFactory, IArtifactToolSelector<string>
@@ -90,16 +93,16 @@ public class TeslerRootCommand : RootCommand
         var pluginStore = new StaticArtifactToolRegistryStore(registry);
         return new TeslerRootCommand(pluginStore)
         {
-            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver),
-            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
-            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider),
-            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, profileResolver),
+            new ArcCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, profileResolver),
+            new DumpCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
+            new FindCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new ListCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider),
+            new StreamCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, profileResolver),
             new RehashCommand(toolLogHandlerProvider, dataProvider, registrationProvider),
             new ToolsCommand(toolLogHandlerProvider, pluginStore),
-            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider),
+            new ValidateCommand(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider),
             new DatabaseCommand(toolLogHandlerProvider, registrationProvider, inputRegistrationProvider),
-            new CookieCommand(toolLogHandlerProvider),
+            new CookieCommand(toolLogHandlerProvider, extensionsContext),
             new ConfigCommand(toolLogHandlerProvider, runnerPropertyProvider, toolPropertyProvider, profileResolver, pluginStore)
         };
     }
@@ -112,6 +115,7 @@ public class TeslerRootCommand : RootCommand
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
         ITeslerRegistrationProvider inputRegistrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
     {
@@ -123,6 +127,7 @@ public class TeslerRootCommand : RootCommand
             dataProvider,
             registrationProvider,
             inputRegistrationProvider,
+            extensionsContext,
             timeProvider,
             profileResolver);
     }

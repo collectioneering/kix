@@ -22,9 +22,10 @@ public class LoggingTests : CommandTestBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider)
     {
-        Command = new DumpCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider);
+        Command = new DumpCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider);
     }
 
     [Fact]
@@ -98,7 +99,8 @@ public class LoggingTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
-        InitCommandDefault(toolLogHandlerProvider, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider());
+        var extensionsContext = CreateMappedExtensionsContext();
+        InitCommandDefault(toolLogHandlerProvider, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider());
         return InvokeCommand(Command, line, testConsole);
     }
 

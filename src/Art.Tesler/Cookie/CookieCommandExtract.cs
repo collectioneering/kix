@@ -1,12 +1,13 @@
 using System.CommandLine;
 using System.Net;
 using System.Text;
-using Art.BrowserCookies;
+using Art.Extensions.BrowserCookies;
 
 namespace Art.Tesler.Cookie;
 
 public class CookieCommandExtract : CommandBase
 {
+    protected IExtensionsContext ExtensionsContext;
     protected Option<string> BrowserOption;
     protected Option<string> BrowserProfileOption;
     protected Option<List<string>> DomainsOption;
@@ -14,7 +15,11 @@ public class CookieCommandExtract : CommandBase
     protected Option<bool> NoSubdomainsOption;
     private readonly IToolLogHandlerProvider _toolLogHandlerProvider;
 
-    public CookieCommandExtract(IToolLogHandlerProvider toolLogHandlerProvider, string name, string? description = null) : base(toolLogHandlerProvider, name, description)
+    public CookieCommandExtract(
+        IToolLogHandlerProvider toolLogHandlerProvider,
+        IExtensionsContext extensionsContext,
+        string name,
+        string? description = null) : base(toolLogHandlerProvider, name, description)
     {
         BrowserOption = new Option<string>("-b", "--browser") { HelpName = "name", Required = true, Description = "Browser name" };
         Add(BrowserOption);
@@ -27,6 +32,7 @@ public class CookieCommandExtract : CommandBase
         NoSubdomainsOption = new Option<bool>("--no-subdomains") { Description = "Do not include subdomains" };
         Add(NoSubdomainsOption);
         _toolLogHandlerProvider = toolLogHandlerProvider;
+        ExtensionsContext = extensionsContext;
     }
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
@@ -35,9 +41,15 @@ public class CookieCommandExtract : CommandBase
         string? browserProfile = parseResult.GetValue(BrowserProfileOption);
         List<string> domains = parseResult.GetRequiredValue(DomainsOption);
         bool includeSubdomains = !parseResult.GetValue(NoSubdomainsOption);
-        if (!CookieSource.TryGetBrowserFromName(browserName, out var source, browserProfile))
+
+        if (!ExtensionsContext.TryGetExtension(out ICookieProviderExtension? cookieProviderExtension))
         {
-            PrintErrorMessage(Common.GetInvalidCookieSourceBrowserMessage(browserName), ToolOutput);
+            PrintErrorMessage("No cookie provider extension is available", ToolOutput);
+            return 2;
+        }
+        if (!cookieProviderExtension.TryGetBrowserFromName(browserName, out var source, browserProfile))
+        {
+            PrintErrorMessage(Common.GetInvalidCookieSourceBrowserMessage(cookieProviderExtension, browserName), ToolOutput);
             return 2;
         }
         source = source.Resolve();
@@ -54,7 +66,7 @@ public class CookieCommandExtract : CommandBase
         return 0;
     }
 
-    private async Task ExportAsync(CookieSource source, IEnumerable<string> domains, bool includeSubdomains, TextWriter output, CancellationToken cancellationToken)
+    private async Task ExportAsync(ICookieSource source, IEnumerable<string> domains, bool includeSubdomains, TextWriter output, CancellationToken cancellationToken)
     {
         CookieContainer cc = new();
         var logHandler = _toolLogHandlerProvider.GetDefaultToolLogHandler(LogPreferences.Default);

@@ -21,10 +21,11 @@ public class ArcCommandTests : CommandTestBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
     {
-        Command = new ArcCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver);
+        Command = new ArcCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, profileResolver);
     }
 
     [Fact]
@@ -34,9 +35,10 @@ public class ArcCommandTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         var profileResolver = CreateDictionaryProfileResolver();
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         Assert.NotEqual(0, InvokeCommand(Command, [], console));
         Assert.NotEmpty(Out.ToString());
         Assert.NotEmpty(Error.ToString());
@@ -49,9 +51,10 @@ public class ArcCommandTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         var profileResolver = CreateDictionaryProfileResolver();
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [BadProfileName];
         Assert.NotEqual(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());
@@ -65,9 +68,10 @@ public class ArcCommandTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName);
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName];
         Assert.Equal(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());
@@ -82,9 +86,10 @@ public class ArcCommandTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName, new ArtifactToolProfile(s_toolId.GetToolString(), null, null));
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName];
         Assert.Equal(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());
@@ -100,9 +105,10 @@ public class ArcCommandTests : CommandTestBase
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName, new ArtifactToolProfile(s_badToolId.GetToolString(), null, null));
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName];
         Assert.NotEqual(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());

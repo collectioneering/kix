@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
-using Art.BrowserCookies;
 using Art.EF;
+using Art.Extensions.BrowserCookies;
 
 namespace Art.Tesler;
 
@@ -45,7 +45,7 @@ public abstract class CommandBase : Command
     private static readonly Dictionary<string, KnownExceptionDelegate?> s_filteredExceptions =
         new()
         {
-            { $"Art.BrowserCookies.{nameof(BrowserLookupConfigException)}", null }, //
+            { $"Art.Extensions.BrowserCookies.{nameof(BrowserLookupConfigException)}", null }, //
             { $"Art.EF.{nameof(EFPendingMigrationsPresentException)}", HandleEFPendingMigrationsPresent }, //
         };
 

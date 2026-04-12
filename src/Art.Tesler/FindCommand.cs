@@ -12,9 +12,10 @@ public class FindCommand : FindListCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider
     )
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, "find", "Execute artifact finder tools.")
+        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, "find", "Execute artifact finder tools.")
     {
     }
 
@@ -22,10 +23,11 @@ public class FindCommand : FindListCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null) :
-        base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, name, description)
+        base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, name, description)
     {
         IdsArg = new Argument<List<string>>("ids") { HelpName = "id", Arity = ArgumentArity.OneOrMore, Description = "IDs" };
         Add(IdsArg);

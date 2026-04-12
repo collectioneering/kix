@@ -2,8 +2,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Text.RegularExpressions;
-using Art.BrowserCookies;
 using Art.Common;
+using Art.Extensions.BrowserCookies;
 using Art.Tesler.Properties;
 using EA;
 
@@ -228,13 +228,13 @@ internal static class Common
             .ToString();
     }
 
-    internal static string GetInvalidCookieSourceBrowserMessage(string browserName)
+    internal static string GetInvalidCookieSourceBrowserMessage(ICookieProviderExtension cookieProviderExtension, string browserName)
     {
         return new StringBuilder($"Failed to find browser with name {browserName}")
             .Append(Environment.NewLine)
             .Append("Supported browsers:")
             .Append(Environment.NewLine)
-            .AppendJoin(Environment.NewLine, CookieSource.GetSupportedBrowserNames())
+            .AppendJoin(Environment.NewLine, cookieProviderExtension.GetSupportedBrowserNames())
             .ToString();
     }
 

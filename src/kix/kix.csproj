@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ext\art\src\Art.Modular\Art.Modular.csproj" />
+    <ProjectReference Include="..\..\ext\art\src\Art.BrowserCookies\Art.BrowserCookies.csproj" />
     <ProjectReference Include="..\Art.Tesler\Art.Tesler.csproj" />
   </ItemGroup>
 

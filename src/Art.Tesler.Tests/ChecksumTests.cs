@@ -18,10 +18,11 @@ public class ChecksumTests : CommandTestBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
     {
-        Command = new ArcCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver);
+        Command = new ArcCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, profileResolver);
     }
 
     [Fact]
@@ -32,8 +33,9 @@ public class ChecksumTests : CommandTestBase
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName);
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName];
         Assert.Equal(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());
@@ -48,8 +50,9 @@ public class ChecksumTests : CommandTestBase
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName);
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName, "--hash", "SHA256"];
         Assert.Equal(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());
@@ -64,8 +67,9 @@ public class ChecksumTests : CommandTestBase
         var dataProvider = CreateSharedMemoryDataProvider();
         var registrationProvider = CreateSharedMemoryRegistrationProvider();
         var profileResolver = CreateDictionaryProfileResolver(ProfileName);
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, new FakeTimeProvider(), profileResolver);
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, new FakeTimeProvider(), profileResolver);
         string[] line = [ProfileName, "--hash", "BAD_CHECKSUM"];
         Assert.NotEqual(0, InvokeCommand(Command, line, console));
         Assert.Empty(Out.ToString());

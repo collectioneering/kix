@@ -16,9 +16,10 @@ public class ListCommandTests : CommandTestBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore artifactToolRegistryStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider)
     {
-        Command = new ListCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, timeProvider);
+        Command = new ListCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, extensionsContext, timeProvider);
     }
 
     [Fact]
@@ -26,8 +27,9 @@ public class ListCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactListTool.CreateRegistryEntry(_ => []));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         int rc = InvokeCommand(Command, [], console);
         Assert.NotEmpty(Out.ToString());
         Assert.Empty(OutQueue);
@@ -41,8 +43,9 @@ public class ListCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactListTool.CreateRegistryEntry(_ => []));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string[] line = ["-t", new ArtifactToolID("NOT_AN_ASSEMBLY", "MALO").GetToolString()];
         int rc = InvokeCommand(Command, line, console);
         Assert.Empty(Out.ToString());
@@ -57,8 +60,9 @@ public class ListCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactListTool.CreateRegistryEntry(_ => []));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string[] line = ["-t", ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactListTool>()];
         int rc = InvokeCommand(Command, line, console);
         Assert.Empty(Out.ToString());
@@ -81,8 +85,9 @@ public class ListCommandTests : CommandTestBase
             return results;
         }));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string toolString = ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactListTool>();
         string[] line = ["-t", toolString, "-g", group];
         int rc = InvokeCommand(Command, line, console);
@@ -120,8 +125,9 @@ public class ListCommandTests : CommandTestBase
             return results;
         }));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string toolString = ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactListTool>();
         string[] line = ["-t", toolString, "-g", group];
         int rc = InvokeCommand(Command, line, console);

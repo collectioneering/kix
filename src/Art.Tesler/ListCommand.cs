@@ -10,9 +10,10 @@ public class ListCommand : FindListCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider
     )
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, "list", "Execute artifact list tools.")
+        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, "list", "Execute artifact list tools.")
     {
     }
 
@@ -20,10 +21,11 @@ public class ListCommand : FindListCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null)
-        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, name, description)
+        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, extensionsContext, timeProvider, name, description)
     {
     }
 

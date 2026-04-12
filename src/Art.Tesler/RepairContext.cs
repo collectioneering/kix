@@ -28,6 +28,7 @@ public class RepairContext : ToolControlContext
         List<ArtifactToolProfile> profiles,
         bool detailed,
         ChecksumSource? checksumSource,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         bool getArtifactRetrievalTimestamps,
         bool getResourceRetrievalTimestamps,
@@ -45,7 +46,7 @@ public class RepairContext : ToolControlContext
             {
                 continue;
             }
-            ArtifactToolConfig config = new(_arm, _adm, timeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps);
+            ArtifactToolConfig config = new(_arm, _adm, extensionsContext, timeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps);
             await tool.InitializeAsync(config, actualProfile, cancellationToken).ConfigureAwait(false);
             tool.DebugMode = debugMode;
             switch (tool)

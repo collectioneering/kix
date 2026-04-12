@@ -25,6 +25,7 @@ public class CommandTestBase
     protected ITeslerRegistrationProvider? RegistrationProvider;
     protected ITeslerDataProvider? DataProvider;
     protected IProfileResolver? ProfileResolver;
+    protected IExtensionsContext? ExtensionsContext;
 
     [MemberNotNull(nameof(Out))]
     [MemberNotNull(nameof(OutStream))]
@@ -230,6 +231,14 @@ public class CommandTestBase
     {
         Dictionary<string, IReadOnlyList<ArtifactToolProfile>> map = new() { [profileName] = profiles };
         return CreateDictionaryProfileResolver(map);
+    }
+
+    [MemberNotNull(nameof(ExtensionsContext))]
+    internal MappedExtensionsContext CreateMappedExtensionsContext()
+    {
+        var result = new MappedExtensionsContext();
+        ExtensionsContext = result;
+        return result;
     }
 
     protected static int InvokeCommand(Command command, IReadOnlyList<string> args, TestConsole testConsole)

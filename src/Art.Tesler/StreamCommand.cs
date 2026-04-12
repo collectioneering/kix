@@ -11,6 +11,8 @@ namespace Art.Tesler;
 
 public class StreamCommand : ToolCommandBase
 {
+    protected IExtensionsContext ExtensionsContext;
+
     protected TimeProvider TimeProvider;
 
     protected IProfileResolver ProfileResolver;
@@ -21,9 +23,18 @@ public class StreamCommand : ToolCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, timeProvider, profileResolver, "stream", "Stream primary resource to standard output.")
+        : this(
+            toolLogHandlerProvider,
+            pluginStore,
+            toolPropertyProvider,
+            extensionsContext,
+            timeProvider,
+            profileResolver,
+            "stream",
+            "Stream primary resource to standard output.")
     {
     }
 
@@ -31,12 +42,14 @@ public class StreamCommand : ToolCommandBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver,
         string name,
         string? description = null)
         : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, name, description)
     {
+        ExtensionsContext = extensionsContext;
         TimeProvider = timeProvider;
         ProfileResolver = profileResolver;
         ProfileFileArg = new Argument<string>("profile") { HelpName = "profile", Arity = ArgumentArity.ExactlyOne, Description = "Profile file" };
@@ -63,7 +76,7 @@ public class StreamCommand : ToolCommandBase
         using var arm = new InMemoryArtifactRegistrationManager();
         using var adm = new InMemoryArtifactDataManager();
         (bool getArtifactRetrievalTimestamps, bool getResourceRetrievalTimestamps, bool debugMode) = GetArtifactRetrievalOptions(parseResult);
-        using var tool = await GetToolAsync(profile, arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
+        using var tool = await GetToolAsync(profile, arm, adm, ExtensionsContext, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
         var listProxy = new ArtifactToolListProxy(tool, ArtifactToolListOptions.Default, l);
 #if NET10_0_OR_GREATER
         var res = await listProxy.ListAsync(cancellationToken).ToListAsync(cancellationToken: cancellationToken).ConfigureAwait(false);

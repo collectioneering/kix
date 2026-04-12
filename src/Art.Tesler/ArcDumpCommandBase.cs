@@ -12,6 +12,8 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
 
     protected ITeslerRegistrationProvider RegistrationProvider;
 
+    protected IExtensionsContext ExtensionsContext;
+
     protected TimeProvider TimeProvider;
 
     protected Option<string> HashOption;
@@ -26,6 +28,7 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         string name,
         string? description = null)
@@ -35,6 +38,7 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
         DataProvider.Initialize(this);
         RegistrationProvider = registrationProvider;
         RegistrationProvider.Initialize(this);
+        ExtensionsContext = extensionsContext;
         TimeProvider = timeProvider;
         HashOption = new Option<string>("-h", "--hash") { HelpName = Common.ChecksumAlgorithms, Description = "Checksum algorithm", DefaultValueFactory = static _ => Common.DefaultChecksumAlgorithm };
         Add(HashOption);
@@ -77,7 +81,7 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
         {
             // no-db mode should use in-memory db to keep tool happy, but specific to each tool run
             using var armNoDb = parseResult.GetValue(NoDatabaseOption) ? new InMemoryArtifactRegistrationManager() : null;
-            using var tool = await GetToolAsync(profile, armNoDb ?? arm, adm, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
+            using var tool = await GetToolAsync(profile, armNoDb ?? arm, adm, ExtensionsContext, TimeProvider, getArtifactRetrievalTimestamps, getResourceRetrievalTimestamps, debugMode, cancellationToken).ConfigureAwait(false);
             await new ArtifactToolDumpProxy(tool, options, l).DumpAsync(cancellationToken).ConfigureAwait(false);
         }
         return 0;

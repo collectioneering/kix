@@ -1,13 +1,17 @@
 ﻿using System.CommandLine;
 using System.Reflection;
 using System.Runtime.Loader;
+using Art.BrowserCookies;
 using Art.Common;
+using Art.Extensions.BrowserCookies;
 using Art.Modular;
 using Art.Tesler;
 using Art.Tesler.Profiles;
 using Art.Tesler.Properties;
 using Artcore;
 
+// interface assemblies
+string[] passthroughAssemblies = ["Art", "Art.Extensions.BrowserCookies"];
 // dirs
 string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 const string kixDirName = ".kix";
@@ -29,7 +33,7 @@ var currentAssembly = Assembly.GetExecutingAssembly();
 var localRegistryStore = new StaticArtifactToolRegistryStore(Plugin.Create(AssemblyLoadContext.GetLoadContext(currentAssembly)!, currentAssembly));
 var modularRegistryStore = new ModularArtifactToolRegistryStore(new AggregateModuleProvider<ALCModule>(
     await ModuleSearchConfigurationUtility.GetModuleProvidersByPathsAsync(
-        ModuleLoadConfiguration.Create(passthroughAssemblies: "Art", isCollectible: false),
+        ModuleLoadConfiguration.Create(passthroughAssemblies: passthroughAssemblies, isCollectible: false),
         searchConfigFiles)
 ));
 var registryStore = new AggregateArtifactToolRegistryStore([localRegistryStore, modularRegistryStore]);
@@ -52,6 +56,9 @@ var inputRegistrationProvider = new SqliteTeslerRegistrationProvider(new Option<
 var diskProfileResolver = new DiskProfileResolver();
 var selectableToolProfileResolver = new SelectableToolProfileResolver(registryStore);
 var profileResolver = new AggregateProfileResolver([diskProfileResolver, selectableToolProfileResolver]);
+// extensions
+var extensions = new MappedExtensionsContext();
+extensions.Register<ICookieProviderExtension, CookieProviderExtension>();
 // command
 var rootCommand = TeslerRootCommand.Create(
     toolLogHandlerProvider: toolLogHandlerProvider,
@@ -61,6 +68,7 @@ var rootCommand = TeslerRootCommand.Create(
     dataProvider: dataProvider,
     registrationProvider: registrationProvider,
     inputRegistrationProvider: inputRegistrationProvider,
+    extensionsContext: extensions,
     timeProvider: TimeProvider.System,
     profileResolver: profileResolver);
 rootCommand.Add(new CoreInfoCommand(

@@ -15,6 +15,7 @@ public class CoreInfoLookup
         "Art.Common",
         "Art.EF",
         "Art.EF.Sqlite",
+        "Art.Extensions.BrowserCookies",
         "Art.Html",
         "Art.Http",
         "Art.M3U",

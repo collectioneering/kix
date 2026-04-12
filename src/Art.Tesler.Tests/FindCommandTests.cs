@@ -16,9 +16,10 @@ public class FindCommandTests : CommandTestBase
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore artifactToolRegistryStore,
         IToolPropertyProvider toolPropertyProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider)
     {
-        Command = new FindCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, timeProvider);
+        Command = new FindCommand(toolLogHandlerProvider, artifactToolRegistryStore, toolPropertyProvider, extensionsContext, timeProvider);
     }
 
     [Fact]
@@ -26,8 +27,9 @@ public class FindCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactFindTool.CreateRegistryEntry((_, _) => null));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         int rc = InvokeCommand(Command, [], console);
         Assert.NotEmpty(Out.ToString());
         Assert.Empty(OutQueue);
@@ -41,8 +43,9 @@ public class FindCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactFindTool.CreateRegistryEntry((_, _) => null));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string[] line = ["-t", new ArtifactToolID("NOT_AN_ASSEMBLY", "MALO").GetToolString()];
         int rc = InvokeCommand(Command, line, console);
         Assert.NotEmpty(Out.ToString());
@@ -57,8 +60,9 @@ public class FindCommandTests : CommandTestBase
     {
         var store = GetSingleStore(ProgrammableArtifactFindTool.CreateRegistryEntry((_, _) => null));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string[] line = ["-t", ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactFindTool>()];
         int rc = InvokeCommand(Command, line, console);
         Assert.NotEmpty(Out.ToString());
@@ -74,8 +78,9 @@ public class FindCommandTests : CommandTestBase
         const string search = "ID_1";
         var store = GetSingleStore(ProgrammableArtifactFindTool.CreateRegistryEntry((_, _) => null));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string[] line = ["-t", ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactFindTool>(), search];
         int rc = InvokeCommand(Command, line, console);
         Assert.Empty(Out.ToString());
@@ -101,8 +106,9 @@ public class FindCommandTests : CommandTestBase
             return null;
         }));
         var toolPropertyProvider = CreateInMemoryPropertyProvider();
+        var extensionsContext = CreateMappedExtensionsContext();
         CreateObjectOutputs(out var toolOutput, out var console);
-        InitCommandDefault(toolOutput, store, toolPropertyProvider, new FakeTimeProvider());
+        InitCommandDefault(toolOutput, store, toolPropertyProvider, extensionsContext, new FakeTimeProvider());
         string toolString = ArtifactToolIDUtil.CreateToolString<ProgrammableArtifactFindTool>();
         string[] line = ["-t", toolString, "-g", group, search];
         int rc = InvokeCommand(Command, line, console);

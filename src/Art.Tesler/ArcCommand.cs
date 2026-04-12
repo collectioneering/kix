@@ -28,9 +28,20 @@ public class ArcCommand : ArcDumpCommandBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver)
-        : this(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, profileResolver, "arc", "Execute archival artifact tools.")
+        : this(
+            toolLogHandlerProvider,
+            pluginStore,
+            toolPropertyProvider,
+            dataProvider,
+            registrationProvider,
+            extensionsContext,
+            timeProvider,
+            profileResolver,
+            "arc",
+            "Execute archival artifact tools.")
     {
     }
 
@@ -40,11 +51,12 @@ public class ArcCommand : ArcDumpCommandBase
         IToolPropertyProvider toolPropertyProvider,
         ITeslerDataProvider dataProvider,
         ITeslerRegistrationProvider registrationProvider,
+        IExtensionsContext extensionsContext,
         TimeProvider timeProvider,
         IProfileResolver profileResolver,
         string name,
         string? description = null)
-        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, timeProvider, name, description)
+        : base(toolLogHandlerProvider, pluginStore, toolPropertyProvider, dataProvider, registrationProvider, extensionsContext, timeProvider, name, description)
     {
         ProfileResolver = profileResolver;
         ProfileFilesArg = new Argument<List<string>>("profile") { HelpName = "profile", Arity = ArgumentArity.OneOrMore, Description = "Profile file(s)" };
