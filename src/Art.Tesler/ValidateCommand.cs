@@ -22,6 +22,8 @@ public class ValidateCommand : ToolCommandBase
 
     protected Option<bool> DetailedOption;
 
+    protected Option<bool> ProgressMeterOption;
+
     public ValidateCommand(
         IToolLogHandlerProvider toolLogHandlerProvider,
         IArtifactToolRegistryStore pluginStore,
@@ -58,6 +60,8 @@ public class ValidateCommand : ToolCommandBase
         Add(AddChecksumOption);
         DetailedOption = new Option<bool>("--detailed") { Description = "Show detailed information on entries" };
         Add(DetailedOption);
+        ProgressMeterOption = new Option<bool>("--progress-meter") { Description = "Show progress meters" };
+        Add(ProgressMeterOption);
     }
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
@@ -97,7 +101,8 @@ public class ValidateCommand : ToolCommandBase
         }
         using var adm = DataProvider.CreateArtifactDataManager(parseResult);
         using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: !repair);
-        var validationContext = new ValidationContext(PluginStore, arm, adm, l);
+        bool progressMeter = parseResult.GetValue(ProgressMeterOption);
+        var validationContext = new ValidationContext(PluginStore, arm, adm, l, progressMeter);
         ValidationProcessResult result;
         ChecksumSource? checksumSourceForAdd = parseResult.GetValue(AddChecksumOption) ? checksumSource : null;
         if (profiles.Count == 0)

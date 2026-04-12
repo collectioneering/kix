@@ -5,10 +5,13 @@ namespace Art.Tesler;
 
 public class ValidationContext : ToolControlContext
 {
+    private static readonly Guid s_timedNamedProgressOperation = Guid.ParseExact("923b6d0747667facd296e1019dd7eae8", "N");
+
     private readonly Dictionary<ArtifactKey, List<ArtifactResourceInfo>> _failed = new();
     private readonly IArtifactRegistrationManager _arm;
     private readonly IArtifactDataManager _adm;
     private readonly IToolLogHandler _l;
+    private readonly bool _progressMeter;
 
     public bool AnyFailed => _failed.Count != 0;
 
@@ -16,11 +19,17 @@ public class ValidationContext : ToolControlContext
 
     public int CountResourceFailures() => _failed.Sum(v => v.Value.Count);
 
-    public ValidationContext(IArtifactToolRegistryStore pluginStore, IArtifactRegistrationManager arm, IArtifactDataManager adm, IToolLogHandler l) : base(pluginStore)
+    public ValidationContext(
+        IArtifactToolRegistryStore pluginStore,
+        IArtifactRegistrationManager arm,
+        IArtifactDataManager adm,
+        IToolLogHandler l,
+        bool progressMeter) : base(pluginStore)
     {
         _arm = arm;
         _adm = adm;
         _l = l;
+        _progressMeter = progressMeter;
     }
 
     private void AddFail(ArtifactResourceInfo r)
@@ -29,86 +38,164 @@ public class ValidationContext : ToolControlContext
         list.Add(r);
     }
 
-    public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactInfo> artifacts, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)
+    public async Task<ValidationProcessResult> ProcessAsync(IReadOnlyCollection<ArtifactInfo> artifacts, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)
     {
         int artifactCount = 0, resourceCount = 0;
-        if (checksumSourceForAdd == null)
+        var context = _progressMeter && _l.TryGetConcurrentOperationProgressContext(GetProgressName(), s_timedNamedProgressOperation, out var contextTmp) ? contextTmp : null;
+        try
         {
-            foreach (ArtifactInfo inf in artifacts)
+            if (checksumSourceForAdd == null)
             {
-                var result = await ProcessAsync(inf, (ActiveHashAlgorithm?)null, cancellationToken).ConfigureAwait(false);
-                artifactCount += result.Artifacts;
-                resourceCount += result.Resources;
+                foreach (ArtifactInfo inf in artifacts)
+                {
+                    context?.ReportNamed((float)artifactCount / artifacts.Count, GetProgressName());
+                    var result = await ProcessArtifactAsync(inf, null, context, cancellationToken).ConfigureAwait(false);
+                    artifactCount += result.Artifacts;
+                    resourceCount += result.Resources;
+                }
             }
+            else
+            {
+                using var hashAlgorithm = checksumSourceForAdd.CreateHashAlgorithm();
+                foreach (ArtifactInfo inf in artifacts)
+                {
+                    context?.ReportNamed((float)artifactCount / artifacts.Count, GetProgressName());
+                    var result = await ProcessArtifactAsync(inf, new ActiveHashAlgorithm(checksumSourceForAdd.Id, hashAlgorithm), context, cancellationToken).ConfigureAwait(false);
+                    artifactCount += result.Artifacts;
+                    resourceCount += result.Resources;
+                }
+            }
+            context?.ReportNamed((float)artifactCount / artifacts.Count, GetProgressName());
+            context?.MarkSafe();
         }
-        else
+        finally
         {
-            using var hashAlgorithm = checksumSourceForAdd.CreateHashAlgorithm();
-            foreach (ArtifactInfo inf in artifacts)
-            {
-                var result = await ProcessAsync(inf, new ActiveHashAlgorithm(checksumSourceForAdd.Id, hashAlgorithm), cancellationToken).ConfigureAwait(false);
-                artifactCount += result.Artifacts;
-                resourceCount += result.Resources;
-            }
+            context?.Dispose();
         }
         return new ValidationProcessResult(artifactCount, resourceCount);
+
+        string GetProgressName()
+        {
+            return $"Artifact {artifactCount + 1}/{artifacts.Count}";
+        }
     }
 
-    public async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)
+    public async Task<ValidationProcessResult> ProcessArtifactAsync(ArtifactInfo artifact, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)
     {
         ValidationProcessResult result;
         if (checksumSourceForAdd == null)
         {
-            result = await ProcessAsync(artifact, (ActiveHashAlgorithm?)null, cancellationToken).ConfigureAwait(false);
+            result = await ProcessArtifactAsync(artifact, null, null, cancellationToken).ConfigureAwait(false);
         }
         else
         {
             using var hashAlgorithm = checksumSourceForAdd.CreateHashAlgorithm();
-            result = await ProcessAsync(artifact, new ActiveHashAlgorithm(checksumSourceForAdd.Id, hashAlgorithm), cancellationToken).ConfigureAwait(false);
+            result = await ProcessArtifactAsync(artifact, new ActiveHashAlgorithm(checksumSourceForAdd.Id, hashAlgorithm), null, cancellationToken).ConfigureAwait(false);
         }
         return result;
     }
 
     private readonly record struct ActiveHashAlgorithm(string Id, HashAlgorithm HashAlgorithm);
 
-    private async Task<ValidationProcessResult> ProcessAsync(ArtifactInfo artifact, ActiveHashAlgorithm? activeHashAlgorithmForAdd, CancellationToken cancellationToken)
+    private async Task<ValidationProcessResult> ProcessArtifactAsync(
+        ArtifactInfo artifact,
+        ActiveHashAlgorithm? activeHashAlgorithmForAdd,
+        IOperationProgressContext? parentProgressContext,
+        CancellationToken cancellationToken)
     {
         int resourceCount = 0;
-        foreach (ArtifactResourceInfo rInf in await _arm.ListResourcesAsync(artifact.Key, cancellationToken).ConfigureAwait(false))
+        var resources = await _arm.ListResourcesAsync(artifact.Key, cancellationToken).ConfigureAwait(false);
+        var context = _progressMeter && _l.TryGetConcurrentOperationProgressContext(GetResourceProgressName(), s_timedNamedProgressOperation, out var contextTmp) ? contextTmp : null;
+        try
         {
-            resourceCount++;
-            if (!await _adm.ExistsAsync(rInf.Key, cancellationToken).ConfigureAwait(false))
+            foreach (ArtifactResourceInfo rInf in resources)
             {
-                AddFail(rInf);
-                continue;
-            }
-            if (rInf.Checksum == null)
-            {
-                if (activeHashAlgorithmForAdd is not { } activeHashAlgorithmForAddReal)
+                context?.ReportNamed((float)resourceCount / resources.Count, GetResourceProgressName());
+                parentProgressContext?.Refresh();
+                resourceCount++;
+                if (!await _adm.ExistsAsync(rInf.Key, cancellationToken).ConfigureAwait(false))
                 {
                     AddFail(rInf);
+                    continue;
                 }
-                else
+                var key = rInf.Key;
+                string resourceDisplayName = !string.IsNullOrEmpty(key.Path) ? $"{key.Path}/{key.File}" : key.File;
+                if (rInf.Checksum == null)
                 {
-                    Stream sourceStreamAdd = await _adm.OpenInputStreamAsync(rInf.Key, cancellationToken).ConfigureAwait(false);
-                    await using var streamAdd = sourceStreamAdd.ConfigureAwait(false);
-                    byte[] newHash = await activeHashAlgorithmForAddReal.HashAlgorithm.ComputeHashAsync(sourceStreamAdd, cancellationToken).ConfigureAwait(false);
-                    await _arm.AddResourceAsync(rInf with { Checksum = new Checksum(activeHashAlgorithmForAddReal.Id, newHash) }, cancellationToken).ConfigureAwait(false);
+                    if (activeHashAlgorithmForAdd is not { } activeHashAlgorithmForAddReal)
+                    {
+                        AddFail(rInf);
+                    }
+                    else
+                    {
+                        Stream sourceStreamAdd = await _adm.OpenInputStreamAsync(rInf.Key, cancellationToken).ConfigureAwait(false);
+                        await using var streamAdd = sourceStreamAdd.ConfigureAwait(false);
+                        byte[] newHash;
+                        var context2 = _progressMeter && _l.TryGetConcurrentOperationProgressContext(resourceDisplayName, s_timedNamedProgressOperation, out var context2Tmp) ? context2Tmp : null;
+                        try
+                        {
+                            if (context2 != null)
+                            {
+                                long? contentLength = sourceStreamAdd.CanSeek ? sourceStreamAdd.Length : null;
+                                newHash = await ReportUtility.ComputeHashWithReportAsync(sourceStreamAdd, activeHashAlgorithmForAddReal.HashAlgorithm, context2, parentProgressContext, contentLength, cancellationToken);
+                                context2.MarkSafe();
+                            }
+                            else
+                            {
+                                newHash = await activeHashAlgorithmForAddReal.HashAlgorithm.ComputeHashAsync(sourceStreamAdd, cancellationToken).ConfigureAwait(false);
+                            }
+                        }
+                        finally
+                        {
+                            context2?.Dispose();
+                        }
+                        await _arm.AddResourceAsync(rInf with { Checksum = new Checksum(activeHashAlgorithmForAddReal.Id, newHash) }, cancellationToken).ConfigureAwait(false);
+                    }
+                    continue;
                 }
-                continue;
+                if (!ChecksumSource.DefaultSources.TryGetValue(rInf.Checksum.Id, out ChecksumSource? checksumSource))
+                {
+                    AddFail(rInf);
+                    continue;
+                }
+                using var hashAlgorithm = checksumSource.CreateHashAlgorithm();
+                Stream sourceStream = await _adm.OpenInputStreamAsync(rInf.Key, cancellationToken).ConfigureAwait(false);
+                await using var stream = sourceStream.ConfigureAwait(false);
+                byte[] existingHash;
+                var context3 = _progressMeter && _l.TryGetConcurrentOperationProgressContext(resourceDisplayName, s_timedNamedProgressOperation, out var context3Tmp) ? context3Tmp : null;
+                try
+                {
+                    if (context3 != null)
+                    {
+                        long? contentLength = sourceStream.CanSeek ? sourceStream.Length : null;
+                        existingHash = await ReportUtility.ComputeHashWithReportAsync(sourceStream, hashAlgorithm, context3, parentProgressContext, contentLength, cancellationToken);
+                        context3.MarkSafe();
+                    }
+                    else
+                    {
+                        existingHash = await hashAlgorithm.ComputeHashAsync(sourceStream, cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                finally
+                {
+                    context3?.Dispose();
+                }
+                if (!rInf.Checksum.Value.AsSpan().SequenceEqual(existingHash)) AddFail(rInf);
             }
-            if (!ChecksumSource.DefaultSources.TryGetValue(rInf.Checksum.Id, out ChecksumSource? checksumSource))
-            {
-                AddFail(rInf);
-                continue;
-            }
-            using var hashAlgorithm = checksumSource.CreateHashAlgorithm();
-            Stream sourceStream = await _adm.OpenInputStreamAsync(rInf.Key, cancellationToken).ConfigureAwait(false);
-            await using var stream = sourceStream.ConfigureAwait(false);
-            byte[] existingHash = await hashAlgorithm.ComputeHashAsync(sourceStream, cancellationToken).ConfigureAwait(false);
-            if (!rInf.Checksum.Value.AsSpan().SequenceEqual(existingHash)) AddFail(rInf);
+            context?.ReportNamed((float)resourceCount / resources.Count, GetResourceProgressName());
+            context?.MarkSafe();
+            parentProgressContext?.Refresh();
+        }
+        finally
+        {
+            context?.Dispose();
         }
         return new ValidationProcessResult(1, resourceCount);
+
+        string GetResourceProgressName()
+        {
+            return $"Resource {resourceCount + 1}/{resources.Count}";
+        }
     }
 
     public async Task<ValidationProcessResult> ProcessAsync(IEnumerable<ArtifactToolProfile> profiles, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)

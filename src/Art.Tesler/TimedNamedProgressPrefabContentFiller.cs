@@ -3,11 +3,11 @@ using ConFormat;
 
 namespace Art.Tesler;
 
-public struct TimedDownloadPrefabContentFiller : IContentFiller
+public struct TimedNamedProgressPrefabContentFiller : IContentFiller
 {
-    public static TimedDownloadPrefabContentFiller Create(string initialName)
+    public static TimedNamedProgressPrefabContentFiller Create(string initialName)
     {
-        return new TimedDownloadPrefabContentFiller(initialName);
+        return new TimedNamedProgressPrefabContentFiller(initialName);
     }
 
     public StringContentFiller NameTextContent;
@@ -17,7 +17,7 @@ public struct TimedDownloadPrefabContentFiller : IContentFiller
 
     public IContentFiller Content;
 
-    public TimedDownloadPrefabContentFiller(string initialName)
+    public TimedNamedProgressPrefabContentFiller(string initialName)
     {
         NameTextContent = StringContentFiller.Create(initialName, ContentAlignment.Left);
         DurationTextContent = StringContentFiller.Create("0.0s", ContentAlignment.Right);

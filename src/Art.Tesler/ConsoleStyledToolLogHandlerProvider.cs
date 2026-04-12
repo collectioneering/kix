@@ -82,6 +82,7 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
     private readonly Func<int> _heightFunc;
     private readonly Func<int> _initialRowFunc;
     private static readonly Guid s_downloadOperation = Guid.ParseExact("c6d42b18f0ae452385f180aa74e9ef29", "N");
+    private static readonly Guid s_timedNamedProgressOperation = Guid.ParseExact("923b6d0747667facd296e1019dd7eae8", "N");
     private static readonly Guid s_operationWaitingForResult = Guid.ParseExact("4fd5c851a88c430c8f8da54dbcf70ab2", "N");
     private readonly Dictionary<object, Guid> _multiObjects = new();
     private readonly HashSet<Guid> _registeredMultiObjects = [];
@@ -141,12 +142,12 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
     {
         lock (_lock)
         {
-            if (operationGuid.Equals(s_downloadOperation))
+            if (operationGuid.Equals(s_downloadOperation) || operationGuid.Equals(s_timedNamedProgressOperation))
             {
                 Guid guid = AllocateGuid();
                 try
                 {
-                    operationProgressContext = new DownloadUpdateContextForMulti(
+                    operationProgressContext = new NamedProgressUpdateContextForMulti(
                         GetMultiBarContext(),
                         guid,
                         operationName,
@@ -193,9 +194,9 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
                 operationProgressContext = null;
                 return false;
             }
-            if (operationGuid.Equals(s_downloadOperation))
+            if (operationGuid.Equals(s_downloadOperation) || operationGuid.Equals(s_timedNamedProgressOperation))
             {
-                operationProgressContext = new DownloadUpdateContext(operationName, Error, _forceFallback, _errorRedirectedFunc, _widthFunc);
+                operationProgressContext = new NamedProgressUpdateContext(operationName, Error, _forceFallback, _errorRedirectedFunc, _widthFunc);
                 return true;
             }
             if (operationGuid.Equals(s_operationWaitingForResult))
@@ -240,6 +241,17 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
         }
     }
 
+    void IOperationProgressContextOwner.GuardRefresh(IGuardedOperationProgressContext context)
+    {
+        lock (_lock)
+        {
+            if (_multiObjects.ContainsKey(context))
+            {
+                context.RefreshGuarded();
+            }
+        }
+    }
+
     void IOperationProgressContextOwner.GuardCall(IGuardedOperationProgressContext context, float value)
     {
         lock (_lock)
@@ -247,6 +259,17 @@ public class ConsoleStyledLogHandler : StyledLogHandler, IOperationProgressConte
             if (_multiObjects.ContainsKey(context))
             {
                 context.ReportGuarded(value);
+            }
+        }
+    }
+
+    void IOperationProgressContextOwner.GuardCallNamed(IGuardedOperationProgressContext context, float value, string name)
+    {
+        lock (_lock)
+        {
+            if (_multiObjects.ContainsKey(context))
+            {
+                context.ReportNamedGuarded(value, name);
             }
         }
     }
@@ -259,12 +282,20 @@ internal interface IOperationsOwner
 
 internal interface IOperationProgressContextOwner : IOperationsOwner
 {
+    void GuardRefresh(IGuardedOperationProgressContext context);
+
     void GuardCall(IGuardedOperationProgressContext context, float value);
+
+    void GuardCallNamed(IGuardedOperationProgressContext context, float value, string name);
 }
 
 internal interface IGuardedOperationProgressContext : IOperationProgressContext
 {
+    void RefreshGuarded();
+
     void ReportGuarded(float value);
+
+    void ReportNamedGuarded(float value, string name);
 }
 
 internal class WaitUpdateContext : IOperationProgressContext
@@ -280,6 +311,17 @@ internal class WaitUpdateContext : IOperationProgressContext
     }
 
     public void Report(float value)
+    {
+        _context.Update(ref _filler);
+    }
+
+    public void ReportNamed(float value, string name)
+    {
+        _context.Update(ref _filler);
+        // TODO support name update
+    }
+
+    public void Refresh()
     {
         _context.Update(ref _filler);
     }
@@ -315,16 +357,41 @@ internal class WaitUpdateContextForMulti : IGuardedOperationProgressContext
         _operationsOwner = owner;
     }
 
+    public void Refresh()
+    {
+        EnsureNotDisposed();
+        _operationsOwner.GuardRefresh(this);
+    }
+
     public void Report(float value)
     {
         EnsureNotDisposed();
         _operationsOwner.GuardCall(this, value);
     }
 
+    public void ReportNamed(float value, string name)
+    {
+        EnsureNotDisposed();
+        _operationsOwner.GuardCallNamed(this, value, name);
+    }
+
+    void IGuardedOperationProgressContext.RefreshGuarded()
+    {
+        EnsureNotDisposed();
+        _context.Update(_key, ref _filler);
+    }
+
     void IGuardedOperationProgressContext.ReportGuarded(float value)
     {
         EnsureNotDisposed();
         _context.Update(_key, ref _filler);
+    }
+
+    void IGuardedOperationProgressContext.ReportNamedGuarded(float value, string name)
+    {
+        EnsureNotDisposed();
+        _context.Update(_key, ref _filler);
+        // TODO support name update
     }
 
     private void EnsureNotDisposed()
@@ -357,19 +424,25 @@ internal class WaitUpdateContextForMulti : IGuardedOperationProgressContext
     }
 }
 
-internal class DownloadUpdateContext : IOperationProgressContext
+internal class NamedProgressUpdateContext : IOperationProgressContext
 {
     private readonly BarContext _context;
     private readonly Stopwatch _stopwatch;
-    private TimedDownloadPrefabContentFiller _filler;
+    private TimedNamedProgressPrefabContentFiller _filler;
 
-    public DownloadUpdateContext(string name, TextWriter output, bool forceFallback, Func<bool> errorRedirectedFunc, Func<int> widthFunc)
+    public NamedProgressUpdateContext(string name, TextWriter output, bool forceFallback, Func<bool> errorRedirectedFunc, Func<int> widthFunc)
     {
         _context = BarContext.Create(output, forceFallback, errorRedirectedFunc, widthFunc);
-        _filler = TimedDownloadPrefabContentFiller.Create(name);
+        _filler = TimedNamedProgressPrefabContentFiller.Create(name);
         _context.Write(ref _filler);
         _stopwatch = new Stopwatch();
         _stopwatch.Start();
+    }
+
+    public void Refresh()
+    {
+        _filler.SetDuration(_stopwatch.Elapsed);
+        _context.Update(ref _filler);
     }
 
     public void Report(float value)
@@ -377,6 +450,14 @@ internal class DownloadUpdateContext : IOperationProgressContext
         _filler.SetDuration(_stopwatch.Elapsed);
         _filler.SetProgress(value);
         _context.Update(ref _filler);
+    }
+
+    public void ReportNamed(float value, string name)
+    {
+        _filler.SetDuration(_stopwatch.Elapsed);
+        _filler.SetProgress(value);
+        _context.Update(ref _filler);
+        _filler.SetName(name);
     }
 
     public void Dispose()
@@ -390,28 +471,34 @@ internal class DownloadUpdateContext : IOperationProgressContext
     }
 }
 
-internal class DownloadUpdateContextForMulti : IGuardedOperationProgressContext
+internal class NamedProgressUpdateContextForMulti : IGuardedOperationProgressContext
 {
     private readonly object _lock = new();
     private readonly MultiBarContext<Guid> _context;
     private readonly Guid _key;
     private readonly Stopwatch _stopwatch;
-    private TimedDownloadPrefabContentFiller _filler;
+    private TimedNamedProgressPrefabContentFiller _filler;
     private readonly IOperationProgressContextOwner _operationsOwner;
     private bool _disposed;
     private bool _safeExit;
 
-    public DownloadUpdateContextForMulti(MultiBarContext<Guid> context, Guid key, string name, IOperationProgressContextOwner owner)
+    public NamedProgressUpdateContextForMulti(MultiBarContext<Guid> context, Guid key, string name, IOperationProgressContextOwner owner)
     {
         _context = context;
         _key = key;
         _context = context;
-        _filler = TimedDownloadPrefabContentFiller.Create(name);
+        _filler = TimedNamedProgressPrefabContentFiller.Create(name);
         _context.Allocate(_key);
         _context.Write(_key, ref _filler);
         _stopwatch = new Stopwatch();
         _stopwatch.Start();
         _operationsOwner = owner;
+    }
+
+    public void Refresh()
+    {
+        EnsureNotDisposed();
+        _operationsOwner.GuardRefresh(this);
     }
 
     public void Report(float value)
@@ -420,11 +507,33 @@ internal class DownloadUpdateContextForMulti : IGuardedOperationProgressContext
         _operationsOwner.GuardCall(this, value);
     }
 
+    public void ReportNamed(float value, string name)
+    {
+        EnsureNotDisposed();
+        _operationsOwner.GuardCallNamed(this, value, name);
+    }
+
+    public void RefreshGuarded()
+    {
+        EnsureNotDisposed();
+        _filler.SetDuration(_stopwatch.Elapsed);
+        _context.Update(_key, ref _filler);
+    }
+
     public void ReportGuarded(float value)
     {
         EnsureNotDisposed();
         _filler.SetDuration(_stopwatch.Elapsed);
         _filler.SetProgress(value);
+        _context.Update(_key, ref _filler);
+    }
+
+    public void ReportNamedGuarded(float value, string name)
+    {
+        EnsureNotDisposed();
+        _filler.SetDuration(_stopwatch.Elapsed);
+        _filler.SetProgress(value);
+        _filler.SetName(name);
         _context.Update(_key, ref _filler);
     }
 
