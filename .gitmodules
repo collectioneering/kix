@@ -1,3 +1,6 @@
 [submodule "ext/art"]
 	path = ext/art
 	url = https://github.com/collectioneering/Art.git
+[submodule "ext/ConFormat"]
+	path = ext/ConFormat
+	url = https://github.com/collectioneering/ConFormat.git

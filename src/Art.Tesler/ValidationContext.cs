@@ -41,6 +41,7 @@ public class ValidationContext : ToolControlContext
     public async Task<ValidationProcessResult> ProcessAsync(IReadOnlyCollection<ArtifactInfo> artifacts, ChecksumSource? checksumSourceForAdd, CancellationToken cancellationToken)
     {
         int artifactCount = 0, resourceCount = 0;
+        var ndc = new NamedDisplayProgressCache(new NamedDisplayProgressCache.Parameters("Artifact", 0, artifacts.Count));
         var context = _progressMeter && _l.TryGetConcurrentOperationProgressContext(GetProgressName(), s_timedNamedProgressOperation, out var contextTmp) ? contextTmp : null;
         try
         {
@@ -74,9 +75,15 @@ public class ValidationContext : ToolControlContext
         }
         return new ValidationProcessResult(artifactCount, resourceCount);
 
+        // ReSharper disable AccessToModifiedClosure
+        NamedDisplayProgressCache.Parameters UpdateProgressCacheParameters(NamedDisplayProgressCache.Parameters v) => v with { Numerator = artifactCount + 1 };
+        // ReSharper restore AccessToModifiedClosure
+
         string GetProgressName()
         {
-            return $"Artifact {artifactCount + 1}/{artifacts.Count}";
+            // ReSharper disable AccessToModifiedClosure
+            return ndc.GetString(UpdateProgressCacheParameters);
+            // ReSharper restore AccessToModifiedClosure
         }
     }
 
@@ -105,6 +112,7 @@ public class ValidationContext : ToolControlContext
     {
         int resourceCount = 0;
         var resources = await _arm.ListResourcesAsync(artifact.Key, cancellationToken).ConfigureAwait(false);
+        var ndc = new NamedDisplayProgressCache(new NamedDisplayProgressCache.Parameters("Resource", 0, resources.Count));
         var context = _progressMeter && _l.TryGetConcurrentOperationProgressContext(GetResourceProgressName(), s_timedNamedProgressOperation, out var contextTmp) ? contextTmp : null;
         try
         {
@@ -192,9 +200,13 @@ public class ValidationContext : ToolControlContext
         }
         return new ValidationProcessResult(1, resourceCount);
 
+        // ReSharper disable AccessToModifiedClosure
+        NamedDisplayProgressCache.Parameters UpdateResourceProgressCacheParameters(NamedDisplayProgressCache.Parameters v) => v with { Numerator = resourceCount + 1 };
+        // ReSharper restore AccessToModifiedClosure
+
         string GetResourceProgressName()
         {
-            return $"Resource {resourceCount + 1}/{resources.Count}";
+            return ndc.GetString(UpdateResourceProgressCacheParameters);
         }
     }
 

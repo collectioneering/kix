@@ -15,6 +15,9 @@ public struct TimedNamedProgressPrefabContentFiller : IContentFiller
     public ProgressContentFiller ProgressContent;
     public StringContentFiller ProgressTextContent;
 
+    public TimeSpan DurationCache;
+    public int ProgressCache;
+
     public IContentFiller Content;
 
     public TimedNamedProgressPrefabContentFiller(string initialName)
@@ -31,6 +34,8 @@ public struct TimedNamedProgressPrefabContentFiller : IContentFiller
                     DurationTextContent,
                     FixedSplitContentFiller.Create("|", 6, 1,
                         ColorContentFiller.Create(ConsoleColor.Green, ProgressContent), ProgressTextContent))));
+        DurationCache = TimeSpan.Zero;
+        ProgressCache = 0;
     }
 
     public void SetName(string name)
@@ -40,14 +45,25 @@ public struct TimedNamedProgressPrefabContentFiller : IContentFiller
 
     public void SetDuration(TimeSpan duration)
     {
+        if (DurationCache == duration)
+        {
+            return;
+        }
         DurationTextContent.Content = $"{duration.TotalSeconds:F1}s";
+        DurationCache = duration;
     }
 
     public void SetProgress(float progress)
     {
         progress = Math.Clamp(progress, 0.0f, 1.0f);
+        int processedProgress = (int)(1000.0f * progress);
+        if (ProgressCache == processedProgress)
+        {
+            return;
+        }
         ProgressContent.Progress = progress;
         ProgressTextContent.Content = $"{100.0f * progress:F1}%";
+        ProgressCache = processedProgress;
     }
 
     public void Fill(StringBuilder stringBuilder, int width, int scrollOffset = 0)

@@ -7,6 +7,7 @@
   <Project Path="../ext/art/src/Art/Art.csproj" />
   <Project Path="../ext/art/src/Artcore/Artcore.csproj" />
   <Project Path="../ext/art/src/Art.TestsBase/Art.TestsBase.csproj" />
+  <Project Path="../ext/ConFormat/src/ConFormat/ConFormat.csproj" />
   <Project Path="Art.Tesler.Tests/Art.Tesler.Tests.csproj" />
   <Project Path="Art.Tesler/Art.Tesler.csproj" />
   <Project Path="kix/kix.csproj" />

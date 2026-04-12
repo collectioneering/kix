@@ -317,8 +317,8 @@ internal class WaitUpdateContext : IOperationProgressContext
 
     public void ReportNamed(float value, string name)
     {
+        _filler.SetMessage(name);
         _context.Update(ref _filler);
-        // TODO support name update
     }
 
     public void Refresh()
@@ -390,8 +390,8 @@ internal class WaitUpdateContextForMulti : IGuardedOperationProgressContext
     void IGuardedOperationProgressContext.ReportNamedGuarded(float value, string name)
     {
         EnsureNotDisposed();
+        _filler.SetMessage(name);
         _context.Update(_key, ref _filler);
-        // TODO support name update
     }
 
     private void EnsureNotDisposed()
@@ -454,10 +454,14 @@ internal class NamedProgressUpdateContext : IOperationProgressContext
 
     public void ReportNamed(float value, string name)
     {
-        _filler.SetDuration(_stopwatch.Elapsed);
-        _filler.SetProgress(value);
-        _context.Update(ref _filler);
         _filler.SetName(name);
+        _filler.SetProgress(value);
+        _context.Update(ref _filler, acceptAction: UpdateTimer);
+    }
+
+    private void UpdateTimer(ref TimedNamedProgressPrefabContentFiller filler)
+    {
+        filler.SetDuration(_stopwatch.Elapsed);
     }
 
     public void Dispose()
@@ -531,10 +535,14 @@ internal class NamedProgressUpdateContextForMulti : IGuardedOperationProgressCon
     public void ReportNamedGuarded(float value, string name)
     {
         EnsureNotDisposed();
-        _filler.SetDuration(_stopwatch.Elapsed);
-        _filler.SetProgress(value);
         _filler.SetName(name);
-        _context.Update(_key, ref _filler);
+        _filler.SetProgress(value);
+        _context.Update(_key, ref _filler, acceptAction: UpdateTimer);
+    }
+
+    private void UpdateTimer(ref TimedNamedProgressPrefabContentFiller filler)
+    {
+        filler.SetDuration(_stopwatch.Elapsed);
     }
 
     private void EnsureNotDisposed()

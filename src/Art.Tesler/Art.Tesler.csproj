@@ -22,7 +22,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConFormat" />
+    <ProjectReference Include="../../ext/ConFormat/src/ConFormat/ConFormat.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- <PackageReference Include="ConFormat" /> -->
     <PackageReference Include="EA" />
     <PackageReference Include="System.CommandLine" />
   </ItemGroup>
