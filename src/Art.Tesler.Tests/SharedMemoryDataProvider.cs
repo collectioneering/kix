@@ -28,7 +28,7 @@ internal class SharedMemoryDataProvider : ITeslerDataProvider
             _artifactDataManager = artifactDataManager;
         }
 
-        public ValueTask<CommittableStream> CreateOutputStreamAsync(ArtifactResourceKey key, OutputStreamOptions? options = null, CancellationToken cancellationToken = default)
+        public ValueTask<ICommittable<Stream>> CreateOutputStreamAsync(ArtifactResourceKey key, OutputStreamOptions? options = null, CancellationToken cancellationToken = default)
         {
             EnsureNotDisposed();
             return _artifactDataManager.CreateOutputStreamAsync(key, options, cancellationToken);
