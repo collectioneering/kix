@@ -8,9 +8,9 @@
     <PackageVersion Include="Art.Tesler" Version="0.52.0" />
     <!-- Package dependencies -->
     <PackageVersion Include="EA" Version="1.2.17100" />
-    <PackageVersion Include="System.CommandLine" Version="2.0.8" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.10" />
     <!-- Test dependencies -->
-    <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.6.0" />
+    <PackageVersion Update="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Update="coverlet.collector" Version="10.0.1" />
     <PackageVersion Update="xunit.v3" Version="3.2.2" />
     <PackageVersion Update="xunit.runner.visualstudio" Version="3.1.5" />
