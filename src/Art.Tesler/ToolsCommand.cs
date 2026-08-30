@@ -78,7 +78,7 @@ public class ToolsCommand : CommandBase
                     if (!isCore)
                     {
                         string coreToolString = ArtifactToolIDUtil.CreateCoreToolString(desc.Type);
-                        if (!string.Equals(toolString, coreToolString, StringComparison.InvariantCulture))
+                        if (!string.Equals(toolString, coreToolString, StringComparison.Ordinal))
                         {
                             stringBuilder.AppendLine().Append("CoreTool: ").Append(coreToolString);
                         }

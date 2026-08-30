@@ -117,15 +117,15 @@ internal static class Common
         {
             return JsonSerializer.SerializeToElement(valDouble, SourceGenerationContext.s_context.Double);
         }
-        else if (string.Equals(prop, "null", StringComparison.InvariantCulture))
+        else if (string.Equals(prop, "null", StringComparison.Ordinal))
         {
             return JsonSerializer.SerializeToElement(null, (JsonTypeInfo)SourceGenerationContext.s_context.Object);
         }
-        else if (string.Equals(prop, "true", StringComparison.InvariantCulture))
+        else if (string.Equals(prop, "true", StringComparison.Ordinal))
         {
             return JsonSerializer.SerializeToElement(true, SourceGenerationContext.s_context.Boolean);
         }
-        else if (string.Equals(prop, "false", StringComparison.InvariantCulture))
+        else if (string.Equals(prop, "false", StringComparison.Ordinal))
         {
             return JsonSerializer.SerializeToElement(false, SourceGenerationContext.s_context.Boolean);
         }

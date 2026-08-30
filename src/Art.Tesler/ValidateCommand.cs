@@ -82,7 +82,7 @@ public class ValidateCommand : ToolCommandBase
     {
         ChecksumSource? checksumSource;
         string? hash = parseResult.GetValue(HashOption);
-        hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
+        hash = string.Equals(hash, "none", StringComparison.OrdinalIgnoreCase) ? null : hash;
         if (hash == null)
         {
             checksumSource = null;

@@ -25,7 +25,7 @@ public record Refactorings(
                 if (refactoredAssembly.Value.Length > 0 && toolType.StartsWith(toolAssembly))
                 {
                     var slice = toolType.AsSpan(toolAssembly.Length);
-                    if (slice.StartsWith(".", StringComparison.InvariantCulture))
+                    if (slice.StartsWith(".", StringComparison.Ordinal))
                     {
                         refactoredArtifactKey = inputArtifactKey with { Tool = ArtifactToolIDUtil.CreateToolString(refactoredAssembly.Value, $"{refactoredAssembly.Value}.{slice[1..]}") };
                         return true;

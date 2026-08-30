@@ -55,7 +55,7 @@ public abstract class ArcDumpCommandBase : ToolCommandBase
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
         string? hash = parseResult.GetValue(HashOption);
-        hash = string.Equals(hash, "none", StringComparison.InvariantCultureIgnoreCase) ? null : hash;
+        hash = string.Equals(hash, "none", StringComparison.OrdinalIgnoreCase) ? null : hash;
         ChecksumSource? checksumSource;
         if (hash == null)
         {
