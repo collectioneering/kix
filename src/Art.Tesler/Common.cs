@@ -103,35 +103,35 @@ internal static class Common
     {
         if (prop.StartsWith('{') || prop.StartsWith('[') || prop.StartsWith('"'))
         {
-            return JsonSerializer.Deserialize(prop, SourceGenerationContext.s_context.JsonElement);
+            return JsonSerializer.Deserialize(prop, SourceGenerationContext.SharedContext.JsonElement);
         }
         else if (long.TryParse(prop, out long valLong))
         {
-            return JsonSerializer.SerializeToElement(valLong, SourceGenerationContext.s_context.Int64);
+            return JsonSerializer.SerializeToElement(valLong, SourceGenerationContext.SharedContext.Int64);
         }
         else if (ulong.TryParse(prop, out ulong valULong))
         {
-            return JsonSerializer.SerializeToElement(valULong, SourceGenerationContext.s_context.UInt64);
+            return JsonSerializer.SerializeToElement(valULong, SourceGenerationContext.SharedContext.UInt64);
         }
         else if (double.TryParse(prop, out double valDouble))
         {
-            return JsonSerializer.SerializeToElement(valDouble, SourceGenerationContext.s_context.Double);
+            return JsonSerializer.SerializeToElement(valDouble, SourceGenerationContext.SharedContext.Double);
         }
         else if (string.Equals(prop, "null", StringComparison.Ordinal))
         {
-            return JsonSerializer.SerializeToElement(null, (JsonTypeInfo)SourceGenerationContext.s_context.Object);
+            return JsonSerializer.SerializeToElement(null, (JsonTypeInfo)SourceGenerationContext.SharedContext.Object);
         }
         else if (string.Equals(prop, "true", StringComparison.Ordinal))
         {
-            return JsonSerializer.SerializeToElement(true, SourceGenerationContext.s_context.Boolean);
+            return JsonSerializer.SerializeToElement(true, SourceGenerationContext.SharedContext.Boolean);
         }
         else if (string.Equals(prop, "false", StringComparison.Ordinal))
         {
-            return JsonSerializer.SerializeToElement(false, SourceGenerationContext.s_context.Boolean);
+            return JsonSerializer.SerializeToElement(false, SourceGenerationContext.SharedContext.Boolean);
         }
         else
         {
-            return JsonSerializer.SerializeToElement(prop, SourceGenerationContext.s_context.String);
+            return JsonSerializer.SerializeToElement(prop, SourceGenerationContext.SharedContext.String);
         }
     }
 
@@ -175,7 +175,7 @@ internal static class Common
     {
         if (!dictionary.ContainsKey(k))
         {
-            dictionary[k] = JsonSerializer.SerializeToElement([v], SourceGenerationContext.s_context.JsonElementArray);
+            dictionary[k] = JsonSerializer.SerializeToElement([v], SourceGenerationContext.SharedContext.JsonElementArray);
             return;
         }
         JsonElement existing = dictionary[k];
@@ -183,8 +183,8 @@ internal static class Common
         {
             throw new ArtUserException($"Property {k} is a {existing.ValueKind}, cannot add an element value to a non-{JsonValueKind.Array} value");
         }
-        var value = existing.Deserialize<JsonElement[]>(SourceGenerationContext.s_context.JsonElementArray) ?? [];
-        dictionary[k] = JsonSerializer.SerializeToElement([..value, v], SourceGenerationContext.s_context.JsonElementArray);
+        var value = existing.Deserialize<JsonElement[]>(SourceGenerationContext.SharedContext.JsonElementArray) ?? [];
+        dictionary[k] = JsonSerializer.SerializeToElement([..value, v], SourceGenerationContext.SharedContext.JsonElementArray);
     }
 
     // https://stackoverflow.com/a/4146349
@@ -260,8 +260,8 @@ internal static class Common
                 opts[pair.Key] = pair.Value;
             }
         }
-        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile, SourceGenerationContext.s_context.String), console);
-        if (userAgent != null) opts.AddPropWithWarning("userAgent", JsonSerializer.SerializeToElement(userAgent, SourceGenerationContext.s_context.String), console);
+        if (cookieFile != null) opts.AddPropWithWarning("cookieFile", JsonSerializer.SerializeToElement(cookieFile, SourceGenerationContext.SharedContext.String), console);
+        if (userAgent != null) opts.AddPropWithWarning("userAgent", JsonSerializer.SerializeToElement(userAgent, SourceGenerationContext.SharedContext.String), console);
         opts.AddProps(properties, console);
         opts.AddPropElements(propertyElements, console);
         return artifactToolProfile with { Options = opts };

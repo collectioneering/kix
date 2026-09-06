@@ -105,7 +105,7 @@ public abstract class ToolCommandBase : CommandBase
         return (
             getArtifactRetrievalTimestamps: !noArtifactRetrievalTimestamps,
             getResourceRetrievalTimestamps: !noResourceRetrievalTimestamps,
-            debugMode: debugMode);
+            debugMode);
     }
 
     protected LogPreferences GetLogPreferences(ParseResult parseResult)

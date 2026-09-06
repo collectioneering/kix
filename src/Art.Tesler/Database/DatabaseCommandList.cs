@@ -49,7 +49,7 @@ public class DatabaseCommandList : DatabaseCommandBase
         {
             await using (var afs = refactoringsFile.OpenRead())
             {
-                refactorings = await JsonSerializer.DeserializeAsync(afs, SourceGenerationContext.s_context.Refactorings, cancellationToken);
+                refactorings = await JsonSerializer.DeserializeAsync(afs, SourceGenerationContext.SharedContext.Refactorings, cancellationToken);
             }
             if (refactorings == null)
             {
@@ -108,7 +108,7 @@ public class DatabaseCommandList : DatabaseCommandBase
                 }
             }
             await using var fs = output.Create();
-            await JsonSerializer.SerializeAsync(fs, profiles, SourceGenerationContext.s_context.ListArtifactToolProfile, cancellationToken).ConfigureAwait(false);
+            await JsonSerializer.SerializeAsync(fs, profiles, SourceGenerationContext.SharedContext.ListArtifactToolProfile, cancellationToken).ConfigureAwait(false);
         }
         return 0;
     }
@@ -123,7 +123,7 @@ public class DatabaseCommandList : DatabaseCommandBase
 
     private static ArtifactToolProfile CreateNewProfile(ToolAndGroup profile, Dictionary<string, JsonElement> dict, List<string> ids)
     {
-        dict["artifactList"] = JsonSerializer.SerializeToElement(ids, SourceGenerationContext.s_context.ListString);
+        dict["artifactList"] = JsonSerializer.SerializeToElement(ids, SourceGenerationContext.SharedContext.ListString);
         return new ArtifactToolProfile(profile.Tool, profile.Group, dict);
     }
 }

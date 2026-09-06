@@ -11,7 +11,7 @@ internal static class PurificationUtil
         {
             if (registry.TryIdentify(key, out var artifactToolId, out string? artifactId))
             {
-                var opts = new Dictionary<string, JsonElement> { { "artifactList", JsonSerializer.SerializeToElement([artifactId], SourceGenerationContext.s_context.ListString) } };
+                var opts = new Dictionary<string, JsonElement> { { "artifactList", JsonSerializer.SerializeToElement([artifactId], SourceGenerationContext.SharedContext.ListString) } };
                 profile = new ArtifactToolProfile(artifactToolId.GetToolString(), null, opts);
                 return true;
             }

@@ -227,7 +227,7 @@ public class ValidationContext : ToolControlContext
             // respect profile's artifact list
             // (checking against it being a find tool matches the behaviour of dump / list proxies)
             HashSet<string>? set = null;
-            if (originalProfile.Options.TryGetOption("artifactList", out string[]? artifactList, SourceGenerationContext.s_context.StringArray) && isFindTool)
+            if (originalProfile.Options.TryGetOption("artifactList", out string[]? artifactList, SourceGenerationContext.SharedContext.StringArray) && isFindTool)
             {
                 set = artifactList.ToHashSet();
             }

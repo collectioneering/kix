@@ -42,31 +42,31 @@ public static class JsonPropertyFileUtility
 
     public static IReadOnlyDictionary<string, JsonElement>? LoadProperties(Stream stream)
     {
-        return JsonSerializer.Deserialize(stream, SourceGenerationContext.s_context.IReadOnlyDictionaryStringJsonElement);
+        return JsonSerializer.Deserialize(stream, SourceGenerationContext.SharedContext.IReadOnlyDictionaryStringJsonElement);
     }
 
     public static ValueTask<IReadOnlyDictionary<string, JsonElement>?> LoadPropertiesAsync(Stream stream)
     {
-        return JsonSerializer.DeserializeAsync(stream, SourceGenerationContext.s_context.IReadOnlyDictionaryStringJsonElement);
+        return JsonSerializer.DeserializeAsync(stream, SourceGenerationContext.SharedContext.IReadOnlyDictionaryStringJsonElement);
     }
 
     public static Dictionary<string, JsonElement>? LoadPropertiesWritable(Stream stream)
     {
-        return JsonSerializer.Deserialize(stream, SourceGenerationContext.s_context.DictionaryStringJsonElement);
+        return JsonSerializer.Deserialize(stream, SourceGenerationContext.SharedContext.DictionaryStringJsonElement);
     }
 
     public static ValueTask<Dictionary<string, JsonElement>?> LoadPropertiesWritableAsync(Stream stream)
     {
-        return JsonSerializer.DeserializeAsync(stream, SourceGenerationContext.s_context.DictionaryStringJsonElement);
+        return JsonSerializer.DeserializeAsync(stream, SourceGenerationContext.SharedContext.DictionaryStringJsonElement);
     }
 
     public static void StoreProperties(Stream stream, IReadOnlyDictionary<string, JsonElement> properties)
     {
-        JsonSerializer.Serialize(stream, properties, SourceGenerationContext.s_context.IReadOnlyDictionaryStringJsonElement);
+        JsonSerializer.Serialize(stream, properties, SourceGenerationContext.SharedContext.IReadOnlyDictionaryStringJsonElement);
     }
 
     public static Task StorePropertiesAsync(Stream stream, IReadOnlyDictionary<string, JsonElement> properties)
     {
-        return JsonSerializer.SerializeAsync(stream, properties, SourceGenerationContext.s_context.IReadOnlyDictionaryStringJsonElement);
+        return JsonSerializer.SerializeAsync(stream, properties, SourceGenerationContext.SharedContext.IReadOnlyDictionaryStringJsonElement);
     }
 }
