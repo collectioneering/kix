@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore src
     - name: Build
-      run: dotnet build src --configuration Release -f "$DN_TFM" --no-restore
+      run: dotnet build src --configuration Release -f "$DN_TFM" --no-restore -p:BuildInParallel=false
     - name: Test
       run: dotnet test src --configuration Release -f "$DN_TFM" --no-build --verbosity normal
     - name: Read version
