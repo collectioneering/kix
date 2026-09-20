@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 
 namespace Art.Tesler.Database;
 
@@ -55,5 +56,53 @@ public abstract class DatabaseCommandBase : CommandBase
         Add(ListResourceOption);
         DetailedOption = new Option<bool>("--detailed") { Description = "Show detailed information on entries" };
         Add(DetailedOption);
+    }
+
+    protected void ValidateDatabaseFilter(CommandResult result, Option<bool>? allOption)
+    {
+        bool anyFilters = false;
+        anyFilters |= result.GetValue(ToolOption) != null;
+        anyFilters |= result.GetValue(GroupOption) != null;
+        anyFilters |= result.GetValue(ToolLikeOption) != null;
+        anyFilters |= result.GetValue(GroupLikeOption) != null;
+        anyFilters |= result.GetValue(IdOption) != null;
+        anyFilters |= result.GetValue(IdLikeOption) != null;
+        anyFilters |= result.GetValue(NameLikeOption) != null;
+        bool all = allOption == null || result.GetValue(allOption);
+        bool invert = result.GetValue(InvertOption);
+        bool skipInvertError = false;
+        if (allOption != null)
+        {
+            if (all)
+            {
+                if (anyFilters)
+                {
+                    result.AddError($"Cannot specify {allOption.Name} when filters have been specified.");
+                }
+            }
+            else if (!anyFilters)
+            {
+                if (invert)
+                {
+                    result.AddError($"At least one filter must be specified with {InvertOption.Name}.");
+                    skipInvertError = true;
+                }
+                else
+                {
+                    result.AddError($"At least one filter or {allOption.Name} must be specified.");
+                }
+            }
+            if (!skipInvertError && all && invert)
+            {
+                result.AddError($"Cannot use {InvertOption.Name} when {allOption.Name} is specified.");
+            }
+        }
+        else
+        {
+            if (!anyFilters && invert)
+            {
+                result.AddError($"Cannot use {InvertOption.Name} when no filters are specified.");
+            }
+        }
     }
 }

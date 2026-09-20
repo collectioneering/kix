@@ -28,6 +28,7 @@ public class DatabaseCommandList : DatabaseCommandBase
         OutputOption = new Option<FileInfo>("-o", "--output") { HelpName = "file", Description = "Generate profile file" };
         OutputOption.AcceptLegalFilePathsOnly();
         Add(OutputOption);
+        Validators.Add(result => ValidateDatabaseFilter(result, null));
     }
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)

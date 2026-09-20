@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Text.Json;
 using Art.Common;
 
@@ -57,28 +58,7 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         RefactoringsFileOption = new Option<FileInfo>("--refactorings-file") { HelpName = "file", Description = "Use this file to apply type or assembly refactorings" };
         RefactoringsFileOption.AcceptExistingOnly();
         Add(RefactoringsFileOption);
-        Validators.Add(result =>
-        {
-            bool anyFilters = false;
-            anyFilters |= result.GetValue(ToolOption) != null;
-            anyFilters |= result.GetValue(GroupOption) != null;
-            anyFilters |= result.GetValue(ToolLikeOption) != null;
-            anyFilters |= result.GetValue(GroupLikeOption) != null;
-            anyFilters |= result.GetValue(IdOption) != null;
-            anyFilters |= result.GetValue(IdLikeOption) != null;
-            anyFilters |= result.GetValue(NameLikeOption) != null;
-            if (result.GetValue(AllOption))
-            {
-                if (anyFilters)
-                {
-                    result.AddError("Cannot specify --all when filters have been specified.");
-                }
-            }
-            else if (!anyFilters)
-            {
-                result.AddError("At least one filter or --all must be specified.");
-            }
-        });
+        Validators.Add(result => ValidateDatabaseFilter(result, AllOption));
     }
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)

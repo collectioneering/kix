@@ -24,28 +24,7 @@ public class DatabaseCommandDelete : DatabaseCommandBase
         Add(AllOption);
         DoDeleteOption = new Option<bool>("--do-delete") { Description = "Perform actual delete" };
         Add(DoDeleteOption);
-        Validators.Add(result =>
-        {
-            bool anyFilters = false;
-            anyFilters |= result.GetValue(ToolOption) != null;
-            anyFilters |= result.GetValue(GroupOption) != null;
-            anyFilters |= result.GetValue(ToolLikeOption) != null;
-            anyFilters |= result.GetValue(GroupLikeOption) != null;
-            anyFilters |= result.GetValue(IdOption) != null;
-            anyFilters |= result.GetValue(IdLikeOption) != null;
-            anyFilters |= result.GetValue(NameLikeOption) != null;
-            if (result.GetValue(AllOption))
-            {
-                if (anyFilters)
-                {
-                    result.AddError("Cannot specify --all when filters have been specified.");
-                }
-            }
-            else if (!anyFilters)
-            {
-                result.AddError("At least one filter or --all must be specified.");
-            }
-        });
+        Validators.Add(result => ValidateDatabaseFilter(result, AllOption));
     }
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
