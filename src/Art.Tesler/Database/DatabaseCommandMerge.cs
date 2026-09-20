@@ -63,8 +63,9 @@ public class DatabaseCommandMerge : DatabaseCommandBase
 
     protected override async Task<int> RunAsync(ParseResult parseResult, CancellationToken cancellationToken)
     {
+        bool doMerge = parseResult.GetValue(DoMergeOption);
         FileInfo? refactoringsFile = parseResult.GetValue(RefactoringsFileOption);
-        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: true);
+        using var arm = RegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: !doMerge);
         using var inputArm = InputRegistrationProvider.CreateArtifactRegistrationManager(parseResult, isReadonly: true);
         IEnumerable<ArtifactInfo> en;
         Refactorings? refactorings = null;
@@ -98,7 +99,6 @@ public class DatabaseCommandMerge : DatabaseCommandBase
         MergeFilter mergeFilter = parseResult.GetValue(MergeFilterOption);
         int v = 0;
         bool list = parseResult.GetValue(ListOption);
-        bool doMerge = parseResult.GetValue(DoMergeOption);
         bool listResource = parseResult.GetValue(ListResourceOption);
         bool detailed = parseResult.GetValue(DetailedOption);
         foreach (ArtifactInfo inputArtifactInfo in en.ToList())
