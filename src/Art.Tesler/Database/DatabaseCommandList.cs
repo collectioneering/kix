@@ -44,6 +44,7 @@ public class DatabaseCommandList : DatabaseCommandBase
         string? id = parseResult.GetValue(IdOption);
         string? idLike = parseResult.GetValue(IdLikeOption);
         string? nameLike = parseResult.GetValue(NameLikeOption);
+        bool invert = parseResult.GetValue(InvertOption);
         Refactorings? refactorings = null;
         if (refactoringsFile != null)
         {
@@ -56,7 +57,7 @@ public class DatabaseCommandList : DatabaseCommandBase
                 throw new InvalidDataException($"Unexpected null JSON in {refactoringsFile.FullName}");
             }
         }
-        IEnumerable<ArtifactInfo> en = (await arm.ListArtifactsOptionalsAsync(tool, group, cancellationToken: cancellationToken).ConfigureAwait(false)).WithFilters(tool, toolLike, group, groupLike, id, idLike, nameLike);
+        IEnumerable<ArtifactInfo> en = await arm.RetrieveEntriesAsync(tool, toolLike, group, groupLike, id, idLike, nameLike, invert, cancellationToken: cancellationToken).ConfigureAwait(false);
         bool listResource = parseResult.GetValue(ListResourceOption);
         bool detailed = parseResult.GetValue(DetailedOption);
         foreach (ArtifactInfo inputArtifactInfo in en)

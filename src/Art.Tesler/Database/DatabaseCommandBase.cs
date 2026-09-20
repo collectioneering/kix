@@ -20,6 +20,8 @@ public abstract class DatabaseCommandBase : CommandBase
 
     protected Option<string> NameLikeOption;
 
+    protected Option<bool> InvertOption;
+
     protected Option<bool> ListResourceOption;
 
     protected Option<bool> DetailedOption;
@@ -47,6 +49,8 @@ public abstract class DatabaseCommandBase : CommandBase
         Add(IdLikeOption);
         NameLikeOption = new Option<string>("--name-like") { HelpName = "pattern", Description = "Name pattern to filter by" };
         Add(NameLikeOption);
+        InvertOption = new Option<bool>("--invert") { Description = "Invert applied filter" };
+        Add(InvertOption);
         ListResourceOption = new Option<bool>("-l", "--list-resource") { Description = "List resource items" };
         Add(ListResourceOption);
         DetailedOption = new Option<bool>("--detailed") { Description = "Show detailed information on entries" };

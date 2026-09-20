@@ -112,7 +112,8 @@ public class DatabaseCommandMerge : DatabaseCommandBase
             string? id = parseResult.GetValue(IdOption);
             string? idLike = parseResult.GetValue(IdLikeOption);
             string? nameLike = parseResult.GetValue(NameLikeOption);
-            en = (await inputArm.ListArtifactsOptionalsAsync(tool, group, cancellationToken: cancellationToken).ConfigureAwait(false)).WithFilters(tool, toolLike, group, groupLike, id, idLike, nameLike);
+            bool invert = parseResult.GetValue(InvertOption);
+            en = await inputArm.RetrieveEntriesAsync(tool, toolLike, group, groupLike, id, idLike, nameLike, invert, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         MergeFilter mergeFilter = parseResult.GetValue(MergeFilterOption);
         int v = 0;

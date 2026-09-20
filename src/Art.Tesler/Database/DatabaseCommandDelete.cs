@@ -66,7 +66,8 @@ public class DatabaseCommandDelete : DatabaseCommandBase
             string? id = parseResult.GetValue(IdOption);
             string? idLike = parseResult.GetValue(IdLikeOption);
             string? nameLike = parseResult.GetValue(NameLikeOption);
-            en = (await arm.ListArtifactsOptionalsAsync(tool, group, cancellationToken: cancellationToken).ConfigureAwait(false)).WithFilters(tool, toolLike, group, groupLike, id, idLike, nameLike);
+            bool invert = parseResult.GetValue(InvertOption);
+            en = await arm.RetrieveEntriesAsync(tool, toolLike, group, groupLike, id, idLike, nameLike, invert, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
         int v = 0;
         bool list = parseResult.GetValue(ListOption);

@@ -184,7 +184,7 @@ internal static class Common
             throw new ArtUserException($"Property {k} is a {existing.ValueKind}, cannot add an element value to a non-{JsonValueKind.Array} value");
         }
         var value = existing.Deserialize<JsonElement[]>(SourceGenerationContext.SharedContext.JsonElementArray) ?? [];
-        dictionary[k] = JsonSerializer.SerializeToElement([..value, v], SourceGenerationContext.SharedContext.JsonElementArray);
+        dictionary[k] = JsonSerializer.SerializeToElement([.. value, v], SourceGenerationContext.SharedContext.JsonElementArray);
     }
 
     // https://stackoverflow.com/a/4146349
@@ -192,30 +192,99 @@ internal static class Common
         (full ? "^" : "") + Regex.Escape(pattern).Replace(@"\*", ".*").Replace(@"\?", ".") + (full ? "$" : ""),
         (caseSensitive ? 0 : RegexOptions.IgnoreCase) | RegexOptions.Singleline);
 
-    internal static IEnumerable<ArtifactInfo> WithFilters(this IEnumerable<ArtifactInfo> enumerable, string? tool, string? toolLike, string? group, string? groupLike, string? id, string? idLike, string? nameLike)
+    internal static async Task<IEnumerable<ArtifactInfo>> RetrieveEntriesAsync(
+        this IArtifactRegistrationManager artifactRegistrationManager,
+        string? tool,
+        string? toolLike,
+        string? group,
+        string? groupLike,
+        string? id,
+        string? idLike,
+        string? nameLike,
+        bool invert,
+        CancellationToken cancellationToken = default)
     {
-        if (id != null) enumerable = enumerable.Where(v => v.Key.Id == id);
-        if (toolLike != null && tool == null)
+        IEnumerable<ArtifactInfo> enumerable;
+        if (invert)
         {
-            Regex r = GetFilterRegex(toolLike, false, false);
-            enumerable = enumerable.Where(v => r.IsMatch(v.Key.Tool));
+            enumerable = await artifactRegistrationManager.ListArtifactsAsync(cancellationToken).ConfigureAwait(false);
+            List<Predicate<ArtifactInfo>> predicates = [];
+            if (id != null)
+            {
+                predicates.Add(v => v.Key.Id == id);
+            }
+            if (tool != null)
+            {
+                predicates.Add(v => v.Key.Tool == tool);
+            }
+            else if (toolLike != null)
+            {
+                Regex r = GetFilterRegex(toolLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Tool));
+            }
+            if (group != null)
+            {
+                predicates.Add(v => v.Key.Group == group);
+            }
+            else if (groupLike != null)
+            {
+                Regex r = GetFilterRegex(groupLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Group));
+            }
+            if (idLike != null && id == null)
+            {
+                Regex r = GetFilterRegex(idLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Id));
+            }
+            if (nameLike != null)
+            {
+                Regex r = GetFilterRegex(nameLike, false, false);
+                predicates.Add(v => v.Name != null && r.IsMatch(v.Name));
+            }
+            return enumerable.Where(v => !predicates.All(predicate => predicate(v)));
         }
-        if (groupLike != null && group == null)
+        else
         {
-            Regex r = GetFilterRegex(groupLike, false, false);
-            enumerable = enumerable.Where(v => r.IsMatch(v.Key.Group));
+            if (tool != null)
+            {
+                enumerable = group != null
+                    ? await artifactRegistrationManager.ListArtifactsAsync(tool, group, cancellationToken).ConfigureAwait(false)
+                    : await artifactRegistrationManager.ListArtifactsAsync(tool, cancellationToken).ConfigureAwait(false);
+            }
+            else
+            {
+                enumerable = group != null
+                    ? (await artifactRegistrationManager.ListArtifactsAsync(cancellationToken).ConfigureAwait(false))
+                    .Where(v => v.Key.Group == group)
+                    : await artifactRegistrationManager.ListArtifactsAsync(cancellationToken).ConfigureAwait(false);
+            }
+            List<Predicate<ArtifactInfo>> predicates = [];
+            if (id != null)
+            {
+                predicates.Add(v => v.Key.Id == id);
+            }
+            if (toolLike != null && tool == null)
+            {
+                Regex r = GetFilterRegex(toolLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Tool));
+            }
+            if (groupLike != null && group == null)
+            {
+                Regex r = GetFilterRegex(groupLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Group));
+            }
+            if (idLike != null && id == null)
+            {
+                Regex r = GetFilterRegex(idLike, false, false);
+                predicates.Add(v => r.IsMatch(v.Key.Id));
+            }
+            if (nameLike != null)
+            {
+                Regex r = GetFilterRegex(nameLike, false, false);
+                predicates.Add(v => v.Name != null && r.IsMatch(v.Name));
+            }
+            return enumerable.Where(v => predicates.All(predicate => predicate(v)));
         }
-        if (idLike != null && id == null)
-        {
-            Regex r = GetFilterRegex(idLike, false, false);
-            enumerable = enumerable.Where(v => r.IsMatch(v.Key.Id));
-        }
-        if (nameLike != null)
-        {
-            Regex r = GetFilterRegex(nameLike, false, false);
-            enumerable = enumerable.Where(v => v.Name != null && r.IsMatch(v.Name));
-        }
-        return enumerable;
     }
 
     internal static string GetInvalidHashMessage(string hash)
